@@ -43,7 +43,7 @@ public class Consumption {
     private BigDecimal percentage;
 
     @JsonProperty(access = Access.WRITE_ONLY)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "nourishment_id", nullable = false)
     private Nourishment nourishment;
 

@@ -57,12 +57,11 @@ public class User {
 
     @OneToMany(
             cascade = CascadeType.ALL,
-            mappedBy = "user",
-            fetch = FetchType.LAZY
+            mappedBy = "user"
     )
     private Collection<Nourishment> nourishments;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(
             name = "user_consumption",
             joinColumns = @JoinColumn(name = "user_id"),
