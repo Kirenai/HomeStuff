@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UserService implements GeneralService<UserDto, Long> {
 
     private final UserRepository userRepository;
-    private final ModelMapper modelmapper;
+    private final ModelMapper modelMapper;
 
     @Override
     public List<UserDto> findAll(Pageable pageable) {
@@ -32,7 +32,7 @@ public class UserService implements GeneralService<UserDto, Long> {
         return this.userRepository.findAll(pageable)
             .getContent()
             .stream()
-            .map(u -> this.modelmapper.map(u, UserDto.class))
+            .map(u -> this.modelMapper.map(u, UserDto.class))
             .collect(Collectors.toList());
     }
 
@@ -41,15 +41,15 @@ public class UserService implements GeneralService<UserDto, Long> {
         log.info("Calling the findOne methond in UserService");
         User user = this.userRepository.findById(id)
             .orElseThrow(() -> new IllegalStateException("User don't found"));
-        return this.modelmapper.map(user, UserDto.class);
+        return this.modelMapper.map(user, UserDto.class);
     }
 
     @Override
     public UserDto create(UserDto data) {
         log.info("Calling the create methond in UserService");
-        User userData = this.modelmapper.map(data, User.class);
+        User userData = this.modelMapper.map(data, User.class);
         User userSaved = this.userRepository.save(userData);
-        return this.modelmapper.map(userSaved, UserDto.class);
+        return this.modelMapper.map(userSaved, UserDto.class);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class UserService implements GeneralService<UserDto, Long> {
                 u.setLastName(data.getLastName());
                 u.setPassword(data.getPassword());
                 u.setAge(data.getAge());
-                return this.modelmapper.map(this.userRepository.save(u), UserDto.class);
+                return this.modelMapper.map(this.userRepository.save(u), UserDto.class);
             })
             .orElseThrow(() -> new IllegalStateException("User don't found"));
     }
@@ -72,7 +72,7 @@ public class UserService implements GeneralService<UserDto, Long> {
         return this.userRepository.findById(id)
             .map(u -> {
                 this.userRepository.delete(u);
-                return this.modelmapper.map(u, UserDto.class);
+                return this.modelMapper.map(u, UserDto.class);
             })
             .orElseThrow(() -> new IllegalStateException("User don't found"));
     }

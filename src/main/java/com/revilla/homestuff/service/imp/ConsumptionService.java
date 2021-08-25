@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ConsumptionService implements GeneralService<ConsumptionDto, Long> {
 
     private final ConsumptionRepository consumptionRepository;
-    private final ModelMapper modelmapper;
+    private final ModelMapper modelMapper;
 
 	@Override
 	public List<ConsumptionDto> findAll(Pageable pageable) {
@@ -32,7 +32,7 @@ public class ConsumptionService implements GeneralService<ConsumptionDto, Long> 
         return this.consumptionRepository.findAll(pageable)
             .getContent()
             .stream()
-            .map(c -> this.modelmapper.map(c, ConsumptionDto.class))
+            .map(c -> this.modelMapper.map(c, ConsumptionDto.class))
             .collect(Collectors.toList());
 	}
 
@@ -41,15 +41,15 @@ public class ConsumptionService implements GeneralService<ConsumptionDto, Long> 
         log.info("Calling the findOne methond in ConsumptionService");
         Consumption consumption = this.consumptionRepository.findById(id)
             .orElseThrow(() -> new IllegalStateException("Consumption don't found"));
-        return this.modelmapper.map(consumption, ConsumptionDto.class);
+        return this.modelMapper.map(consumption, ConsumptionDto.class);
 	}
 
 	@Override
 	public ConsumptionDto create(ConsumptionDto data) {
         log.info("Calling the create methond in ConsumptionService");
-        Consumption consumptionData = this.modelmapper.map(data, Consumption.class);
+        Consumption consumptionData = this.modelMapper.map(data, Consumption.class);
         Consumption consumptionSaved = this.consumptionRepository.save(consumptionData);
-        return this.modelmapper.map(consumptionSaved, ConsumptionDto.class);
+        return this.modelMapper.map(consumptionSaved, ConsumptionDto.class);
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public class ConsumptionService implements GeneralService<ConsumptionDto, Long> 
             .map(c -> {
                 c.setUnit(data.getUnit());
                 c.setPercentage(data.getPercentage());
-                return this.modelmapper.map(this.consumptionRepository.save(c), ConsumptionDto.class);
+                return this.modelMapper.map(this.consumptionRepository.save(c), ConsumptionDto.class);
             })
             .orElseThrow(() -> new IllegalStateException("Consumption don't found"));
     }
@@ -70,7 +70,7 @@ public class ConsumptionService implements GeneralService<ConsumptionDto, Long> 
         return this.consumptionRepository.findById(id)
             .map(c -> {
                 this.consumptionRepository.delete(c);
-                return this.modelmapper.map(c, ConsumptionDto.class);
+                return this.modelMapper.map(c, ConsumptionDto.class);
             })
             .orElseThrow(() -> new IllegalStateException("Consumption don't found"));
 	}

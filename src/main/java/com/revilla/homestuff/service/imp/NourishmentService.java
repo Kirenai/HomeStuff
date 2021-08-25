@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import com.revilla.homestuff.dto.NourishmentDto;
 import com.revilla.homestuff.entity.Nourishment;
-import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.repository.NourishmentRepository;
 import com.revilla.homestuff.service.GeneralService;
 import org.modelmapper.ModelMapper;
@@ -25,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 public class NourishmentService implements GeneralService<NourishmentDto, Long> {
 
     private final NourishmentRepository nourishmentRepository;
-    private final ModelMapper modelmapper;
+    private final ModelMapper modelMapper;
 
 	@Override
 	public List<NourishmentDto> findAll(Pageable pageable) {
@@ -33,7 +32,7 @@ public class NourishmentService implements GeneralService<NourishmentDto, Long> 
         return this.nourishmentRepository.findAll(pageable)
             .getContent()
             .stream()
-            .map(n -> this.modelmapper.map(n, NourishmentDto.class))
+            .map(n -> this.modelMapper.map(n, NourishmentDto.class))
             .collect(Collectors.toList());
 	}
 
@@ -42,15 +41,15 @@ public class NourishmentService implements GeneralService<NourishmentDto, Long> 
         log.info("Calling the findOne methond in NourishmentService");
         Nourishment nourishment = this.nourishmentRepository.findById(id)
             .orElseThrow(() -> new IllegalStateException("Nourishment don't found"));
-        return this.modelmapper.map(nourishment, NourishmentDto.class);
+        return this.modelMapper.map(nourishment, NourishmentDto.class);
 	}
 
 	@Override
 	public NourishmentDto create(NourishmentDto data) {
         log.info("Calling the create methond in NourishmentService");
-        Nourishment userData = this.modelmapper.map(data, Nourishment.class);
+        Nourishment userData = this.modelMapper.map(data, Nourishment.class);
         Nourishment userSaved = this.nourishmentRepository.save(userData);
-        return this.modelmapper.map(userSaved, NourishmentDto.class);
+        return this.modelMapper.map(userSaved, NourishmentDto.class);
 	}
 
 	@Override
@@ -62,7 +61,7 @@ public class NourishmentService implements GeneralService<NourishmentDto, Long> 
                 n.setImagePath(data.getImagePath());
                 n.setDescription(data.getDescription());
                 n.setIsAvailable(data.getIsAvailable());
-                return this.modelmapper.map(this.nourishmentRepository.save(n), NourishmentDto.class);
+                return this.modelMapper.map(this.nourishmentRepository.save(n), NourishmentDto.class);
             })
             .orElseThrow(() -> new IllegalStateException("User don't found"));
 	}
@@ -73,7 +72,7 @@ public class NourishmentService implements GeneralService<NourishmentDto, Long> 
         return this.nourishmentRepository.findById(id)
             .map(u -> {
                 this.nourishmentRepository.delete(u);
-                return this.modelmapper.map(u, NourishmentDto.class);
+                return this.modelMapper.map(u, NourishmentDto.class);
             })
             .orElseThrow(() -> new IllegalStateException("User don't found"));
 	}
