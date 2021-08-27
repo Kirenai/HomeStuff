@@ -13,7 +13,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,7 +28,7 @@ import lombok.ToString;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
+@ToString(exclude = {"nourishments", "consumptions"})
 @Entity
 @Table(name = "users", uniqueConstraints = {
         @UniqueConstraint(name = "unq_username", columnNames = {"username"})
@@ -54,12 +55,11 @@ public class User {
     @Column(name = "age", nullable = false)
     private Byte age;
 
-    @OneToMany(
-            cascade = CascadeType.ALL,
-            mappedBy = "user"
-    )
+    @JsonProperty(access = Access.WRITE_ONLY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Collection<Nourishment> nourishments;
 
+    @JsonProperty(access = Access.WRITE_ONLY)
     @ManyToMany
     @JoinTable(
             name = "users_roles",
@@ -67,6 +67,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Collection<Role> roles;
 
+    @JsonProperty(access = Access.WRITE_ONLY)
     @ManyToMany
     @JoinTable(
             name = "user_consumption",

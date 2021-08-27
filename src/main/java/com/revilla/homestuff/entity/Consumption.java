@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -42,7 +43,7 @@ public class Consumption {
     private BigDecimal percentage;
 
     @JsonProperty(access = Access.WRITE_ONLY)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "nourishment_id", nullable = false)
     private Nourishment nourishment;
 

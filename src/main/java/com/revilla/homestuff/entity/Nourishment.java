@@ -3,6 +3,7 @@ package com.revilla.homestuff.entity;
 import java.util.Collection;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -51,14 +52,14 @@ public class Nourishment {
     private Boolean isAvailable;
 
     @JsonProperty(access = Access.WRITE_ONLY)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false,
         foreignKey = @ForeignKey(name = "fk_user_id")
     )
     private User user;
 
     @JsonProperty(access = Access.WRITE_ONLY)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
