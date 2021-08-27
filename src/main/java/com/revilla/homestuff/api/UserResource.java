@@ -2,7 +2,7 @@ package com.revilla.homestuff.api;
 
 import java.util.List;
 import com.revilla.homestuff.dto.UserDto;
-import com.revilla.homestuff.service.GeneralService;
+import com.revilla.homestuff.service.UserService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class UserResource {
 
     @Qualifier("user.service")
-    private final GeneralService<UserDto, Long> userService;
+    private final UserService userService;
 
     @GetMapping
     public List<UserDto> getUsers(Pageable pageable) {

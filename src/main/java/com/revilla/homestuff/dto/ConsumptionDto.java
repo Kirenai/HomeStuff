@@ -4,20 +4,22 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.revilla.homestuff.entity.Nourishment;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * ConsumptionDto
  * @author Kirenai
  */
 @Data
+@ToString(exclude = {"nourishment", "users"})
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonInclude(content = Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ConsumptionDto {
 
@@ -27,8 +29,10 @@ public class ConsumptionDto {
 
     private BigDecimal percentage;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Nourishment nourishment;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Collection<UserDto> users;
 
 }
