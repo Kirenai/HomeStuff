@@ -29,14 +29,15 @@ public class NourishmentDto {
 
     private String description;
 
-    private Boolean isAvailable;
+    //private Boolean isAvailable;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private UserDto user;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private CategoryDto category;
 
     private Collection<ConsumptionDto> consumptions;
+
+    private AmountNourishementDto amountNourishment;
 
 }

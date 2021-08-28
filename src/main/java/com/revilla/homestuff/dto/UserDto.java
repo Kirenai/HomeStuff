@@ -30,4 +30,6 @@ public class UserDto {
 
     private Collection<NourishmentDto> nourishments;
 
+    private Collection<ConsumptionDto> consumptions;
+
 }

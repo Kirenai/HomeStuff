@@ -22,7 +22,6 @@ import lombok.ToString;
 
 /**
  * User
- *
  * @author Kirenai
  */
 @Data

@@ -5,6 +5,7 @@ import java.util.Collection;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -39,16 +40,18 @@ public class Consumption {
     @Column(name = "unit")
     private Byte unit;
 
-    @Column(name = "percentage", precision = 10, scale = 2)
+    @Column(name = "percentage", precision = 3, scale = 2)
     private BigDecimal percentage;
 
     @JsonProperty(access = Access.WRITE_ONLY)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "nourishment_id", nullable = false)
+    @JoinColumn(name = "nourishment_id", nullable = false,
+        foreignKey = @ForeignKey(name = "fk_nourishment_id")
+    )
     private Nourishment nourishment;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    /*@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToMany(mappedBy = "consumptions")
-    private Collection<User> users;
+    private Collection<User> users;*/
 
 }

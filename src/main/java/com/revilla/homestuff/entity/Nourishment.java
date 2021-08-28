@@ -1,6 +1,7 @@
 package com.revilla.homestuff.entity;
 
 import java.util.Collection;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,7 +11,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -49,7 +53,7 @@ public class Nourishment {
     private String description;
 
     @Column(name = "is_available", nullable = false)
-    private Boolean isAvailable;
+    private Boolean isAvailable = true;
 
     @JsonProperty(access = Access.WRITE_ONLY)
     @ManyToOne(fetch = FetchType.LAZY)
@@ -59,11 +63,17 @@ public class Nourishment {
     private User user;
 
     @JsonProperty(access = Access.WRITE_ONLY)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false,
+        foreignKey = @ForeignKey(name = "fk_category_id")
+    )
     private Category category;
 
     @OneToMany(mappedBy = "nourishment")
     private Collection<Consumption> consumptions;
+
+    @OneToOne(mappedBy = "nourishment", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private AmountNourishment amountNourishment;
 
 }

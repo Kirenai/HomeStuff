@@ -1,6 +1,5 @@
 package com.revilla.homestuff.dto;
 
-import java.util.Collection;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -24,6 +23,5 @@ public class CategoryDto {
 
     private String name;
 
-    private Collection<NourishmentDto> nourishment;
 }
 
