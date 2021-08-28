@@ -2,9 +2,11 @@ package com.revilla.homestuff.service.imp;
 
 import javax.transaction.Transactional;
 import com.revilla.homestuff.dto.NourishmentDto;
+import com.revilla.homestuff.entity.AmountNourishment;
 import com.revilla.homestuff.entity.Category;
 import com.revilla.homestuff.entity.Nourishment;
 import com.revilla.homestuff.entity.User;
+import com.revilla.homestuff.repository.AmountNourishmentRepository;
 import com.revilla.homestuff.repository.CategoryRepository;
 import com.revilla.homestuff.repository.NourishmentRepository;
 import com.revilla.homestuff.repository.UserRepository;
@@ -30,6 +32,7 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
     private final NourishmentRepository nourishmentRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final AmountNourishmentRepository amountNourishmentRepository;
     private final ModelMapper modelMapper;
 
     @Override
@@ -51,6 +54,7 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
             .orElseThrow(() -> new IllegalStateException("Category don't found"));
         nourishment.setUser(user);
         nourishment.setCategory(category);
+        nourishment.getAmountNourishment().setNourishment(nourishment);
         Nourishment nourishmentSaved = this.nourishmentRepository.save(nourishment);
         return this.modelMapper.map(nourishmentSaved, this.getFirstGenericClass());
     }
@@ -63,7 +67,6 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
                 n.setName(data.getName());
                 n.setImagePath(data.getImagePath());
                 n.setDescription(data.getDescription());
-                n.setIsAvailable(data.getIsAvailable());
                 return this.modelMapper.map(this.nourishmentRepository.save(n), NourishmentDto.class);
             })
             .orElseThrow(() -> new IllegalStateException("User don't found"));

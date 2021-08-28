@@ -41,7 +41,7 @@ public class CategoryServiceImp extends GeneralServiceImp<CategoryDto, Long, Cat
 
 	@Override
 	public CategoryDto update(Long id, CategoryDto data) {
-        log.info("Calling the update methond in CategoryService");
+        log.info("Calling the update methond in " + getClass());
         return this.categoryRepository.findById(id)
             .map(c -> {
                 c.setName(data.getName());
