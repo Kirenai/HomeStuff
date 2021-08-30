@@ -1,7 +1,6 @@
 package com.revilla.homestuff.dto;
 
 import java.math.BigDecimal;
-import java.util.Collection;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,7 +15,7 @@ import lombok.ToString;
  * @author Kirenai
  */
 @Data
-@ToString(exclude = {"nourishment", "users"})
+@ToString(exclude = {"nourishment", "user"})
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -33,6 +32,6 @@ public class ConsumptionDto {
     private NourishmentDto nourishment;
 
     //@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private Collection<UserDtoOnly> users;
+    private UserDtoOnly user;
 
 }

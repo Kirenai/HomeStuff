@@ -72,8 +72,8 @@ public class ConsumptionServiceImp extends GeneralServiceImp<ConsumptionDto, Lon
             }
         }
         consumption.setNourishment(nourishment);
+        consumption.setUser(user);
         Consumption consumptionSaved = this.consumptionRepository.save(consumption);
-        user.getConsumptions().add(consumption);
         return this.modelMapper.map(consumptionSaved, this.getFirstGenericClass());
     }
 

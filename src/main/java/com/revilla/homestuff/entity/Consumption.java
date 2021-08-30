@@ -1,7 +1,6 @@
 package com.revilla.homestuff.entity;
 
 import java.math.BigDecimal;
-import java.util.Collection;
 import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -44,7 +43,8 @@ public class Consumption {
     private Nourishment nourishment;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @ManyToMany(mappedBy = "consumptions")
-    private Collection<User> users;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
 }

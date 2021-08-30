@@ -27,4 +27,6 @@ public class ConsumptionDtoOnly {
 
     private BigDecimal percentage;
 
+    private NourishmentDtoOnly nourishment;
+
 }
