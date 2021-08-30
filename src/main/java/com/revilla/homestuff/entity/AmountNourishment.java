@@ -6,8 +6,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapsId;
@@ -42,8 +40,9 @@ public class AmountNourishment {
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @MapsId
-    @JoinColumn(name = "amountn_id", 
-        foreignKey = @ForeignKey(name = "fk_nourishment_id")
+    @JoinColumn(
+            name = "amountn_id",
+            foreignKey = @ForeignKey(name = "fk_nourishment_id")
     )
     private Nourishment nourishment;
 

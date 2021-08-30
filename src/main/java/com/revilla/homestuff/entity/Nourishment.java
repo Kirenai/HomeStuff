@@ -11,7 +11,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
@@ -53,7 +52,7 @@ public class Nourishment {
     private String description;
 
     @Column(name = "is_available", nullable = false)
-    private Boolean isAvailable = true;
+    private Boolean isAvailable;
 
     @JsonProperty(access = Access.WRITE_ONLY)
     @ManyToOne(fetch = FetchType.LAZY)
