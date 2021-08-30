@@ -3,33 +3,24 @@ package com.revilla.homestuff.dto;
 import java.util.Collection;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.revilla.homestuff.dto.only.ConsumptionDtoOnly;
+import com.revilla.homestuff.dto.only.NourishmentDtoOnly;
+import com.revilla.homestuff.dto.only.UserDtoOnly;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UserDto {
+public class UserDto extends UserDtoOnly {
 
-    private Long userId;
+    private Collection<NourishmentDtoOnly> nourishments;
 
-    private String username;
-
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String password;
-
-    private String firstName;
-
-    private String lastName;
-
-    private Byte age;
-
-    private Collection<NourishmentDto> nourishments;
-
-    private Collection<ConsumptionDto> consumptions;
+    private Collection<ConsumptionDtoOnly> consumptions;
 
 }

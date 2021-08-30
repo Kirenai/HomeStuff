@@ -1,7 +1,7 @@
 package com.revilla.homestuff.service.imp;
 
-import javax.transaction.Transactional;
 import com.revilla.homestuff.dto.ConsumptionDto;
+import com.revilla.homestuff.entity.AmountNourishment;
 import com.revilla.homestuff.entity.Consumption;
 import com.revilla.homestuff.entity.Nourishment;
 import com.revilla.homestuff.entity.User;
@@ -9,12 +9,16 @@ import com.revilla.homestuff.repository.ConsumptionRepository;
 import com.revilla.homestuff.repository.NourishmentRepository;
 import com.revilla.homestuff.repository.UserRepository;
 import com.revilla.homestuff.service.ConsumptionService;
+import com.revilla.homestuff.util.UserUtil;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
+import javax.transaction.Transactional;
+import java.math.BigDecimal;
 
 /**
  * ConsumptionService
@@ -43,20 +47,39 @@ public class ConsumptionServiceImp extends GeneralServiceImp<ConsumptionDto, Lon
             Long nourishmentId,
             Long userId,
             ConsumptionDto data) {
-        log.info("Calling the create methond in " + getClass());
+        log.info("Calling the create method in " + getClass());
         Consumption consumption = this.modelMapper.map(data, this.getThirdGenericClass());
         Nourishment nourishment = this.nourishmentRepository.findById(nourishmentId).orElseThrow();
-        User user = this.userRepository.findById(userId).orElseThrow();
+        User user = UserUtil.getUserOrThrow(userId, userRepository);
+        AmountNourishment amountNourishment = nourishment.getAmountNourishment();
+        if (data.getUnit() != null) { //then, refactor
+            if (Byte.toUnsignedInt(data.getUnit()) > Byte.toUnsignedInt(amountNourishment.getUnit())) {
+                throw new IllegalStateException("amount exceeded");
+            }
+            int unitUpdatedValue = (Byte.toUnsignedInt(amountNourishment.getUnit()) - Byte.toUnsignedInt(data.getUnit()));
+            amountNourishment.setUnit((byte) unitUpdatedValue);
+            if (amountNourishment.getUnit() == 0) {
+                nourishment.setIsAvailable(false);
+            }
+        } else if (data.getPercentage() != null) { //then, refactor
+            if (data.getPercentage().doubleValue() > amountNourishment.getPercentage().doubleValue()) {
+                throw new IllegalStateException("percentage exceeded");
+            }
+            double percentageUpdatedValue = (amountNourishment.getPercentage().doubleValue() - data.getPercentage().doubleValue());
+            amountNourishment.setPercentage(new BigDecimal(percentageUpdatedValue));
+            if (amountNourishment.getPercentage().doubleValue() == 0.00) {
+                nourishment.setIsAvailable(false);
+            }
+        }
         consumption.setNourishment(nourishment);
         Consumption consumptionSaved = this.consumptionRepository.save(consumption);
         user.getConsumptions().add(consumption);
-        this.userRepository.save(user);
         return this.modelMapper.map(consumptionSaved, this.getFirstGenericClass());
     }
 
     @Override
     public ConsumptionDto update(Long id, ConsumptionDto data) {
-        log.info("Calling the update methond in " + getClass());
+        log.info("Calling the update method in " + getClass());
         return this.consumptionRepository.findById(id)
             .map(c -> {
                 c.setUnit(data.getUnit());

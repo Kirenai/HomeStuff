@@ -3,38 +3,24 @@ package com.revilla.homestuff.dto;
 import java.util.Collection;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import com.revilla.homestuff.dto.only.NourishmentDtoOnly;
+import com.revilla.homestuff.dto.only.UserDtoOnly;
+import lombok.*;
 
 /**
  * NourishmentDto
  * @author Kirenai
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
-@ToString(exclude = {"user", "category"})
+@ToString(exclude = {"user"})
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class NourishmentDto {
+public class NourishmentDto extends NourishmentDtoOnly {
 
-    private Long nourishmentId;
-
-    private String name;
-
-    private String imagePath;
-
-    private String description;
-
-    //private Boolean isAvailable;
-
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private UserDto user;
-
-    private CategoryDto category;
+    private UserDtoOnly user;
 
     private Collection<ConsumptionDto> consumptions;
 

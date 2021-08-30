@@ -2,11 +2,9 @@ package com.revilla.homestuff.service.imp;
 
 import javax.transaction.Transactional;
 import com.revilla.homestuff.dto.NourishmentDto;
-import com.revilla.homestuff.entity.AmountNourishment;
 import com.revilla.homestuff.entity.Category;
 import com.revilla.homestuff.entity.Nourishment;
 import com.revilla.homestuff.entity.User;
-import com.revilla.homestuff.repository.AmountNourishmentRepository;
 import com.revilla.homestuff.repository.CategoryRepository;
 import com.revilla.homestuff.repository.NourishmentRepository;
 import com.revilla.homestuff.repository.UserRepository;
@@ -32,7 +30,6 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
     private final NourishmentRepository nourishmentRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
-    private final AmountNourishmentRepository amountNourishmentRepository;
     private final ModelMapper modelMapper;
 
     @Override
@@ -46,8 +43,9 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
             Long userId,
             Long categoryId,
             NourishmentDto data) {
-        log.info("Calling the create methond in " + getClass());
+        log.info("Calling the create method in " + getClass());
         Nourishment nourishment = this.modelMapper.map(data, this.getThirdGenericClass());
+        nourishment.setIsAvailable(true);
         User user = this.userRepository.findById(userId)
             .orElseThrow(() -> new IllegalStateException("User don't found"));
         Category category = this.categoryRepository.findById(categoryId)
@@ -61,7 +59,7 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
 
 	@Override
 	public NourishmentDto update(Long id, NourishmentDto data) {
-        log.info("Calling the update methond in NourishmentService");
+        log.info("Calling the update method in NourishmentService");
         return this.nourishmentRepository.findById(id)
             .map(n -> {
                 n.setName(data.getName());
