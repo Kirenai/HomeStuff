@@ -5,6 +5,9 @@ import com.revilla.homestuff.dto.ConsumptionDto;
 import com.revilla.homestuff.service.ConsumptionService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,10 +29,23 @@ public class ConsumptionResource {
 
     @Qualifier("consumption.service")
     private final ConsumptionService consumptionService;
-    
+
     @GetMapping
-    public ResponseEntity<List<ConsumptionDto>> getConsumptions(Pageable pageable) {
+    public ResponseEntity<List<ConsumptionDto>> getNourishments(
+            @PageableDefault(size = 3)
+            @SortDefault.SortDefaults(value = {
+                    @SortDefault(sort = "consumptionId", direction = Sort.Direction.ASC)
+            }) Pageable pageable
+    ) {
         List<ConsumptionDto> response = this.consumptionService.findAll(pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/{consumptionId}")
+    public ResponseEntity<ConsumptionDto> getConsumption(
+            @PathVariable Long consumptionId
+    ) {
+        ConsumptionDto response = this.consumptionService.findOne(consumptionId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

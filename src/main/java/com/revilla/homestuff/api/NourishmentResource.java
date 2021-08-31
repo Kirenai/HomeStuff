@@ -1,17 +1,19 @@
 package com.revilla.homestuff.api;
 
 import com.revilla.homestuff.dto.NourishmentDto;
+import com.revilla.homestuff.dto.UserDto;
 import com.revilla.homestuff.service.NourishmentService;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 /**
  * NourishmentResource
@@ -25,8 +27,21 @@ public class NourishmentResource {
     @Qualifier("nourishment.service")
     private final NourishmentService nourishmentService;
 
+    @GetMapping
+    public ResponseEntity<List<NourishmentDto>> getNourishments(
+            @PageableDefault(size = 5)
+            @SortDefault.SortDefaults(value = {
+                    @SortDefault(sort = "nourishmentId", direction = Sort.Direction.ASC)
+            }) Pageable pageable
+    ) {
+        List<NourishmentDto> response = this.nourishmentService.findAll(pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     @GetMapping("/{nourishmentId}")
-    public ResponseEntity<NourishmentDto> getNourishment(@PathVariable Long nourishmentId) {
+    public ResponseEntity<NourishmentDto> getNourishment(
+            @PathVariable Long nourishmentId
+    ) {
         NourishmentDto response = this.nourishmentService.findOne(nourishmentId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -35,7 +50,8 @@ public class NourishmentResource {
     public ResponseEntity<NourishmentDto> createNourishment(
             @PathVariable Long userId,
             @PathVariable Long categoryId,
-            @RequestBody NourishmentDto nourishmentDto) {
+            @RequestBody NourishmentDto nourishmentDto
+    ) {
         NourishmentDto response = this.nourishmentService.create(
                 userId,
                 categoryId,
@@ -43,4 +59,14 @@ public class NourishmentResource {
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @PutMapping("/{nourishmentId}")
+    public ResponseEntity<NourishmentDto> updateNourishment(
+            @PathVariable Long nourishmentId,
+            @RequestBody NourishmentDto nourishmentDto
+    ) {
+        NourishmentDto response = this.nourishmentService.update(nourishmentId, nourishmentDto);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 }
