@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * RoleServiceImp
+ *
  * @author Kirenai
  */
 @Slf4j
@@ -29,23 +30,26 @@ public class RoleServiceImp extends GeneralServiceImp<RoleDto, Long, Role> imple
         return this.roleRepository;
     }
 
-	@Override
-	public RoleDto create(RoleDto data) {
+    @Override
+    public RoleDto create(RoleDto data) {
         log.info("Calling the create method in " + this.getClass());
-        Role role = this.modelMapper.map(data, Role.class);
+        Role role = this.modelMapper.map(data, this.getThirdGenericClass());
         Role roleSaved = this.roleRepository.save(role);
-        return this.modelMapper.map(roleSaved, RoleDto.class);
-	}
+        return this.modelMapper.map(roleSaved, this.getFirstGenericClass());
+    }
 
-	@Override
-	public RoleDto update(Long id, RoleDto data) {
+    @Override
+    public RoleDto update(Long id, RoleDto data) {
         log.info("Calling the update method in " + this.getClass());
         return this.roleRepository.findById(id)
-            .map(u -> {
-                u.setName(data.getName());
-                return this.modelMapper.map(this.roleRepository.save(u), RoleDto.class);
-            })
-            .orElseThrow(() -> new IllegalStateException("User don't found"));
-	}
+                .map(u -> {
+                    u.setName(data.getName());
+                    return this.modelMapper.map(
+                            this.roleRepository.save(u),
+                            this.getFirstGenericClass()
+                    );
+                })
+                .orElseThrow(() -> new IllegalStateException("User don't found"));
+    }
 
 }
