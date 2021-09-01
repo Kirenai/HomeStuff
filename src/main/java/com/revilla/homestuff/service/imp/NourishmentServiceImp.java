@@ -43,7 +43,7 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
             Long userId,
             Long categoryId,
             NourishmentDto data) {
-        log.info("Calling the create method in " + getClass());
+        log.info("Calling the create method in " + this.getClass());
         Nourishment nourishment = this.modelMapper.map(data, this.getThirdGenericClass());
         nourishment.setIsAvailable(true);
         User user = this.userRepository.findById(userId)
@@ -59,7 +59,7 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
 
 	@Override
 	public NourishmentDto update(Long id, NourishmentDto data) {
-        log.info("Calling the update method in NourishmentService");
+        log.info("Calling the update method in " + this.getClass());
         return this.nourishmentRepository.findById(id)
             .map(n -> {
                 n.setName(data.getName());

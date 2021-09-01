@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * CategoryService
+ * @author Kirenai
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -33,7 +34,7 @@ public class CategoryServiceImp extends GeneralServiceImp<CategoryDto, Long, Cat
     @Transactional
 	@Override
 	public CategoryDto create(CategoryDto data) {
-        log.info("Calling the create methond in " + getClass());
+        log.info("Calling the create method in " + getClass());
         Category category = this.modelMapper.map(data, this.getThirdGenericClass());
         Category categorySaved = this.categoryRepository.save(category);
         return this.modelMapper.map(categorySaved, this.getFirstGenericClass());
@@ -41,7 +42,7 @@ public class CategoryServiceImp extends GeneralServiceImp<CategoryDto, Long, Cat
 
 	@Override
 	public CategoryDto update(Long id, CategoryDto data) {
-        log.info("Calling the update methond in " + getClass());
+        log.info("Calling the update method in " + getClass());
         return this.categoryRepository.findById(id)
             .map(c -> {
                 c.setName(data.getName());

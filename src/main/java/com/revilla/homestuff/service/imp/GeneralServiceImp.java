@@ -2,6 +2,7 @@ package com.revilla.homestuff.service.imp;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import com.revilla.homestuff.service.GeneralService;
 import org.modelmapper.ModelMapper;
@@ -32,8 +33,8 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
     @SuppressWarnings("unchecked") // idk, but work
     public Class<T> getFirstGenericClass(){
         if (firstGeneric == null) {
-            firstGeneric = (Class<T>) GenericTypeResolver
-                .resolveTypeArguments(this.getClass(), GeneralServiceImp.class)[0];
+            firstGeneric = (Class<T>) Objects.requireNonNull(GenericTypeResolver
+                    .resolveTypeArguments(this.getClass(), GeneralServiceImp.class))[0];
         }
         return firstGeneric;
     }
@@ -41,15 +42,15 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
     @SuppressWarnings("unchecked") // idk, but work
     public Class<E> getThirdGenericClass(){
         if (thirdGeneric == null) {
-            thirdGeneric = (Class<E>) GenericTypeResolver
-                .resolveTypeArguments(getClass(), GeneralServiceImp.class)[2];
+            thirdGeneric = (Class<E>) Objects.requireNonNull(GenericTypeResolver
+                    .resolveTypeArguments(getClass(), GeneralServiceImp.class))[2];
         }
         return thirdGeneric;
     }
 
     @Override
     public List<T> findAll(Pageable pageable) {
-        log.info("Calling the findAll methond in " + getClass());
+        log.info("Calling the findAll method in " + getClass());
         return this.getRepo().findAll(pageable)
             .getContent()
             .stream()
@@ -59,7 +60,7 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
 
     @Override
     public T findOne(ID id) {
-        log.info("Calling the findOne methond in " + getClass());
+        log.info("Calling the findOne method in " + getClass());
         E obj = this.getRepo().findById(id)
             .orElseThrow(() -> new IllegalStateException("Don't found"));
         return this.modelMapper.map(obj, this.getFirstGenericClass());
@@ -67,7 +68,7 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
 
     @Override
     public T delete(ID id) {
-        log.info("Calling the delete methond in " + getClass());
+        log.info("Calling the delete method in " + getClass());
         return this.getRepo().findById(id)
             .map(obj -> {
                 this.getRepo().delete(obj);
