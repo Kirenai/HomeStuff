@@ -5,12 +5,17 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.revilla.homestuff.dto.only.ConsumptionDtoOnly;
 import com.revilla.homestuff.dto.only.NourishmentDtoOnly;
+import com.revilla.homestuff.dto.only.RoleDtoOnly;
 import com.revilla.homestuff.dto.only.UserDtoOnly;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+/**
+ * UserDto
+ * @author Kirenai
+ */
 @EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
@@ -22,5 +27,7 @@ public class UserDto extends UserDtoOnly {
     private Collection<NourishmentDtoOnly> nourishments;
 
     private Collection<ConsumptionDtoOnly> consumptions;
+
+    private Collection<RoleDtoOnly> roles;
 
 }

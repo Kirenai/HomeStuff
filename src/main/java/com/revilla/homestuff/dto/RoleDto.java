@@ -2,25 +2,25 @@ package com.revilla.homestuff.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import com.revilla.homestuff.dto.only.RoleDtoOnly;
+import com.revilla.homestuff.dto.only.UserDtoOnly;
+import lombok.*;
+
+import java.util.Collection;
 
 /**
  * RoleDto
  * @author Kirenai
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RoleDto {
+public class RoleDto extends RoleDtoOnly {
 
-    private Long id;
-
-    private String name;
+    private Collection<UserDtoOnly> users;
 
 }
