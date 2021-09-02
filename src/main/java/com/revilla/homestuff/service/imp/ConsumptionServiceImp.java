@@ -9,7 +9,7 @@ import com.revilla.homestuff.repository.ConsumptionRepository;
 import com.revilla.homestuff.repository.NourishmentRepository;
 import com.revilla.homestuff.repository.UserRepository;
 import com.revilla.homestuff.service.ConsumptionService;
-import com.revilla.homestuff.util.UserUtil;
+import com.revilla.homestuff.util.GeneralUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 
 /**
  * ConsumptionService
+ *
  * @author Kirenai
  */
 @Slf4j
@@ -29,7 +30,7 @@ import java.math.BigDecimal;
 @Qualifier("consumption.service")
 @RequiredArgsConstructor
 public class ConsumptionServiceImp extends GeneralServiceImp<ConsumptionDto, Long, Consumption>
-    implements ConsumptionService {
+        implements ConsumptionService {
 
     private final ConsumptionRepository consumptionRepository;
     private final NourishmentRepository nourishmentRepository;
@@ -47,10 +48,13 @@ public class ConsumptionServiceImp extends GeneralServiceImp<ConsumptionDto, Lon
             Long nourishmentId,
             Long userId,
             ConsumptionDto data) {
-        log.info("Calling the create method in " + getClass());
+        log.info("Calling the create method in "
+                + GeneralUtil.simpleNameClass(this.getClass()));
         Consumption consumption = this.modelMapper.map(data, this.getThirdGenericClass());
-        Nourishment nourishment = this.nourishmentRepository.findById(nourishmentId).orElseThrow();
-        User user = UserUtil.getUserOrThrow(userId, userRepository);
+        Nourishment nourishment = GeneralUtil.getEntityByIdOrThrow(nourishmentId,
+                this.nourishmentRepository, Nourishment.class);
+        User user = GeneralUtil.getEntityByIdOrThrow(userId, this.userRepository,
+                User.class);
         AmountNourishment amountNourishment = nourishment.getAmountNourishment();
         if (data.getUnit() != null) { //then, refactor
             if (Byte.toUnsignedInt(data.getUnit()) > Byte.toUnsignedInt(amountNourishment.getUnit())) {
@@ -79,14 +83,15 @@ public class ConsumptionServiceImp extends GeneralServiceImp<ConsumptionDto, Lon
 
     @Override
     public ConsumptionDto update(Long id, ConsumptionDto data) {
-        log.info("Calling the update method in " + getClass());
+        log.info("Calling the update method in "
+                + GeneralUtil.simpleNameClass(this.getClass()));
         return this.consumptionRepository.findById(id)
-            .map(c -> {
-                c.setUnit(data.getUnit());
-                c.setPercentage(data.getPercentage());
-                return this.modelMapper.map(this.consumptionRepository.save(c), this.getFirstGenericClass());
-            })
-            .orElseThrow(() -> new IllegalStateException("Consumption don't found"));
+                .map(c -> {
+                    c.setUnit(data.getUnit());
+                    c.setPercentage(data.getPercentage());
+                    return this.modelMapper.map(this.consumptionRepository.save(c), this.getFirstGenericClass());
+                })
+                .orElseThrow(() -> new IllegalStateException("Consumption don't found"));
     }
 
 

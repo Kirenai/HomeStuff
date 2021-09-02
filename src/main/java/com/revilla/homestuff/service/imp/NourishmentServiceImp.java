@@ -9,6 +9,7 @@ import com.revilla.homestuff.repository.CategoryRepository;
 import com.revilla.homestuff.repository.NourishmentRepository;
 import com.revilla.homestuff.repository.UserRepository;
 import com.revilla.homestuff.service.NourishmentService;
+import com.revilla.homestuff.util.GeneralUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -43,13 +44,12 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
             Long userId,
             Long categoryId,
             NourishmentDto data) {
-        log.info("Calling the create method in " + this.getClass());
+        log.info("Calling the create method in "
+                + GeneralUtil.simpleNameClass(this.getClass()));
         Nourishment nourishment = this.modelMapper.map(data, this.getThirdGenericClass());
         nourishment.setIsAvailable(true);
-        User user = this.userRepository.findById(userId)
-            .orElseThrow(() -> new IllegalStateException("User don't found"));
-        Category category = this.categoryRepository.findById(categoryId)
-            .orElseThrow(() -> new IllegalStateException("Category don't found"));
+        User user = GeneralUtil.getEntityByIdOrThrow(userId, this.userRepository, User.class);
+        Category category = GeneralUtil.getEntityByIdOrThrow(categoryId, this.categoryRepository, Category.class);
         nourishment.setUser(user);
         nourishment.setCategory(category);
         nourishment.getAmountNourishment().setNourishment(nourishment);
@@ -59,13 +59,14 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
 
 	@Override
 	public NourishmentDto update(Long id, NourishmentDto data) {
-        log.info("Calling the update method in " + this.getClass());
+        log.info("Calling the update method in "
+                + GeneralUtil.simpleNameClass(this.getClass()));
         return this.nourishmentRepository.findById(id)
             .map(n -> {
                 n.setName(data.getName());
                 n.setImagePath(data.getImagePath());
                 n.setDescription(data.getDescription());
-                return this.modelMapper.map(this.nourishmentRepository.save(n), NourishmentDto.class);
+                return this.modelMapper.map(this.nourishmentRepository.save(n), this.getFirstGenericClass());
             })
             .orElseThrow(() -> new IllegalStateException("User don't found"));
 	}
