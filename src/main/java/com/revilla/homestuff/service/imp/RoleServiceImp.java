@@ -4,6 +4,7 @@ import com.revilla.homestuff.dto.RoleDto;
 import com.revilla.homestuff.entity.Role;
 import com.revilla.homestuff.repository.RoleRepository;
 import com.revilla.homestuff.service.RoleService;
+import com.revilla.homestuff.util.RoleUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -33,6 +34,7 @@ public class RoleServiceImp extends GeneralServiceImp<RoleDto, Long, Role> imple
     @Override
     public RoleDto create(RoleDto data) {
         log.info("Calling the create method in " + this.getClass());
+        RoleUtil.validateConstraintViolation(data.getName(), this.roleRepository);
         Role role = this.modelMapper.map(data, this.getThirdGenericClass());
         Role roleSaved = this.roleRepository.save(role);
         return this.modelMapper.map(roleSaved, this.getFirstGenericClass());

@@ -10,6 +10,7 @@ import com.revilla.homestuff.repository.NourishmentRepository;
 import com.revilla.homestuff.repository.UserRepository;
 import com.revilla.homestuff.service.NourishmentService;
 import com.revilla.homestuff.util.GeneralUtil;
+import com.revilla.homestuff.util.NourishmentUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -46,6 +47,7 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
             NourishmentDto data) {
         log.info("Calling the create method in "
                 + GeneralUtil.simpleNameClass(this.getClass()));
+        NourishmentUtil.validateConstraintViolation(data.getName(), this.nourishmentRepository);
         Nourishment nourishment = this.modelMapper.map(data, this.getThirdGenericClass());
         nourishment.setIsAvailable(true);
         User user = GeneralUtil.getEntityByIdOrThrow(userId, this.userRepository, User.class);
