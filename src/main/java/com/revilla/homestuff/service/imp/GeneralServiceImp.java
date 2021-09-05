@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
 import com.revilla.homestuff.service.GeneralService;
 import com.revilla.homestuff.util.GeneralUtil;
 import org.modelmapper.ModelMapper;
@@ -80,8 +81,9 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
                     this.getRepo().delete(obj);
                     return this.modelMapper.map(obj, this.getFirstGenericClass());
                 })
-                .orElseThrow(() -> new IllegalStateException(
-                        GeneralUtil.simpleNameClass(this.getFirstGenericClass())+ " don't found with id: " + id));
+                .orElseThrow(() -> new EntityNoSuchElementException(
+                        GeneralUtil.simpleNameClass(this.getFirstGenericClass())
+                                + " don't found with id: " + id));
     }
 
     public abstract JpaRepository<E, ID> getRepo();
