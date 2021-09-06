@@ -5,7 +5,7 @@ import com.revilla.homestuff.dto.UserDto;
 import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.repository.UserRepository;
 import com.revilla.homestuff.service.UserService;
-import com.revilla.homestuff.util.UserUtil;
+import com.revilla.homestuff.util.GeneralUtil;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,7 +35,8 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
     @Override
     public UserDto create(UserDto data) {
         log.info("Calling the create method in " + this.getClass());
-        UserUtil.validateConstraintViolation(data.getUsername(), this.userRepository);
+        GeneralUtil.validateDuplicateConstraintViolation(data.getUsername(),
+                this.userRepository, User.class);
         User user = this.modelMapper.map(data, this.getThirdGenericClass());
         User userSaved = this.userRepository.save(user);
         return this.modelMapper.map(userSaved, this.getFirstGenericClass());
