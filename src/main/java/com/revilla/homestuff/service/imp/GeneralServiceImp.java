@@ -34,6 +34,10 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
         this.modelMapper = modelMapper;
     }
 
+    public final ModelMapper getModelMapper() {
+        return this.modelMapper;
+    }
+
     @SuppressWarnings("unchecked") // idk, but work
     public Class<T> getFirstGenericClass() {
         if (firstGeneric == null) {

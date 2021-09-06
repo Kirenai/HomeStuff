@@ -2,10 +2,10 @@ package com.revilla.homestuff.service.imp;
 
 import com.revilla.homestuff.dto.RoleDto;
 import com.revilla.homestuff.entity.Role;
+import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
 import com.revilla.homestuff.repository.RoleRepository;
 import com.revilla.homestuff.service.RoleService;
 import com.revilla.homestuff.util.GeneralUtil;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 public class RoleServiceImp extends GeneralServiceImp<RoleDto, Long, Role> implements RoleService {
 
     private final RoleRepository roleRepository;
-    private final ModelMapper modelMapper;
 
     @Override
     public JpaRepository<Role, Long> getRepo() {
@@ -33,26 +32,31 @@ public class RoleServiceImp extends GeneralServiceImp<RoleDto, Long, Role> imple
 
     @Override
     public RoleDto create(RoleDto data) {
-        log.info("Calling the create method in " + this.getClass());
+        log.info("Calling the create method in "
+                + GeneralUtil.simpleNameClass(this.getClass()));
         GeneralUtil.validateDuplicateConstraintViolation(data.getName(),
                 this.roleRepository, Role.class);
-        Role role = this.modelMapper.map(data, this.getThirdGenericClass());
+        Role role = super.getModelMapper().map(data, super.getThirdGenericClass());
         Role roleSaved = this.roleRepository.save(role);
-        return this.modelMapper.map(roleSaved, this.getFirstGenericClass());
+        return super.getModelMapper().map(roleSaved, super.getFirstGenericClass());
     }
 
     @Override
     public RoleDto update(Long id, RoleDto data) {
-        log.info("Calling the update method in " + this.getClass());
+        log.info("Calling the update method in "
+                + GeneralUtil.simpleNameClass(this.getClass()));
         return this.roleRepository.findById(id)
                 .map(u -> {
                     u.setName(data.getName());
-                    return this.modelMapper.map(
+                    return super.getModelMapper().map(
                             this.roleRepository.save(u),
-                            this.getFirstGenericClass()
+                            super.getFirstGenericClass()
                     );
                 })
-                .orElseThrow(() -> new IllegalStateException("User don't found"));
+                .orElseThrow(() -> new EntityNoSuchElementException(
+                        GeneralUtil.simpleNameClass(Role.class)
+                                + " don't found with id: " + id)
+                );
     }
 
 }

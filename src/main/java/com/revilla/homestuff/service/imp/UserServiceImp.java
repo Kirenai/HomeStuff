@@ -7,7 +7,6 @@ import com.revilla.homestuff.repository.UserRepository;
 import com.revilla.homestuff.service.UserService;
 import com.revilla.homestuff.util.GeneralUtil;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> implements UserService {
 
     private final UserRepository userRepository;
-    private final ModelMapper modelMapper;
 
     @Override
 	public JpaRepository<User, Long> getRepo() {
@@ -34,12 +32,13 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
     @Transactional
     @Override
     public UserDto create(UserDto data) {
-        log.info("Calling the create method in " + this.getClass());
+        log.info("Calling the create method in "
+                + GeneralUtil.simpleNameClass(this.getClass()));
         GeneralUtil.validateDuplicateConstraintViolation(data.getUsername(),
                 this.userRepository, User.class);
-        User user = this.modelMapper.map(data, this.getThirdGenericClass());
+        User user = super.getModelMapper().map(data, super.getThirdGenericClass());
         User userSaved = this.userRepository.save(user);
-        return this.modelMapper.map(userSaved, this.getFirstGenericClass());
+        return super.getModelMapper().map(userSaved, super.getFirstGenericClass());
     }
 
 	@Override
