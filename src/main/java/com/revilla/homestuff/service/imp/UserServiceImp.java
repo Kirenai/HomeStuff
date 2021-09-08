@@ -1,8 +1,10 @@
 package com.revilla.homestuff.service.imp;
 
 import javax.transaction.Transactional;
+
 import com.revilla.homestuff.dto.UserDto;
 import com.revilla.homestuff.entity.User;
+import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
 import com.revilla.homestuff.repository.UserRepository;
 import com.revilla.homestuff.service.UserService;
 import com.revilla.homestuff.util.GeneralUtil;
@@ -14,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * NourishmentService
+ *
  * @author Kirenai
  */
 @Slf4j
@@ -25,9 +28,9 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
     private final UserRepository userRepository;
 
     @Override
-	public JpaRepository<User, Long> getRepo() {
-		return this.userRepository;
-	}
+    public JpaRepository<User, Long> getRepo() {
+        return this.userRepository;
+    }
 
     @Transactional
     @Override
@@ -41,9 +44,22 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
         return super.getModelMapper().map(userSaved, super.getFirstGenericClass());
     }
 
-	@Override
-	public UserDto update(Long id, UserDto data) {
-		return null;
-	}
+    @Override
+    public UserDto update(Long id, UserDto data) {
+        return this.userRepository.findById(id)
+                .map(user -> {
+                    user.setUsername(data.getUsername());
+                    user.setPassword(data.getPassword());
+                    user.setFirstName(data.getFirstName());
+                    user.setLastName(data.getLastName());
+                    user.setAge(data.getAge());
+                    return super.getModelMapper()
+                            .map(user, super.getFirstGenericClass());
+                })
+                .orElseThrow(() -> new EntityNoSuchElementException(
+                        GeneralUtil.simpleNameClass(User.class)
+                                + " don't found with id: " + id
+                ));
+    }
 
 }
