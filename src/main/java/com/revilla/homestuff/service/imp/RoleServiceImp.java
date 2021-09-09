@@ -48,10 +48,11 @@ public class RoleServiceImp extends GeneralServiceImp<RoleDto, Long, Role> imple
         return this.roleRepository.findById(id)
                 .map(u -> {
                     u.setName(data.getName());
-                    return super.getModelMapper().map(
-                            this.roleRepository.save(u),
-                            super.getFirstGenericClass()
-                    );
+                    return super.getModelMapper()
+                            .map(
+                                    this.roleRepository.save(u),
+                                    super.getFirstGenericClass()
+                            );
                 })
                 .orElseThrow(() -> new EntityNoSuchElementException(
                         GeneralUtil.simpleNameClass(Role.class)

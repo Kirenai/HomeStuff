@@ -46,4 +46,12 @@ public class RoleResource {
         RoleDto response = this.roleService.create(roleDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @PutMapping("/{roleId}")
+    public ResponseEntity<RoleDto> updateRole(@PathVariable Long roleId,
+                                              @RequestBody RoleDto roleDto) {
+        RoleDto response = this.roleService.update(roleId, roleDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
 }
