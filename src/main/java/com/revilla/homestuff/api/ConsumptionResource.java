@@ -31,7 +31,7 @@ public class ConsumptionResource {
     private final ConsumptionService consumptionService;
 
     @GetMapping
-    public ResponseEntity<List<ConsumptionDto>> getNourishments(
+    public ResponseEntity<List<ConsumptionDto>> getConsumptions(
             @PageableDefault(size = 3)
             @SortDefault.SortDefaults(value = {
                     @SortDefault(sort = "consumptionId", direction = Sort.Direction.ASC)
