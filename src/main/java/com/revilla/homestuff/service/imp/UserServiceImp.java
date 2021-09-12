@@ -1,8 +1,7 @@
 package com.revilla.homestuff.service.imp;
 
-import javax.transaction.Transactional;
-
 import com.revilla.homestuff.dto.UserDto;
+import com.revilla.homestuff.dto.request.RegisterRequestDto;
 import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
 import com.revilla.homestuff.exception.unauthorize.UnauthorizedPermissionException;
@@ -19,6 +18,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
 
 /**
  * NourishmentService
@@ -42,6 +44,20 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
 
     @Transactional
     @Override
+    public UserDto register(RegisterRequestDto requestDto) {
+        log.info("Calling the register method in "
+                + GeneralUtil.simpleNameClass(this.getClass()));
+        GeneralUtil.validateDuplicateConstraintViolation(requestDto.getUsername(),
+                this.userRepository, User.class);
+        User user = super.getModelMapper().map(requestDto, super.getThirdGenericClass());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoles(RoleUtil.getSetOfRolesOrThrow(null, this.roleRepository));
+        User userRegistered = this.userRepository.save(user);
+        return super.getModelMapper().map(userRegistered, super.getFirstGenericClass());
+    }
+
+    @Transactional
+    @Override
     public UserDto create(UserDto data) {
         log.info("Calling the create method in "
                 + GeneralUtil.simpleNameClass(this.getClass()));
@@ -49,12 +65,12 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
                 this.userRepository, User.class);
         User user = super.getModelMapper().map(data, super.getThirdGenericClass());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        // TODO: possible backdoor
         user.setRoles(RoleUtil.getSetOfRolesOrThrow(data.getRoles(), this.roleRepository));
         User userSaved = this.userRepository.save(user);
         return super.getModelMapper().map(userSaved, super.getFirstGenericClass());
     }
 
+    @Transactional
     @Override
     public UserDto update(Long id, UserDto data, AuthUserDetails userDetails) {
         return this.userRepository.findById(id)
@@ -66,6 +82,9 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
                         user.setFirstName(data.getFirstName());
                         user.setLastName(data.getLastName());
                         user.setAge(data.getAge());
+                        if (Objects.nonNull(data.getRoles())) {
+                            user.setRoles(RoleUtil.getSetOfRolesOrThrow(data.getRoles(), this.roleRepository));
+                        }
                         return super.getModelMapper()
                                 .map(this.userRepository.save(user),
                                         super.getFirstGenericClass());

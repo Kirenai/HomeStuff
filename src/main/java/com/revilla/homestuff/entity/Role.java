@@ -1,19 +1,15 @@
 package com.revilla.homestuff.entity;
 
 import java.util.Collection;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.revilla.homestuff.util.enums.RoleName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.NaturalId;
 
 /**
  * Role
@@ -34,8 +30,10 @@ public class Role {
     @Column(name = "role_id", nullable = false)
     private Long roleId;
 
+    @Enumerated(value = EnumType.STRING)
+    @NaturalId
     @Column(name = "name", nullable = false, length = 20)
-    private String name;
+    private RoleName name;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToMany(mappedBy = "roles")

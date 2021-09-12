@@ -34,7 +34,7 @@ public class RoleServiceImp extends GeneralServiceImp<RoleDto, Long, Role> imple
     public RoleDto create(RoleDto data) {
         log.info("Calling the create method in "
                 + GeneralUtil.simpleNameClass(this.getClass()));
-        GeneralUtil.validateDuplicateConstraintViolation(data.getName(),
+        GeneralUtil.validateDuplicateConstraintViolation(data.getName().name(),
                 this.roleRepository, Role.class);
         Role role = super.getModelMapper().map(data, super.getThirdGenericClass());
         Role roleSaved = this.roleRepository.save(role);

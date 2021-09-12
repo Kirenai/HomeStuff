@@ -10,6 +10,7 @@ import com.revilla.homestuff.repository.NourishmentRepository;
 import com.revilla.homestuff.repository.RoleRepository;
 import com.revilla.homestuff.repository.UserRepository;
 import com.revilla.homestuff.security.AuthUserDetails;
+import com.revilla.homestuff.util.enums.RoleName;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -43,7 +44,7 @@ public class GeneralUtil {
         if (repo instanceof UserRepository) {
             isDuplicated = ((UserRepository) repo).existsByUsername(toValidate);
         } else if (repo instanceof RoleRepository) {
-            isDuplicated = ((RoleRepository) repo).existsByName(toValidate);
+            isDuplicated = ((RoleRepository) repo).existsByName(RoleName.valueOf(toValidate));
         } else if (repo instanceof NourishmentRepository) {
             isDuplicated = ((NourishmentRepository) repo).existsByName(toValidate);
         }

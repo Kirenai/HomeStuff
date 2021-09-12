@@ -2,6 +2,7 @@ package com.revilla.homestuff.dto.only;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.revilla.homestuff.util.enums.RoleName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,6 @@ public class RoleDtoOnly {
 
     private Long roleId;
 
-    private String name;
+    private RoleName name;
 
 }

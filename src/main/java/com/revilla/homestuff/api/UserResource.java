@@ -50,6 +50,7 @@ public class UserResource {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserDto> saveUser(@RequestBody UserDto data) {
         UserDto response = this.userService.create(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
