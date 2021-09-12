@@ -1,12 +1,18 @@
 package com.revilla.homestuff.util;
 
+import com.revilla.homestuff.entity.Nourishment;
+import com.revilla.homestuff.entity.Role;
+import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.exception.entity.EntityDuplicateConstraintViolationException;
 import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
+import com.revilla.homestuff.exception.unauthorize.UnauthorizedPermissionException;
 import com.revilla.homestuff.repository.NourishmentRepository;
 import com.revilla.homestuff.repository.RoleRepository;
 import com.revilla.homestuff.repository.UserRepository;
+import com.revilla.homestuff.security.AuthUserDetails;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.io.Serializable;
 
@@ -48,6 +54,35 @@ public class GeneralUtil {
                             + " is already exists with name: " + toValidate
             );
         }
+    }
+
+    public static <E, ID> E validateAuthorizationPermission(
+            @NotNull E obj,
+            @NotNull JpaRepository<E, ID> repo,
+            @NotNull AuthUserDetails userDetails) {
+        String errorMessage = null;
+        if (obj instanceof User) {
+            if (((User) obj).getUserId().equals(userDetails.getUserId())
+                    || userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+                repo.delete(obj);
+                return obj;
+            }
+            errorMessage = "You don't have the permission to access this profile";
+        } else if (obj instanceof Nourishment) {
+            if (((Nourishment) obj).getUser().getUserId().equals(userDetails.getUserId())
+                    || userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+                repo.delete(obj);
+                return obj;
+            }
+            errorMessage = "You don't have the permission to access this nourishment";
+        } else if (obj instanceof Role) {
+            if (userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+                repo.delete(obj);
+                return obj;
+            }
+            errorMessage = "You don't have the permission to access this role";
+        }
+        throw new UnauthorizedPermissionException(errorMessage);
     }
 
     public static String simpleNameClass(@NotNull Class<?> classGeneric) {

@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
+import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.service.GeneralService;
 import com.revilla.homestuff.util.GeneralUtil;
 import org.modelmapper.ModelMapper;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * GeneralServiceImp
@@ -77,16 +79,18 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
     }
 
     @Override
-    public T delete(ID id) {
+    @Transactional
+    public T delete(ID id, AuthUserDetails userDetails) {
         log.info("Calling the delete method in "
                 + GeneralUtil.simpleNameClass(this.getClass()));
         return this.getRepo().findById(id)
                 .map(obj -> {
-                    this.getRepo().delete(obj);
-                    return this.modelMapper.map(obj, this.getFirstGenericClass());
+                    E objDeleted = GeneralUtil.validateAuthorizationPermission(obj,
+                            this.getRepo(), userDetails);
+                    return this.modelMapper.map(objDeleted, this.getFirstGenericClass());
                 })
                 .orElseThrow(() -> new EntityNoSuchElementException(
-                        GeneralUtil.simpleNameClass(this.getFirstGenericClass())
+                        GeneralUtil.simpleNameClass(this.getThirdGenericClass())
                                 + " don't found with id: " + id));
     }
 

@@ -59,15 +59,15 @@ public class UserResource {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<UserDto> updateUser(@PathVariable Long userId,
                                               @RequestBody UserDto userDto,
-                                              @CurrentUser AuthUserDetails userDetails
-                                              ) {
+                                              @CurrentUser AuthUserDetails userDetails) {
         UserDto response = this.userService.update(userId, userDto, userDetails);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<UserDto> deleteUser(@PathVariable Long userId) {
-        UserDto response = this.userService.delete(userId);
+    public ResponseEntity<UserDto> deleteUser(@PathVariable Long userId,
+                                              @CurrentUser AuthUserDetails userDetails) {
+        UserDto response = this.userService.delete(userId, userDetails);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
