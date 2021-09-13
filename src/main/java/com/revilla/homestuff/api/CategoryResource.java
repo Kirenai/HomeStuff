@@ -62,7 +62,7 @@ public class CategoryResource {
     }
 
     @PutMapping("/{categoryId}")
-    @PreAuthorize("hasRole('ADMIN'")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryDto> updateUser(
             @PathVariable Long categoryId,
             @RequestBody CategoryDto categoryDto
