@@ -26,7 +26,7 @@ import javax.validation.Valid;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
-public class AuthController {
+public class AuthResource {
 
     @Qualifier(BeanIds.AUTHENTICATION_MANAGER)
     private final AuthenticationManager authenticationManager;
