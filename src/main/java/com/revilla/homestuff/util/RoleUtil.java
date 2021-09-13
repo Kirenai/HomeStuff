@@ -29,7 +29,7 @@ public class RoleUtil {
 
     /**
      *
-     * @param roleDto if is null return ROLE_USER
+     * @param roleDto A Collection of {@link RoleDtoOnly} or if is null return ROLE_USER
      * @param repo Role repository
      * @return a Set of just one role or Set of roles
      */

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
 import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.service.GeneralService;
 import com.revilla.homestuff.util.GeneralUtil;
@@ -70,11 +69,12 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
     }
 
     @Override
-    public T findOne(ID id) {
+    public T findOne(ID id, AuthUserDetails userDetails) {
         log.info("Calling the findOne method in "
                 + GeneralUtil.simpleNameClass(this.getClass()));
         E obj = GeneralUtil.getEntityByIdOrThrow(id, this.getRepo(),
                 this.getThirdGenericClass());
+        GeneralUtil.validateAuthorizationPermissionOrThrow(obj, this.getRepo(), userDetails);
         return this.modelMapper.map(obj, this.getFirstGenericClass());
     }
 
@@ -83,15 +83,11 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
     public T delete(ID id, AuthUserDetails userDetails) {
         log.info("Calling the delete method in "
                 + GeneralUtil.simpleNameClass(this.getClass()));
-        return this.getRepo().findById(id)
-                .map(obj -> {
-                    E objDeleted = GeneralUtil.validateAuthorizationPermission(obj,
-                            this.getRepo(), userDetails);
-                    return this.modelMapper.map(objDeleted, this.getFirstGenericClass());
-                })
-                .orElseThrow(() -> new EntityNoSuchElementException(
-                        GeneralUtil.simpleNameClass(this.getThirdGenericClass())
-                                + " don't found with id: " + id));
+        E obj = GeneralUtil.getEntityByIdOrThrow(id, this.getRepo(),
+                this.getThirdGenericClass());
+        GeneralUtil.validateAuthorizationPermissionOrThrow(obj, this.getRepo(), userDetails);
+        this.getRepo().delete(obj);
+        return this.modelMapper.map(obj, this.getFirstGenericClass());
     }
 
     public abstract JpaRepository<E, ID> getRepo();

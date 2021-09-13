@@ -3,6 +3,8 @@ package com.revilla.homestuff.api;
 import java.util.List;
 
 import com.revilla.homestuff.dto.CategoryDto;
+import com.revilla.homestuff.security.AuthUserDetails;
+import com.revilla.homestuff.security.CurrentUser;
 import com.revilla.homestuff.service.CategoryService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
@@ -40,9 +42,10 @@ public class CategoryResource {
 
     @GetMapping("/{categoryId}")
     public ResponseEntity<CategoryDto> getCategory(
-            @PathVariable Long categoryId
+            @PathVariable Long categoryId,
+            @CurrentUser AuthUserDetails userDetails
     ) {
-        CategoryDto response = this.categoryService.findOne(categoryId);
+        CategoryDto response = this.categoryService.findOne(categoryId, userDetails);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

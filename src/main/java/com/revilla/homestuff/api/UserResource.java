@@ -33,6 +33,7 @@ public class UserResource {
     private final UserService userService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserDto>> getUsers(
             @PageableDefault(size = 5)
             @SortDefault.SortDefaults(value = {
@@ -44,8 +45,10 @@ public class UserResource {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserDto> getUser(@PathVariable Long userId) {
-        UserDto response = this.userService.findOne(userId);
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    public ResponseEntity<UserDto> getUser(@PathVariable Long userId,
+                                           @CurrentUser AuthUserDetails userDetails) {
+        UserDto response = this.userService.findOne(userId, userDetails);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -66,6 +69,7 @@ public class UserResource {
     }
 
     @DeleteMapping("/{userId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<UserDto> deleteUser(@PathVariable Long userId,
                                               @CurrentUser AuthUserDetails userDetails) {
         UserDto response = this.userService.delete(userId, userDetails);

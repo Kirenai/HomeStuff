@@ -57,7 +57,7 @@ public class GeneralUtil {
         }
     }
 
-    public static <E, ID> E validateAuthorizationPermission(
+    public static <E, ID> void validateAuthorizationPermissionOrThrow(
             @NotNull E obj,
             @NotNull JpaRepository<E, ID> repo,
             @NotNull AuthUserDetails userDetails) {
@@ -65,21 +65,20 @@ public class GeneralUtil {
         if (obj instanceof User) {
             if (((User) obj).getUserId().equals(userDetails.getUserId())
                     || userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
-                repo.delete(obj);
-                return obj;
+                return;
             }
             errorMessage = "You don't have the permission to access this profile";
-        } else if (obj instanceof Nourishment) {
+        }
+        if (obj instanceof Nourishment) {
             if (((Nourishment) obj).getUser().getUserId().equals(userDetails.getUserId())
                     || userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
-                repo.delete(obj);
-                return obj;
+                return;
             }
             errorMessage = "You don't have the permission to access this nourishment";
-        } else if (obj instanceof Role) {
+        }
+        if (obj instanceof Role) {
             if (userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
-                repo.delete(obj);
-                return obj;
+                return;
             }
             errorMessage = "You don't have the permission to access this role";
         }

@@ -1,6 +1,8 @@
 package com.revilla.homestuff.api;
 
 import com.revilla.homestuff.dto.RoleDto;
+import com.revilla.homestuff.security.AuthUserDetails;
+import com.revilla.homestuff.security.CurrentUser;
 import com.revilla.homestuff.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -36,8 +38,9 @@ public class RoleResource {
     }
 
     @GetMapping("/{roleId}")
-    public ResponseEntity<RoleDto> getRole(@PathVariable Long roleId) {
-        RoleDto response = this.roleService.findOne(roleId);
+    public ResponseEntity<RoleDto> getRole(@PathVariable Long roleId,
+                                           @CurrentUser AuthUserDetails userDetails) {
+        RoleDto response = this.roleService.findOne(roleId, userDetails);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

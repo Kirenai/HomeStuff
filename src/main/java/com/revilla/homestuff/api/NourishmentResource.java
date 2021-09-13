@@ -1,7 +1,8 @@
 package com.revilla.homestuff.api;
 
 import com.revilla.homestuff.dto.NourishmentDto;
-import com.revilla.homestuff.dto.UserDto;
+import com.revilla.homestuff.security.AuthUserDetails;
+import com.revilla.homestuff.security.CurrentUser;
 import com.revilla.homestuff.service.NourishmentService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
@@ -40,9 +41,11 @@ public class NourishmentResource {
 
     @GetMapping("/{nourishmentId}")
     public ResponseEntity<NourishmentDto> getNourishment(
-            @PathVariable Long nourishmentId
+            @PathVariable Long nourishmentId,
+            @CurrentUser AuthUserDetails userDetails
     ) {
-        NourishmentDto response = this.nourishmentService.findOne(nourishmentId);
+        NourishmentDto response = this.nourishmentService.findOne(nourishmentId,
+                userDetails);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -66,6 +69,14 @@ public class NourishmentResource {
             @RequestBody NourishmentDto nourishmentDto
     ) {
         NourishmentDto response = this.nourishmentService.update(nourishmentId, nourishmentDto);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping("/{nourishmentId}")
+    public ResponseEntity<NourishmentDto> deleteNourishment(
+            @PathVariable Long nourishmentId,
+            @CurrentUser AuthUserDetails userDetails) {
+        NourishmentDto response = this.nourishmentService.delete(nourishmentId, userDetails);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

@@ -2,6 +2,8 @@ package com.revilla.homestuff.api;
 
 import java.util.List;
 import com.revilla.homestuff.dto.ConsumptionDto;
+import com.revilla.homestuff.security.AuthUserDetails;
+import com.revilla.homestuff.security.CurrentUser;
 import com.revilla.homestuff.service.ConsumptionService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
@@ -43,9 +45,11 @@ public class ConsumptionResource {
 
     @GetMapping("/{consumptionId}")
     public ResponseEntity<ConsumptionDto> getConsumption(
-            @PathVariable Long consumptionId
+            @PathVariable Long consumptionId,
+            @CurrentUser AuthUserDetails userDetails
     ) {
-        ConsumptionDto response = this.consumptionService.findOne(consumptionId);
+        ConsumptionDto response = this.consumptionService.findOne(consumptionId,
+                userDetails);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

@@ -68,7 +68,7 @@ public class Nourishment {
     )
     private Category category;
 
-    @OneToMany(mappedBy = "nourishment")
+    @OneToMany(mappedBy = "nourishment", cascade = CascadeType.ALL)
     private Collection<Consumption> consumptions;
 
     @OneToOne(mappedBy = "nourishment", cascade = CascadeType.ALL)

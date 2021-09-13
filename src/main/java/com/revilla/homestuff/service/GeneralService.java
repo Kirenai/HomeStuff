@@ -9,7 +9,7 @@ public interface GeneralService<T, ID extends Serializable> {
 
     List<T> findAll(Pageable pageable);
 
-    T findOne(ID id);
+    T findOne(ID id, AuthUserDetails userDetails);
 
     T delete(ID id, AuthUserDetails userDetails);
 
