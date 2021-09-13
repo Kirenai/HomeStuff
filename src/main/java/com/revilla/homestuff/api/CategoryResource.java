@@ -13,6 +13,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +31,7 @@ public class CategoryResource {
     private final CategoryService categoryService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<List<CategoryDto>> getCategories(
             @PageableDefault(size = 7)
             @SortDefault.SortDefaults(value = {
@@ -41,6 +43,7 @@ public class CategoryResource {
     }
 
     @GetMapping("/{categoryId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryDto> getCategory(
             @PathVariable Long categoryId,
             @CurrentUser AuthUserDetails userDetails
@@ -50,6 +53,7 @@ public class CategoryResource {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<CategoryDto> createCategory(
             @RequestBody CategoryDto categoryDto
     ) {
@@ -58,6 +62,7 @@ public class CategoryResource {
     }
 
     @PutMapping("/{categoryId}")
+    @PreAuthorize("hasRole('ADMIN'")
     public ResponseEntity<CategoryDto> updateUser(
             @PathVariable Long categoryId,
             @RequestBody CategoryDto categoryDto

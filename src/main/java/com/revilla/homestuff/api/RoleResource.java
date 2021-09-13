@@ -11,6 +11,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,6 +28,7 @@ public class RoleResource {
     private final RoleService roleService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<RoleDto>> getRoles(
         @PageableDefault(size = 2)
         @SortDefault.SortDefaults(value = {
@@ -38,6 +40,7 @@ public class RoleResource {
     }
 
     @GetMapping("/{roleId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RoleDto> getRole(@PathVariable Long roleId,
                                            @CurrentUser AuthUserDetails userDetails) {
         RoleDto response = this.roleService.findOne(roleId, userDetails);
@@ -45,12 +48,14 @@ public class RoleResource {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RoleDto> createRole(@RequestBody RoleDto roleDto) {
         RoleDto response = this.roleService.create(roleDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{roleId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RoleDto> updateRole(@PathVariable Long roleId,
                                               @RequestBody RoleDto roleDto) {
         RoleDto response = this.roleService.update(roleId, roleDto);

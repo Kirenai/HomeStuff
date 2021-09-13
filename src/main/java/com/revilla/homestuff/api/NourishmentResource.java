@@ -11,6 +11,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
 
@@ -29,6 +30,7 @@ public class NourishmentResource {
     private final NourishmentService nourishmentService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<List<NourishmentDto>> getNourishments(
             @PageableDefault(size = 5)
             @SortDefault.SortDefaults(value = {
@@ -40,6 +42,7 @@ public class NourishmentResource {
     }
 
     @GetMapping("/{nourishmentId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<NourishmentDto> getNourishment(
             @PathVariable Long nourishmentId,
             @CurrentUser AuthUserDetails userDetails
@@ -50,6 +53,7 @@ public class NourishmentResource {
     }
 
     @PostMapping("/user/{userId}/category/{categoryId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<NourishmentDto> createNourishment(
             @PathVariable Long userId,
             @PathVariable Long categoryId,
@@ -64,6 +68,7 @@ public class NourishmentResource {
     }
 
     @PutMapping("/{nourishmentId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<NourishmentDto> updateNourishment(
             @PathVariable Long nourishmentId,
             @RequestBody NourishmentDto nourishmentDto
@@ -73,6 +78,7 @@ public class NourishmentResource {
     }
 
     @DeleteMapping("/{nourishmentId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<NourishmentDto> deleteNourishment(
             @PathVariable Long nourishmentId,
             @CurrentUser AuthUserDetails userDetails) {

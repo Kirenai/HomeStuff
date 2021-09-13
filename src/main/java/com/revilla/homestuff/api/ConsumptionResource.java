@@ -12,6 +12,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +34,7 @@ public class ConsumptionResource {
     private final ConsumptionService consumptionService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<List<ConsumptionDto>> getConsumptions(
             @PageableDefault(size = 3)
             @SortDefault.SortDefaults(value = {
@@ -44,6 +46,7 @@ public class ConsumptionResource {
     }
 
     @GetMapping("/{consumptionId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ConsumptionDto> getConsumption(
             @PathVariable Long consumptionId,
             @CurrentUser AuthUserDetails userDetails
@@ -54,11 +57,13 @@ public class ConsumptionResource {
     }
 
     @PostMapping("/nourishment/{nourishmentId}/user/{userId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<ConsumptionDto> createConsumption(
             @PathVariable Long nourishmentId,
             @PathVariable Long userId,
             @RequestBody ConsumptionDto consumptionDto) {
-        ConsumptionDto response = this.consumptionService.create(nourishmentId, userId, consumptionDto);
+        ConsumptionDto response = this.consumptionService.create(nourishmentId,
+                userId, consumptionDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
