@@ -71,9 +71,11 @@ public class NourishmentResource {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<NourishmentDto> updateNourishment(
             @PathVariable Long nourishmentId,
-            @RequestBody NourishmentDto nourishmentDto
+            @RequestBody NourishmentDto nourishmentDto,
+            @CurrentUser AuthUserDetails userDetails
     ) {
-        NourishmentDto response = this.nourishmentService.update(nourishmentId, nourishmentDto);
+        NourishmentDto response = this.nourishmentService.update(nourishmentId,
+                nourishmentDto, userDetails);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
