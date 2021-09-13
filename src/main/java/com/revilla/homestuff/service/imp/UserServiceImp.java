@@ -11,6 +11,7 @@ import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.service.UserService;
 import com.revilla.homestuff.util.GeneralUtil;
 import com.revilla.homestuff.util.RoleUtil;
+import com.revilla.homestuff.util.enums.RoleName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -76,13 +77,14 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
         return this.userRepository.findById(id)
                 .map(user -> {
                     if (user.getUserId().equals(userDetails.getUserId())
-                            || userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+                            || userDetails.getAuthorities().contains(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
                         user.setUsername(data.getUsername());
                         user.setPassword(this.passwordEncoder.encode(data.getPassword()));
                         user.setFirstName(data.getFirstName());
                         user.setLastName(data.getLastName());
                         user.setAge(data.getAge());
-                        if (Objects.nonNull(data.getRoles())) {
+                        if (Objects.nonNull(data.getRoles())
+                                && userDetails.getAuthorities().contains(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
                             user.setRoles(RoleUtil.getSetOfRolesOrThrow(data.getRoles(), this.roleRepository));
                         }
                         return super.getModelMapper()
