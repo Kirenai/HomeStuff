@@ -87,7 +87,8 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
                 this.getThirdGenericClass());
         GeneralUtil.validateAuthorizationPermissionOrThrow(obj, this.getRepo(), userDetails);
         this.getRepo().delete(obj);
-        return this.modelMapper.map(obj, this.getFirstGenericClass());
+        T objDto = this.modelMapper.map(obj, this.getFirstGenericClass());
+        return GeneralUtil.addResponseMessageDeleteAction(objDto, this.getFirstGenericClass());
     }
 
     public abstract JpaRepository<E, ID> getRepo();

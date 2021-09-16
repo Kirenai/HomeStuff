@@ -1,5 +1,6 @@
 package com.revilla.homestuff.util;
 
+import com.revilla.homestuff.dto.UserDto;
 import com.revilla.homestuff.entity.Nourishment;
 import com.revilla.homestuff.entity.Role;
 import com.revilla.homestuff.entity.User;
@@ -83,6 +84,15 @@ public class GeneralUtil {
             errorMessage = "You don't have the permission to access this role";
         }
         throw new UnauthorizedPermissionException(errorMessage);
+    }
+
+    public static <T> T addResponseMessageDeleteAction(T obj, Class<T> clazz) {
+        if (obj instanceof UserDto) {
+            UserDto userDto = ((UserDto) obj)
+                    .setMessage(simpleNameClass(User.class) + " successfully removed");
+            return clazz.cast(userDto);
+        }
+        return null;
     }
 
     public static String simpleNameClass(@NotNull Class<?> classGeneric) {

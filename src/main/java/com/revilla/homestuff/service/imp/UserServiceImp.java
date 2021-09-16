@@ -54,7 +54,9 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(RoleUtil.getSetOfRolesOrThrow(null, this.roleRepository));
         User userRegistered = this.userRepository.save(user);
-        return super.getModelMapper().map(userRegistered, super.getFirstGenericClass());
+        return super.getModelMapper().map(userRegistered, super.getFirstGenericClass())
+                .setMessage("Successfully registered "
+                        + GeneralUtil.simpleNameClass(User.class));
     }
 
     @Transactional
@@ -68,7 +70,9 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(RoleUtil.getSetOfRolesOrThrow(data.getRoles(), this.roleRepository));
         User userSaved = this.userRepository.save(user);
-        return super.getModelMapper().map(userSaved, super.getFirstGenericClass());
+        return super.getModelMapper().map(userSaved, super.getFirstGenericClass())
+                .setMessage(GeneralUtil.simpleNameClass(User.class)
+                        + " created successfully by admin");
     }
 
     @Transactional
@@ -89,7 +93,9 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
                         }
                         return super.getModelMapper()
                                 .map(this.userRepository.save(user),
-                                        super.getFirstGenericClass());
+                                        super.getFirstGenericClass())
+                                .setMessage(GeneralUtil.simpleNameClass(User.class)
+                                        + " updated successfully");
                     }
                     throw new UnauthorizedPermissionException(
                             "You don't have the permission to update this profile");

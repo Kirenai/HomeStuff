@@ -30,4 +30,17 @@ public class UserDto extends UserDtoOnly {
 
     private Collection<RoleDtoOnly> roles;
 
+    private String message;
+
+    /**
+     * Adding a message to the response
+     *
+     * @param message of response
+     * @return the object referece (this)
+     */
+    public UserDto setMessage(String message) {
+        this.message = message;
+        return this;
+    }
+
 }
