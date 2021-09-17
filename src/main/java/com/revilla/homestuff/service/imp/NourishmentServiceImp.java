@@ -65,17 +65,21 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
         nourishment.setCategory(category);
         nourishment.getAmountNourishment().setNourishment(nourishment);
         Nourishment nourishmentSaved = this.nourishmentRepository.save(nourishment);
-        return super.getModelMapper().map(nourishmentSaved, super.getFirstGenericClass());
+        return super.getModelMapper().map(nourishmentSaved, super.getFirstGenericClass())
+                .setMessage(GeneralUtil.simpleNameClass(Nourishment.class)
+                        + " created successfully");
     }
 
 	@Override
-	public NourishmentDto update(Long id, NourishmentDto data, AuthUserDetails userDetails) {
+	public NourishmentDto update(Long id, NourishmentDto data,
+            AuthUserDetails userDetails) {
         log.info("Calling the update method in "
                 + GeneralUtil.simpleNameClass(this.getClass()));
         return this.nourishmentRepository.findById(id)
             .map(n -> {
                 if (n.getUser().getUserId().equals(userDetails.getUserId())
-                        || userDetails.getAuthorities().contains(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
+                            || userDetails.getAuthorities().contains(
+                                    new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
                     n.setName(data.getName());
                     n.setImagePath(data.getImagePath());
                     n.setDescription(data.getDescription());
@@ -94,7 +98,8 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
                     return super.getModelMapper().map(
                             this.nourishmentRepository.save(n),
                             super.getFirstGenericClass()
-                    );
+                    ).setMessage(GeneralUtil.simpleNameClass(Nourishment.class)
+                            + " updated successfully");
                 }
                 throw new UnauthorizedPermissionException(
                         "You don't have the permission to update this nourishment");
