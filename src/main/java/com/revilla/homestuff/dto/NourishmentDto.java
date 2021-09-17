@@ -16,7 +16,7 @@ import lombok.*;
 @ToString(exclude = {"user"})
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NourishmentDto extends NourishmentDtoOnly {
 
@@ -25,5 +25,18 @@ public class NourishmentDto extends NourishmentDtoOnly {
     private Collection<ConsumptionDto> consumptions;
 
     private AmountNourishementDto amountNourishment;
+
+    private String message;
+
+    /**
+     * Adding a message to the response
+     *
+     * @param message of response
+     * @return the object referece (this)
+     */
+    public NourishmentDto setMessage(String message) {
+        this.message = message;
+        return this;
+    }
 
 }

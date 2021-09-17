@@ -1,5 +1,6 @@
 package com.revilla.homestuff.util;
 
+import com.revilla.homestuff.dto.NourishmentDto;
 import com.revilla.homestuff.dto.UserDto;
 import com.revilla.homestuff.entity.Nourishment;
 import com.revilla.homestuff.entity.Role;
@@ -44,9 +45,11 @@ public class GeneralUtil {
 
         if (repo instanceof UserRepository) {
             isDuplicated = ((UserRepository) repo).existsByUsername(toValidate);
-        } else if (repo instanceof RoleRepository) {
+        }
+        if (repo instanceof RoleRepository) {
             isDuplicated = ((RoleRepository) repo).existsByName(RoleName.valueOf(toValidate));
-        } else if (repo instanceof NourishmentRepository) {
+        }
+        if (repo instanceof NourishmentRepository) {
             isDuplicated = ((NourishmentRepository) repo).existsByName(toValidate);
         }
 
@@ -65,20 +68,23 @@ public class GeneralUtil {
         String errorMessage = null;
         if (obj instanceof User) {
             if (((User) obj).getUserId().equals(userDetails.getUserId())
-                    || userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+                    || userDetails.getAuthorities()
+                            .contains(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
                 return;
             }
             errorMessage = "You don't have the permission to access this profile";
         }
         if (obj instanceof Nourishment) {
             if (((Nourishment) obj).getUser().getUserId().equals(userDetails.getUserId())
-                    || userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+                    || userDetails.getAuthorities()
+                            .contains(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
                 return;
             }
             errorMessage = "You don't have the permission to access this nourishment";
         }
         if (obj instanceof Role) {
-            if (userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+            if (userDetails.getAuthorities()
+                    .contains(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
                 return;
             }
             errorMessage = "You don't have the permission to access this role";
@@ -86,17 +92,23 @@ public class GeneralUtil {
         throw new UnauthorizedPermissionException(errorMessage);
     }
 
-    public static <T> T addResponseMessageDeleteAction(T obj, Class<T> clazz) {
+    public static <T> T addResponseMessageDeleteAction(@NotNull T obj,
+            @NotNull Class<T> clazz) {
         if (obj instanceof UserDto) {
             UserDto userDto = ((UserDto) obj)
                     .setMessage(simpleNameClass(User.class) + " successfully removed");
             return clazz.cast(userDto);
         }
+        if (obj instanceof NourishmentDto) {
+            NourishmentDto nourishmentDto = ((NourishmentDto) obj)
+                    .setMessage(simpleNameClass(Nourishment.class) + " successfully removed");
+            return clazz.cast(nourishmentDto);
+        }
         return null;
     }
 
-    public static String simpleNameClass(@NotNull Class<?> classGeneric) {
-        return classGeneric.getSimpleName();
+    public static String simpleNameClass(@NotNull Class<?> clazzGeneric) {
+        return clazzGeneric.getSimpleName();
     }
 
 }
