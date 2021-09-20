@@ -1,7 +1,8 @@
 package com.revilla.homestuff.util;
 
-import com.revilla.homestuff.dto.NourishmentDto;
-import com.revilla.homestuff.dto.UserDto;
+import java.io.Serializable;
+import com.revilla.homestuff.dto.response.ApiResponseDto;
+import com.revilla.homestuff.entity.Category;
 import com.revilla.homestuff.entity.Nourishment;
 import com.revilla.homestuff.entity.Role;
 import com.revilla.homestuff.entity.User;
@@ -16,8 +17,6 @@ import com.revilla.homestuff.util.enums.RoleName;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
-import java.io.Serializable;
 
 /**
  * GeneralUtil
@@ -92,19 +91,23 @@ public class GeneralUtil {
         throw new UnauthorizedPermissionException(errorMessage);
     }
 
-    public static <T> T addResponseMessageDeleteAction(@NotNull T obj,
-            @NotNull Class<T> clazz) {
-        if (obj instanceof UserDto) {
-            UserDto userDto = ((UserDto) obj)
-                    .setMessage(simpleNameClass(User.class) + " successfully removed");
-            return clazz.cast(userDto);
+    public static <E> ApiResponseDto responseMessageAction(@NotNull E obj,
+            @NotNull Class<E> clazz,
+            @NotNull String messageAction) {
+        StringBuilder message = new StringBuilder();
+        if (obj instanceof User) {
+            message.append(simpleNameClass(clazz)+ " " + messageAction);
         }
-        if (obj instanceof NourishmentDto) {
-            NourishmentDto nourishmentDto = ((NourishmentDto) obj)
-                    .setMessage(simpleNameClass(Nourishment.class) + " successfully removed");
-            return clazz.cast(nourishmentDto);
+        if (obj instanceof Nourishment) {
+            message.append(simpleNameClass(clazz) + " " + messageAction);
         }
-        return null;
+        if (obj instanceof Role) {
+            message.append(simpleNameClass(clazz) + " " + messageAction);
+        }
+        if (obj instanceof Category) {
+            message.append(simpleNameClass(clazz) + " " + messageAction);
+        }
+        return new ApiResponseDto(Boolean.TRUE, message.toString());
     }
 
     public static String simpleNameClass(@NotNull Class<?> clazzGeneric) {

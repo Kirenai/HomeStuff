@@ -1,9 +1,9 @@
 package com.revilla.homestuff.service.imp;
 
 import java.util.Objects;
-import javax.transaction.Transactional;
 import com.revilla.homestuff.dto.AmountNourishementDto;
 import com.revilla.homestuff.dto.NourishmentDto;
+import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.entity.AmountNourishment;
 import com.revilla.homestuff.entity.Category;
 import com.revilla.homestuff.entity.Nourishment;
@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -70,8 +71,9 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
                         + " created successfully");
     }
 
+    @Transactional
 	@Override
-	public NourishmentDto update(Long id, NourishmentDto data,
+	public ApiResponseDto update(Long id, NourishmentDto data,
             AuthUserDetails userDetails) {
         log.info("Calling the update method in "
                 + GeneralUtil.simpleNameClass(this.getClass()));
@@ -95,11 +97,8 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
                             && Objects.nonNull(amountNourishment.getPercentage())) {
                         amountNourishment.setPercentage(amountNourishmentDto.getPercentage());
                     }
-                    return super.getModelMapper().map(
-                            this.nourishmentRepository.save(n),
-                            super.getFirstGenericClass()
-                    ).setMessage(GeneralUtil.simpleNameClass(Nourishment.class)
-                            + " updated successfully");
+                    return GeneralUtil.responseMessageAction(n, Nourishment.class,
+                            "updated successfully");
                 }
                 throw new UnauthorizedPermissionException(
                         "You don't have the permission to update this nourishment");

@@ -1,5 +1,6 @@
 package com.revilla.homestuff.exception;
 
+import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.exception.entity.EntityDuplicateConstraintViolationException;
 import com.revilla.homestuff.exception.entity.EntityErrorMessage;
 import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
@@ -24,7 +25,7 @@ public class EntityExceptionHandler {
         return new EntityErrorMessage(
                 HttpStatus.NOT_FOUND.value(),
                 LocalDateTime.now(),
-                ex.getMessage(),
+                new ApiResponseDto(Boolean.FALSE, ex.getMessage()),
                 request.getDescription(false)
         );
     }
@@ -38,7 +39,7 @@ public class EntityExceptionHandler {
         return new EntityErrorMessage(
                 HttpStatus.NOT_FOUND.value(),
                 LocalDateTime.now(),
-                ex.getMessage(),
+                new ApiResponseDto(Boolean.FALSE, ex.getMessage()),
                 request.getDescription(false)
         );
     }

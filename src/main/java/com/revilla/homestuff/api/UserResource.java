@@ -3,6 +3,7 @@ package com.revilla.homestuff.api;
 import java.util.List;
 
 import com.revilla.homestuff.dto.UserDto;
+import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.security.CurrentUser;
 import com.revilla.homestuff.service.UserService;
@@ -61,18 +62,18 @@ public class UserResource {
 
     @PutMapping("/{userId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ResponseEntity<UserDto> updateUser(@PathVariable Long userId,
+    public ResponseEntity<ApiResponseDto> updateUser(@PathVariable Long userId,
                                               @RequestBody UserDto userDto,
                                               @CurrentUser AuthUserDetails userDetails) {
-        UserDto response = this.userService.update(userId, userDto, userDetails);
+        ApiResponseDto response = this.userService.update(userId, userDto, userDetails);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{userId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ResponseEntity<UserDto> deleteUser(@PathVariable Long userId,
+    public ResponseEntity<ApiResponseDto> deleteUser(@PathVariable Long userId,
                                               @CurrentUser AuthUserDetails userDetails) {
-        UserDto response = this.userService.delete(userId, userDetails);
+        ApiResponseDto response = this.userService.delete(userId, userDetails);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

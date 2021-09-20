@@ -1,6 +1,7 @@
 package com.revilla.homestuff.api;
 
 import com.revilla.homestuff.dto.NourishmentDto;
+import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.security.CurrentUser;
 import com.revilla.homestuff.service.NourishmentService;
@@ -69,22 +70,22 @@ public class NourishmentResource {
 
     @PutMapping("/{nourishmentId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ResponseEntity<NourishmentDto> updateNourishment(
+    public ResponseEntity<ApiResponseDto> updateNourishment(
             @PathVariable Long nourishmentId,
             @RequestBody NourishmentDto nourishmentDto,
             @CurrentUser AuthUserDetails userDetails
     ) {
-        NourishmentDto response = this.nourishmentService.update(nourishmentId,
+        ApiResponseDto response = this.nourishmentService.update(nourishmentId,
                 nourishmentDto, userDetails);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{nourishmentId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ResponseEntity<NourishmentDto> deleteNourishment(
+    public ResponseEntity<ApiResponseDto> deleteNourishment(
             @PathVariable Long nourishmentId,
             @CurrentUser AuthUserDetails userDetails) {
-        NourishmentDto response = this.nourishmentService.delete(nourishmentId, userDetails);
+        ApiResponseDto response = this.nourishmentService.delete(nourishmentId, userDetails);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

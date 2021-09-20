@@ -2,6 +2,7 @@ package com.revilla.homestuff.service.imp;
 
 import com.revilla.homestuff.dto.UserDto;
 import com.revilla.homestuff.dto.request.RegisterRequestDto;
+import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
 import com.revilla.homestuff.exception.unauthorize.UnauthorizedPermissionException;
@@ -45,7 +46,7 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
 
     @Transactional
     @Override
-    public UserDto register(RegisterRequestDto requestDto) {
+    public ApiResponseDto register(RegisterRequestDto requestDto) {
         log.info("Calling the register method in "
                 + GeneralUtil.simpleNameClass(this.getClass()));
         GeneralUtil.validateDuplicateConstraintViolation(requestDto.getUsername(),
@@ -53,10 +54,8 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
         User user = super.getModelMapper().map(requestDto, super.getThirdGenericClass());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(RoleUtil.getSetOfRolesOrThrow(null, this.roleRepository));
-        User userRegistered = this.userRepository.save(user);
-        return super.getModelMapper().map(userRegistered, super.getFirstGenericClass())
-                .setMessage("Successfully registered "
-                        + GeneralUtil.simpleNameClass(User.class));
+        this.userRepository.save(user);
+        return GeneralUtil.responseMessageAction(user, User.class, "registered successfully");
     }
 
     @Transactional
@@ -77,7 +76,7 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
 
     @Transactional
     @Override
-    public UserDto update(Long id, UserDto data, AuthUserDetails userDetails) {
+    public ApiResponseDto update(Long id, UserDto data, AuthUserDetails userDetails) {
         return this.userRepository.findById(id)
                 .map(user -> {
                     if (user.getUserId().equals(userDetails.getUserId())
@@ -91,11 +90,7 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
                                 && userDetails.getAuthorities().contains(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
                             user.setRoles(RoleUtil.getSetOfRolesOrThrow(data.getRoles(), this.roleRepository));
                         }
-                        return super.getModelMapper()
-                                .map(this.userRepository.save(user),
-                                        super.getFirstGenericClass())
-                                .setMessage(GeneralUtil.simpleNameClass(User.class)
-                                        + " updated successfully");
+                        return GeneralUtil.responseMessageAction(user, User.class, "updated successfully");
                     }
                     throw new UnauthorizedPermissionException(
                             "You don't have the permission to update this profile");

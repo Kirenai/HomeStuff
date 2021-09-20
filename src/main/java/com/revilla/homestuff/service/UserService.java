@@ -2,6 +2,7 @@ package com.revilla.homestuff.service;
 
 import com.revilla.homestuff.dto.UserDto;
 import com.revilla.homestuff.dto.request.RegisterRequestDto;
+import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.security.AuthUserDetails;
 
 /**
@@ -10,10 +11,10 @@ import com.revilla.homestuff.security.AuthUserDetails;
  */
 public interface UserService extends GeneralService<UserDto, Long> {
 
-    UserDto register(RegisterRequestDto requestDto);
+    ApiResponseDto register(RegisterRequestDto requestDto);
 
     UserDto create(UserDto data);
 
-    UserDto update(Long id, UserDto data, AuthUserDetails userDetails);
+    ApiResponseDto update(Long id, UserDto data, AuthUserDetails userDetails);
 
 }

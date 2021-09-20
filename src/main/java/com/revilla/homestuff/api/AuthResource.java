@@ -1,8 +1,8 @@
 package com.revilla.homestuff.api;
 
-import com.revilla.homestuff.dto.UserDto;
 import com.revilla.homestuff.dto.request.LoginRequestDto;
 import com.revilla.homestuff.dto.request.RegisterRequestDto;
+import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.security.jwt.JwtTokenProvider;
 import com.revilla.homestuff.service.UserService;
@@ -49,8 +49,8 @@ public class AuthResource {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserDto> register(@RequestBody @Valid RegisterRequestDto request) {
-        UserDto response = this.userService.register(request);
+    public ResponseEntity<ApiResponseDto> register(@RequestBody @Valid RegisterRequestDto request) {
+        ApiResponseDto response = this.userService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

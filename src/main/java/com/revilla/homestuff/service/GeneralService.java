@@ -1,5 +1,6 @@
 package com.revilla.homestuff.service;
 
+import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.security.AuthUserDetails;
 import org.springframework.data.domain.Pageable;
 import java.io.Serializable;
@@ -11,6 +12,6 @@ public interface GeneralService<T, ID extends Serializable> {
 
     T findOne(ID id, AuthUserDetails userDetails);
 
-    T delete(ID id, AuthUserDetails userDetails);
+    ApiResponseDto delete(ID id, AuthUserDetails userDetails);
 
 }

@@ -3,6 +3,7 @@ package com.revilla.homestuff.api;
 import java.util.List;
 
 import com.revilla.homestuff.dto.CategoryDto;
+import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.security.CurrentUser;
 import com.revilla.homestuff.service.CategoryService;
@@ -63,11 +64,11 @@ public class CategoryResource {
 
     @PutMapping("/{categoryId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CategoryDto> updateUser(
+    public ResponseEntity<ApiResponseDto> updateUser(
             @PathVariable Long categoryId,
             @RequestBody CategoryDto categoryDto
     ) {
-        CategoryDto response = this.categoryService.update(categoryId, categoryDto);
+        ApiResponseDto response = this.categoryService.update(categoryId, categoryDto);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

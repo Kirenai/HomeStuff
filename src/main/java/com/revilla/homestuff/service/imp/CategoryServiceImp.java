@@ -1,7 +1,7 @@
 package com.revilla.homestuff.service.imp;
 
-import javax.transaction.Transactional;
 import com.revilla.homestuff.dto.CategoryDto;
+import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.entity.Category;
 import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
 import com.revilla.homestuff.repository.CategoryRepository;
@@ -10,6 +10,7 @@ import com.revilla.homestuff.util.GeneralUtil;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,16 +41,15 @@ public class CategoryServiceImp extends GeneralServiceImp<CategoryDto, Long, Cat
         return super.getModelMapper().map(categorySaved, super.getFirstGenericClass());
 	}
 
+    @Transactional
 	@Override
-	public CategoryDto update(Long id, CategoryDto data) {
+	public ApiResponseDto update(Long id, CategoryDto data) {
         log.info("Calling the update method in " + getClass());
         return this.categoryRepository.findById(id)
             .map(c -> {
                 c.setName(data.getName());
-                return super.getModelMapper().map(
-                        this.categoryRepository.save(c),
-                        CategoryDto.class
-                );
+                return GeneralUtil.responseMessageAction(c, Category.class,
+                        "updated successfully");
             })
             .orElseThrow(() -> new EntityNoSuchElementException(
                     GeneralUtil.simpleNameClass(Category.class)

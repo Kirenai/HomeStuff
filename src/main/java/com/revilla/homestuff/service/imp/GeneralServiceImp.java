@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
+import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.service.GeneralService;
 import com.revilla.homestuff.util.GeneralUtil;
@@ -80,15 +80,15 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
 
     @Override
     @Transactional
-    public T delete(ID id, AuthUserDetails userDetails) {
+    public ApiResponseDto delete(ID id, AuthUserDetails userDetails) {
         log.info("Calling the delete method in "
                 + GeneralUtil.simpleNameClass(this.getClass()));
         E obj = GeneralUtil.getEntityByIdOrThrow(id, this.getRepo(),
                 this.getThirdGenericClass());
         GeneralUtil.validateAuthorizationPermissionOrThrow(obj, this.getRepo(), userDetails);
         this.getRepo().delete(obj);
-        T objDto = this.modelMapper.map(obj, this.getFirstGenericClass());
-        return GeneralUtil.addResponseMessageDeleteAction(objDto, this.getFirstGenericClass());
+        return GeneralUtil.responseMessageAction(obj, this.getThirdGenericClass(),
+                "successfully removed");
     }
 
     public abstract JpaRepository<E, ID> getRepo();

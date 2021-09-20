@@ -1,5 +1,6 @@
 package com.revilla.homestuff.exception;
 
+import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.exception.unauthorize.UnauthorizedErrorMessage;
 import com.revilla.homestuff.exception.unauthorize.UnauthorizedPermissionException;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ public class UnauthorizedExceptionHandler {
         return new UnauthorizedErrorMessage(
                 HttpStatus.NOT_FOUND.value(),
                 LocalDateTime.now(),
-                ex.getMessage(),
+                new ApiResponseDto(Boolean.FALSE, ex.getMessage()),
                 request.getDescription(false)
         );
     }

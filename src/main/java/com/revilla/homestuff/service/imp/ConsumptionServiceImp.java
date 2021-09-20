@@ -41,6 +41,8 @@ public class ConsumptionServiceImp extends GeneralServiceImp<ConsumptionDto, Lon
         return this.consumptionRepository;
     }
 
+    // TODO: only the authenticated user can create their own consumptions,
+    // then implement
     @Transactional
     @Override
     public ConsumptionDto create(

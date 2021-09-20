@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import com.revilla.homestuff.dto.response.ApiResponseDto;
 
 @Data
 @AllArgsConstructor
@@ -13,7 +14,7 @@ public class EntityErrorMessage {
 
     private Integer statusCode;
     private LocalDateTime timestamp;
-    private String message;
+    private ApiResponseDto response;
     private String description;
 
 }

@@ -1,6 +1,7 @@
 package com.revilla.homestuff.service.imp;
 
 import com.revilla.homestuff.dto.RoleDto;
+import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.entity.Role;
 import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
 import com.revilla.homestuff.repository.RoleRepository;
@@ -42,17 +43,14 @@ public class RoleServiceImp extends GeneralServiceImp<RoleDto, Long, Role> imple
     }
 
     @Override
-    public RoleDto update(Long id, RoleDto data) {
+    public ApiResponseDto update(Long id, RoleDto data) {
         log.info("Calling the update method in "
                 + GeneralUtil.simpleNameClass(this.getClass()));
         return this.roleRepository.findById(id)
-                .map(u -> {
-                    u.setName(data.getName());
-                    return super.getModelMapper()
-                            .map(
-                                    this.roleRepository.save(u),
-                                    super.getFirstGenericClass()
-                            );
+                .map(role -> {
+                    role.setName(data.getName());
+                    return GeneralUtil.responseMessageAction(role, Role.class,
+                            "updated successfully");
                 })
                 .orElseThrow(() -> new EntityNoSuchElementException(
                         GeneralUtil.simpleNameClass(Role.class)

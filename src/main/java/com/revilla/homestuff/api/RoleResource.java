@@ -1,6 +1,7 @@
 package com.revilla.homestuff.api;
 
 import com.revilla.homestuff.dto.RoleDto;
+import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.security.CurrentUser;
 import com.revilla.homestuff.service.RoleService;
@@ -56,9 +57,9 @@ public class RoleResource {
 
     @PutMapping("/{roleId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<RoleDto> updateRole(@PathVariable Long roleId,
+    public ResponseEntity<ApiResponseDto> updateRole(@PathVariable Long roleId,
                                               @RequestBody RoleDto roleDto) {
-        RoleDto response = this.roleService.update(roleId, roleDto);
+        ApiResponseDto response = this.roleService.update(roleId, roleDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
