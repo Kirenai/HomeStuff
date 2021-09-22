@@ -63,7 +63,7 @@ public class JwtTokenProvider {
     public boolean validateJwtToken(String token) {
         try {
             Jwts.parserBuilder()
-                    .setSigningKey(this.secretKey.getBytes())
+                    .setSigningKey(Keys.hmacShaKeyFor(this.getSecretKey().getBytes()))
                     .build()
                     .parseClaimsJws(token);
             return true;
