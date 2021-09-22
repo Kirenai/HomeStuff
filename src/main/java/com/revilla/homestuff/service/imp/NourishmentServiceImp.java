@@ -9,17 +9,15 @@ import com.revilla.homestuff.entity.Category;
 import com.revilla.homestuff.entity.Nourishment;
 import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
-import com.revilla.homestuff.exception.unauthorize.UnauthorizedPermissionException;
 import com.revilla.homestuff.repository.CategoryRepository;
 import com.revilla.homestuff.repository.NourishmentRepository;
 import com.revilla.homestuff.repository.UserRepository;
 import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.service.NourishmentService;
 import com.revilla.homestuff.util.GeneralUtil;
-import com.revilla.homestuff.util.enums.RoleName;
+import com.revilla.homestuff.util.enums.MessageAction;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -41,47 +39,42 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
     private final CategoryRepository categoryRepository;
 
     @Override
-	public JpaRepository<Nourishment, Long> getRepo() {
-		return this.nourishmentRepository;
+    public JpaRepository<Nourishment, Long> getRepo() {
+        return this.nourishmentRepository;
     }
 
     @Transactional
     @Override
-    public NourishmentDto create(
-            Long userId,
-            Long categoryId,
-            NourishmentDto data) {
+    public NourishmentDto create(Long userId, Long categoryId, NourishmentDto data,
+            AuthUserDetails userDetails) {
         log.info("Calling the create method in "
                 + GeneralUtil.simpleNameClass(this.getClass()));
-        GeneralUtil.validateDuplicateConstraintViolation(data.getName(),
-                this.nourishmentRepository, Nourishment.class);
-        Nourishment nourishment = super.getModelMapper().map(data,
-                super.getThirdGenericClass());
-        nourishment.setIsAvailable(true);
-        User user = GeneralUtil.getEntityByIdOrThrow(userId, this.userRepository,
-                User.class);
-        Category category = GeneralUtil.getEntityByIdOrThrow(categoryId,
-                this.categoryRepository, Category.class);
+        GeneralUtil.validateDuplicateConstraintViolation(data.getName(), this.nourishmentRepository,
+                Nourishment.class);
+        User user = GeneralUtil.getEntityByIdOrThrow(userId, this.userRepository, User.class);
+        Nourishment nourishment = super.getModelMapper().map(data, super.getThirdGenericClass());
         nourishment.setUser(user);
+        GeneralUtil.validateAuthorizationPermissionOrThrow(nourishment, userDetails,
+                MessageAction.CREATE);
+        nourishment.setIsAvailable(true);
+        Category category = GeneralUtil.getEntityByIdOrThrow(categoryId, this.categoryRepository,
+                Category.class);
         nourishment.setCategory(category);
         nourishment.getAmountNourishment().setNourishment(nourishment);
         Nourishment nourishmentSaved = this.nourishmentRepository.save(nourishment);
         return super.getModelMapper().map(nourishmentSaved, super.getFirstGenericClass())
-                .setMessage(GeneralUtil.simpleNameClass(Nourishment.class)
-                        + " created successfully");
+                .setMessage(
+                        GeneralUtil.simpleNameClass(Nourishment.class) + " created successfully");
     }
 
     @Transactional
-	@Override
-	public ApiResponseDto update(Long id, NourishmentDto data,
-            AuthUserDetails userDetails) {
-        log.info("Calling the update method in "
-                + GeneralUtil.simpleNameClass(this.getClass()));
+    @Override
+    public ApiResponseDto update(Long id, NourishmentDto data, AuthUserDetails userDetails) {
+        log.info("Calling the update method in " + GeneralUtil.simpleNameClass(this.getClass()));
         return this.nourishmentRepository.findById(id)
-            .map(n -> {
-                if (n.getUser().getUserId().equals(userDetails.getUserId())
-                            || userDetails.getAuthorities().contains(
-                                    new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
+                .map(n -> {
+                    GeneralUtil.validateAuthorizationPermissionOrThrow(n, userDetails,
+                            MessageAction.UPDATE);
                     n.setName(data.getName());
                     n.setImagePath(data.getImagePath());
                     n.setDescription(data.getDescription());
@@ -99,14 +92,10 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
                     }
                     return GeneralUtil.responseMessageAction(n, Nourishment.class,
                             "updated successfully");
-                }
-                throw new UnauthorizedPermissionException(
-                        "You don't have the permission to update this nourishment");
-            })
-            .orElseThrow(() -> new EntityNoSuchElementException(
-                    GeneralUtil.simpleNameClass(Nourishment.class)
-                            + " don't found with id: " + id)
-            );
-	}
+                })
+                .orElseThrow(() -> new EntityNoSuchElementException(
+                        GeneralUtil.simpleNameClass(Nourishment.class) + " don't found with id: "
+                                + id));
+    }
 
 }

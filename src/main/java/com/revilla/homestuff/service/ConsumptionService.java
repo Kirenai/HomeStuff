@@ -1,6 +1,7 @@
 package com.revilla.homestuff.service;
 
 import com.revilla.homestuff.dto.ConsumptionDto;
+import com.revilla.homestuff.security.AuthUserDetails;
 
 /**
  * ConsumptionService
@@ -8,9 +9,7 @@ import com.revilla.homestuff.dto.ConsumptionDto;
  */
 public interface ConsumptionService extends GeneralService<ConsumptionDto, Long> {
 
-    ConsumptionDto create(Long nourishmentId, Long userId, ConsumptionDto data);
-
-    ConsumptionDto update(Long id, ConsumptionDto categoryDto);
+    ConsumptionDto create(Long nourishmentId, Long userId, ConsumptionDto data, AuthUserDetails userDetails);
 
 }
 

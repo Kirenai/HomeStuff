@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * CategoryService
+ *
  * @author Kirenai
  */
 @Slf4j
@@ -23,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Qualifier("category.service")
 public class CategoryServiceImp extends GeneralServiceImp<CategoryDto, Long, Category>
-    implements CategoryService {
+        implements CategoryService {
 
     private final CategoryRepository categoryRepository;
 
@@ -33,28 +34,23 @@ public class CategoryServiceImp extends GeneralServiceImp<CategoryDto, Long, Cat
     }
 
     @Transactional
-	@Override
-	public CategoryDto create(CategoryDto data) {
+    @Override
+    public CategoryDto create(CategoryDto data) {
         log.info("Calling the create method in " + getClass());
         Category category = super.getModelMapper().map(data, super.getThirdGenericClass());
         Category categorySaved = this.categoryRepository.save(category);
         return super.getModelMapper().map(categorySaved, super.getFirstGenericClass());
-	}
+    }
 
     @Transactional
-	@Override
-	public ApiResponseDto update(Long id, CategoryDto data) {
+    @Override
+    public ApiResponseDto update(Long id, CategoryDto data) {
         log.info("Calling the update method in " + getClass());
-        return this.categoryRepository.findById(id)
-            .map(c -> {
-                c.setName(data.getName());
-                return GeneralUtil.responseMessageAction(c, Category.class,
-                        "updated successfully");
-            })
-            .orElseThrow(() -> new EntityNoSuchElementException(
-                    GeneralUtil.simpleNameClass(Category.class)
-                            + " don't found with id: " + id)
-            );
+        return this.categoryRepository.findById(id).map(c -> {
+            c.setName(data.getName());
+            return GeneralUtil.responseMessageAction(c, Category.class, "updated successfully");
+        }).orElseThrow(() -> new EntityNoSuchElementException(
+                GeneralUtil.simpleNameClass(Category.class) + " don't found with id: " + id));
     }
 
 }

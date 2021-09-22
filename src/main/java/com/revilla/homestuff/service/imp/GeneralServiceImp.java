@@ -8,6 +8,7 @@ import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.service.GeneralService;
 import com.revilla.homestuff.util.GeneralUtil;
+import com.revilla.homestuff.util.enums.MessageAction;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.GenericTypeResolver;
@@ -74,7 +75,7 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
                 + GeneralUtil.simpleNameClass(this.getClass()));
         E obj = GeneralUtil.getEntityByIdOrThrow(id, this.getRepo(),
                 this.getThirdGenericClass());
-        GeneralUtil.validateAuthorizationPermissionOrThrow(obj, this.getRepo(), userDetails);
+        GeneralUtil.validateAuthorizationPermissionOrThrow(obj, userDetails, MessageAction.ACCESS);
         return this.modelMapper.map(obj, this.getFirstGenericClass());
     }
 
@@ -85,7 +86,7 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
                 + GeneralUtil.simpleNameClass(this.getClass()));
         E obj = GeneralUtil.getEntityByIdOrThrow(id, this.getRepo(),
                 this.getThirdGenericClass());
-        GeneralUtil.validateAuthorizationPermissionOrThrow(obj, this.getRepo(), userDetails);
+        GeneralUtil.validateAuthorizationPermissionOrThrow(obj, userDetails, MessageAction.ACCESS);
         this.getRepo().delete(obj);
         return GeneralUtil.responseMessageAction(obj, this.getThirdGenericClass(),
                 "successfully removed");

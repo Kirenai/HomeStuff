@@ -58,12 +58,14 @@ public class NourishmentResource {
     public ResponseEntity<NourishmentDto> createNourishment(
             @PathVariable Long userId,
             @PathVariable Long categoryId,
-            @RequestBody NourishmentDto nourishmentDto
+            @RequestBody NourishmentDto nourishmentDto,
+            @CurrentUser AuthUserDetails userDetails
     ) {
         NourishmentDto response = this.nourishmentService.create(
                 userId,
                 categoryId,
-                nourishmentDto
+                nourishmentDto,
+                userDetails
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

@@ -37,7 +37,7 @@ public class EntityExceptionHandler {
             WebRequest request) {
         log.error("Error: " + ex.getMessage());
         return new EntityErrorMessage(
-                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.BAD_REQUEST.value(),
                 LocalDateTime.now(),
                 new ApiResponseDto(Boolean.FALSE, ex.getMessage()),
                 request.getDescription(false)

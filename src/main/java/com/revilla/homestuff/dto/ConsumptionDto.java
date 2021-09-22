@@ -28,10 +28,6 @@ public class ConsumptionDto {
 
     private BigDecimal percentage;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private NourishmentDto nourishment;
-
-    //@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private UserDtoOnly user;
 
 }

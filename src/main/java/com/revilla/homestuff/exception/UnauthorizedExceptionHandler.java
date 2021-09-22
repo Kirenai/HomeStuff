@@ -23,7 +23,7 @@ public class UnauthorizedExceptionHandler {
             WebRequest request) {
         log.error("Error: " + ex.getMessage());
         return new UnauthorizedErrorMessage(
-                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.UNAUTHORIZED.value(),
                 LocalDateTime.now(),
                 new ApiResponseDto(Boolean.FALSE, ex.getMessage()),
                 request.getDescription(false)

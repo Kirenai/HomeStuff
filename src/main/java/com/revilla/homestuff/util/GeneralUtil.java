@@ -3,6 +3,7 @@ package com.revilla.homestuff.util;
 import java.io.Serializable;
 import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.entity.Category;
+import com.revilla.homestuff.entity.Consumption;
 import com.revilla.homestuff.entity.Nourishment;
 import com.revilla.homestuff.entity.Role;
 import com.revilla.homestuff.entity.User;
@@ -13,6 +14,7 @@ import com.revilla.homestuff.repository.NourishmentRepository;
 import com.revilla.homestuff.repository.RoleRepository;
 import com.revilla.homestuff.repository.UserRepository;
 import com.revilla.homestuff.security.AuthUserDetails;
+import com.revilla.homestuff.util.enums.MessageAction;
 import com.revilla.homestuff.util.enums.RoleName;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -60,10 +62,10 @@ public class GeneralUtil {
         }
     }
 
-    public static <E, ID> void validateAuthorizationPermissionOrThrow(
+    public static <E> void validateAuthorizationPermissionOrThrow(
             @NotNull E obj,
-            @NotNull JpaRepository<E, ID> repo,
-            @NotNull AuthUserDetails userDetails) {
+            @NotNull AuthUserDetails userDetails,
+            @NotNull MessageAction action) {
         String errorMessage = null;
         if (obj instanceof User) {
             if (((User) obj).getUserId().equals(userDetails.getUserId())
@@ -71,7 +73,7 @@ public class GeneralUtil {
                             .contains(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
                 return;
             }
-            errorMessage = "You don't have the permission to access this profile";
+            errorMessage = "You don't have the permission to " + action.name() + " this profile";
         }
         if (obj instanceof Nourishment) {
             if (((Nourishment) obj).getUser().getUserId().equals(userDetails.getUserId())
@@ -79,14 +81,22 @@ public class GeneralUtil {
                             .contains(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
                 return;
             }
-            errorMessage = "You don't have the permission to access this nourishment";
+            errorMessage = "You don't have the permission to " + action.name() + " this nourishment";
+        }
+        if (obj instanceof Consumption) {
+            if (((Consumption) obj).getUser().getUserId().equals(userDetails.getUserId())
+                    || userDetails.getAuthorities()
+                            .contains(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
+                return;
+            }
+            errorMessage = "You don't have the permission to " + action.name() + " this Consumption";
         }
         if (obj instanceof Role) {
             if (userDetails.getAuthorities()
                     .contains(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
                 return;
             }
-            errorMessage = "You don't have the permission to access this role";
+            errorMessage = "You don't have the permission to " + action.name() + " this Role";
         }
         throw new UnauthorizedPermissionException(errorMessage);
     }

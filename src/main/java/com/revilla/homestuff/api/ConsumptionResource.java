@@ -46,7 +46,7 @@ public class ConsumptionResource {
     }
 
     @GetMapping("/{consumptionId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<ConsumptionDto> getConsumption(
             @PathVariable Long consumptionId,
             @CurrentUser AuthUserDetails userDetails
@@ -61,9 +61,10 @@ public class ConsumptionResource {
     public ResponseEntity<ConsumptionDto> createConsumption(
             @PathVariable Long nourishmentId,
             @PathVariable Long userId,
-            @RequestBody ConsumptionDto consumptionDto) {
+            @RequestBody ConsumptionDto consumptionDto,
+            @CurrentUser AuthUserDetails userDetails) {
         ConsumptionDto response = this.consumptionService.create(nourishmentId,
-                userId, consumptionDto);
+                userId, consumptionDto, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

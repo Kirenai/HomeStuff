@@ -10,7 +10,7 @@ import com.revilla.homestuff.security.AuthUserDetails;
  */
 public interface NourishmentService extends GeneralService<NourishmentDto, Long> {
 
-    NourishmentDto create(Long userId, Long CategoryId,  NourishmentDto data);
+    NourishmentDto create(Long userId, Long CategoryId,  NourishmentDto data, AuthUserDetails userDetails);
 
     ApiResponseDto update(Long id, NourishmentDto nourishmentDto, AuthUserDetails userDetails);
 

@@ -5,12 +5,13 @@ import com.revilla.homestuff.entity.AmountNourishment;
 import com.revilla.homestuff.entity.Consumption;
 import com.revilla.homestuff.entity.Nourishment;
 import com.revilla.homestuff.entity.User;
-import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
 import com.revilla.homestuff.repository.ConsumptionRepository;
 import com.revilla.homestuff.repository.NourishmentRepository;
 import com.revilla.homestuff.repository.UserRepository;
+import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.service.ConsumptionService;
 import com.revilla.homestuff.util.GeneralUtil;
+import com.revilla.homestuff.util.enums.MessageAction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.Objects;
 
 /**
  * ConsumptionService
@@ -41,65 +43,51 @@ public class ConsumptionServiceImp extends GeneralServiceImp<ConsumptionDto, Lon
         return this.consumptionRepository;
     }
 
-    // TODO: only the authenticated user can create their own consumptions,
-    // then implement
     @Transactional
     @Override
     public ConsumptionDto create(
             Long nourishmentId,
             Long userId,
-            ConsumptionDto data) {
+            ConsumptionDto data,
+            AuthUserDetails userDetails) {
         log.info("Calling the create method in "
                 + GeneralUtil.simpleNameClass(this.getClass()));
-        Consumption consumption = super.getModelMapper().map(data, super.getThirdGenericClass());
+        User user = GeneralUtil.getEntityByIdOrThrow(userId, this.userRepository, User.class);
         Nourishment nourishment = GeneralUtil.getEntityByIdOrThrow(nourishmentId,
                 this.nourishmentRepository, Nourishment.class);
-        User user = GeneralUtil.getEntityByIdOrThrow(userId, this.userRepository,
-                User.class);
+        Consumption consumption = super.getModelMapper().map(data, super.getThirdGenericClass());
+        consumption.setUser(user);
+        GeneralUtil.validateAuthorizationPermissionOrThrow(consumption, userDetails,
+                MessageAction.CREATE);
         AmountNourishment amountNourishment = nourishment.getAmountNourishment();
-        if (data.getUnit() != null) { //then, refactor
-            if (Byte.toUnsignedInt(data.getUnit()) > Byte.toUnsignedInt(amountNourishment.getUnit())) {
+        if (Objects.nonNull(data.getUnit())) { // then, refactor
+            if (Byte.toUnsignedInt(data.getUnit()) > Byte
+                    .toUnsignedInt(amountNourishment.getUnit())) {
                 throw new IllegalStateException("amount exceeded");
             }
-            int unitUpdatedValue = (Byte.toUnsignedInt(amountNourishment.getUnit()) - Byte.toUnsignedInt(data.getUnit()));
+            int unitUpdatedValue = (Byte.toUnsignedInt(amountNourishment.getUnit())
+                    - Byte.toUnsignedInt(data.getUnit()));
             amountNourishment.setUnit((byte) unitUpdatedValue);
             if (amountNourishment.getUnit() == 0) {
                 nourishment.setIsAvailable(false);
             }
-        } else if (data.getPercentage() != null) { //then, refactor
-            if (data.getPercentage().doubleValue() > amountNourishment.getPercentage().doubleValue()) {
+        } else if (Objects.nonNull(data.getPercentage())) { // then, refactor
+            if (data.getPercentage().doubleValue() > amountNourishment.getPercentage()
+                    .doubleValue()) {
                 throw new IllegalStateException("percentage exceeded");
             }
-            double percentageUpdatedValue = (amountNourishment.getPercentage().doubleValue() - data.getPercentage().doubleValue());
+            double percentageUpdatedValue = (amountNourishment.getPercentage().doubleValue()
+                    - data.getPercentage().doubleValue());
             amountNourishment.setPercentage(new BigDecimal(percentageUpdatedValue));
             if (amountNourishment.getPercentage().doubleValue() == 0.00) {
                 nourishment.setIsAvailable(false);
             }
         }
         consumption.setNourishment(nourishment);
-        consumption.setUser(user);
         Consumption consumptionSaved = this.consumptionRepository.save(consumption);
-        return super.getModelMapper().map(consumptionSaved, super.getFirstGenericClass());
+        return super.getModelMapper().map(consumptionSaved, super.getFirstGenericClass())
+                .setMessage(
+                        GeneralUtil.simpleNameClass(Consumption.class) + " created successfully");
     }
-
-    @Override
-    public ConsumptionDto update(Long id, ConsumptionDto data) {
-        log.info("Calling the update method in "
-                + GeneralUtil.simpleNameClass(this.getClass()));
-        return this.consumptionRepository.findById(id)
-                .map(c -> {
-                    c.setUnit(data.getUnit());
-                    c.setPercentage(data.getPercentage());
-                    return super.getModelMapper().map(
-                            this.consumptionRepository.save(c),
-                            super.getFirstGenericClass()
-                    );
-                })
-                .orElseThrow(() -> new EntityNoSuchElementException(
-                        GeneralUtil.simpleNameClass(Consumption.class)
-                                + " don't found with id: " + id)
-                );
-    }
-
 
 }
