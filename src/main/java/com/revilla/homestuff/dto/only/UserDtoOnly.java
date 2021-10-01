@@ -19,16 +19,20 @@ public class UserDtoOnly {
     private Long userId;
 
     @NotEmpty
+    @Size(min = 2, max = 50)
     private String username;
 
     @NotEmpty
+    @Size(min = 8, max = 64)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @NotEmpty
+    @Size(min = 2, max = 50)
     private String firstName;
 
     @NotEmpty
+    @Size(min = 2, max = 50)
     private String lastName;
 
     @Min(value = 0)

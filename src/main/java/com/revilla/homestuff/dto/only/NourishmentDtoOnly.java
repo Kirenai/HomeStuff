@@ -1,5 +1,7 @@
 package com.revilla.homestuff.dto.only;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -23,8 +25,12 @@ public class NourishmentDtoOnly {
 
     private Long nourishmentId;
 
+    @NotEmpty
+    @Size(min = 2, max = 35)
     private String name;
 
+    @NotEmpty
+    @Size(min = 2, max = 45)
     private String imagePath;
 
     private String description;
