@@ -15,7 +15,7 @@ import lombok.ToString;
  * @author Kirenai
  */
 @Data
-@ToString(exclude = {"nourishment", "user"})
+@ToString(exclude = {"user"})
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -30,4 +30,16 @@ public class ConsumptionDto {
 
     private UserDtoOnly user;
 
+    private String message;
+
+    /**
+     * Adding a message to the response
+     *
+     * @param message of response
+     * @return the object reference (this)
+     */
+    public ConsumptionDto setMessage(String message) {
+        this.message = message;
+        return this;
+    }
 }
