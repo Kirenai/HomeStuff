@@ -3,12 +3,14 @@ package com.revilla.homestuff.service.imp;
 import com.revilla.homestuff.dto.RoleDto;
 import com.revilla.homestuff.entity.Role;
 import com.revilla.homestuff.exception.entity.EntityDuplicateConstraintViolationException;
+import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
 import com.revilla.homestuff.repository.RoleRepository;
 import com.revilla.homestuff.service.RoleService;
 import com.revilla.homestuff.util.GeneralUtil;
 import com.revilla.homestuff.util.enums.RoleName;
 import com.revilla.homestuff.utils.RoleServiceDataTestUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +20,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -58,8 +62,8 @@ class RoleServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should not throw exception when role name is not duplicated and create role name")
-    void shouldNotThrowExceptionWhenRoleNameIsNotDuplicatedAndCreateRoleName() {
+    @DisplayName("Should not throw exception when role name is not duplicated and create a role")
+    void shouldNotThrowExceptionWhenRoleNameIsNotDuplicatedAndCreateRole() {
         String expected = "ROLE_USER";
         Role role = RoleServiceDataTestUtils.getMockRole(1L, RoleName.ROLE_USER);
         RoleDto roleDto = RoleServiceDataTestUtils.getMockRoleDto(1L, RoleName.ROLE_USER);
@@ -80,10 +84,29 @@ class RoleServiceImpTest {
     }
 
     @Test
-    void create() {
+    @DisplayName("Should throw an exception when a role by id is not found")
+    void shouldThrowExceptionWhenRoleByIdIsNotFound() {
+        Long roleId = 1L;
+        String expected = GeneralUtil.simpleNameClass(Role.class)
+                + " don't found with id: " + roleId;
+
+        Mockito.when(this.roleRepository.findById(roleId)).thenReturn(Optional.empty());
+
+        EntityNoSuchElementException ex = assertThrows(EntityNoSuchElementException.class,
+                () -> this.roleService.update(roleId, new RoleDto()));
+
+        assertEquals(expected, ex.getMessage());
+
+        Mockito.verify(this.roleRepository).findById(roleId);
     }
 
+    // TODO: To implement this test, first implement the service
     @Test
-    void update() {
+    @DisplayName("Should update a Role when found by id")
+    @Disabled
+    void shouldUpdateARole() {
+        Long roleId = 1L;
+        Role role = RoleServiceDataTestUtils.getMockRole(roleId, RoleName.ROLE_USER);
+        Mockito.when(this.roleRepository.findById(roleId)).thenReturn(Optional.of(role));
     }
 }
