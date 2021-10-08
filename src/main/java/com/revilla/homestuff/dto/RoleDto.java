@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.revilla.homestuff.dto.only.RoleDtoOnly;
 import com.revilla.homestuff.dto.only.UserDtoOnly;
+import com.revilla.homestuff.util.enums.RoleName;
 import lombok.*;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.Collection;
 
 /**
@@ -22,5 +24,10 @@ import java.util.Collection;
 public class RoleDto extends RoleDtoOnly {
 
     private Collection<UserDtoOnly> users;
+
+    public RoleDto(Long roleId, @NotEmpty RoleName name, Collection<UserDtoOnly> users) {
+        super(roleId, name);
+        this.users = users;
+    }
 
 }

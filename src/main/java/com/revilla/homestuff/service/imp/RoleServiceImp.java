@@ -7,6 +7,7 @@ import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
 import com.revilla.homestuff.repository.RoleRepository;
 import com.revilla.homestuff.service.RoleService;
 import com.revilla.homestuff.util.GeneralUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Qualifier("role.service")
 public class RoleServiceImp extends GeneralServiceImp<RoleDto, Long, Role> implements RoleService {
 
+    @Autowired
     private final RoleRepository roleRepository;
 
     @Override

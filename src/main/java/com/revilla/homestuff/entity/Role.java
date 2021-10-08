@@ -5,10 +5,7 @@ import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.revilla.homestuff.util.enums.RoleName;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.NaturalId;
 
 /**
@@ -16,6 +13,8 @@ import org.hibernate.annotations.NaturalId;
  * @author Kirenai
  */
 @Data
+@Builder
+@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(exclude = {"users"})

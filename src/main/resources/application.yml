@@ -6,6 +6,13 @@ server:
     include-stacktrace: never
 
 spring:
+  profiles:
+    active: dev
+
+---
+
+spring:
+  profiles: dev
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     platform: mysql
@@ -27,3 +34,18 @@ spring:
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false
     time-zone: UTC
+---
+
+spring:
+  profiles: test
+  datasource:
+    driver-class-name: jdbc:h2:mem:testdb
+    url: root
+    password: test
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+
+---

@@ -4,16 +4,14 @@ import javax.validation.constraints.NotEmpty;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.revilla.homestuff.util.enums.RoleName;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 /**
  * RoleDtoOnly
  * @author Kirenai
  */
 @Data
+@EqualsAndHashCode
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor

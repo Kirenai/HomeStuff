@@ -6,20 +6,18 @@ import com.revilla.homestuff.repository.RoleRepository;
 import com.revilla.homestuff.repository.UserRepository;
 import com.revilla.homestuff.service.UserService;
 import com.revilla.homestuff.util.GeneralUtil;
+import com.revilla.homestuff.utils.UserServiceDataTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Collections;
-
-import static com.revilla.homestuff.entity.User.builder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -28,7 +26,6 @@ import static org.mockito.Mockito.when;
 class UserServiceImpTest {
 
     @Autowired
-    @Qualifier("user.service")
     private UserService userServiceImp;
     @MockBean
     private UserRepository userRepository;
@@ -39,11 +36,13 @@ class UserServiceImpTest {
     @MockBean
     private ModelMapper modelMapper;
 
-    private User user;
-    private UserDto userDto;
-
     @BeforeEach
     void setUp() {
+
+    }
+
+    @Test
+    void createTest() {
         Long userId = 1L;
         String username = "Kirenai";
         String password = "kirenai";
@@ -51,31 +50,9 @@ class UserServiceImpTest {
         String lastName = "Kirenai";
         Byte age = 22;
 
-        user = builder()
-                .userId(userId)
-                .username(username)
-                .password(password)
-                .firstName(firstName)
-                .lastName(lastName)
-                .age(age)
-                .roles(Collections.emptySet())
-                .build();
+        var user = UserServiceDataTestUtils.getMockUser(userId, username, password, firstName, lastName, age);
+        var userDto = UserServiceDataTestUtils.getMockUserDto(userId, username, password, firstName, lastName, age);
 
-        userDto = new UserDto(
-                userId,
-                username,
-                password,
-                firstName,
-                lastName,
-                age,
-                Collections.emptySet(),
-                Collections.emptyList(),
-                Collections.emptyList()
-        );
-    }
-
-    @Test
-    void createTest() {
         when(this.modelMapper.map(userDto, User.class)).thenReturn(user);
         when(this.userRepository.save(user)).thenReturn(user);
         when(this.modelMapper.map(user, UserDto.class)).thenReturn(userDto);
@@ -84,6 +61,10 @@ class UserServiceImpTest {
         String expected = GeneralUtil.simpleNameClass(User.class)
                 + " created successfully by admin";
         assertEquals(expected, userSaved.getMessage());
+
+        Mockito.verify(this.modelMapper).map(userDto, User.class);
+        Mockito.verify(this.userRepository).save(user);
+        Mockito.verify(this.modelMapper).map(user, UserDto.class);
     }
 
 }
