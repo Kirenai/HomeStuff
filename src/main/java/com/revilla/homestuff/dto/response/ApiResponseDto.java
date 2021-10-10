@@ -1,6 +1,7 @@
 package com.revilla.homestuff.dto.response;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
  * @author Kirenai
  */
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApiResponseDto {

@@ -1,14 +1,21 @@
 package com.revilla.homestuff.service.imp;
 
 import com.revilla.homestuff.dto.RoleDto;
+import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.entity.Role;
+import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.exception.entity.EntityDuplicateConstraintViolationException;
 import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
+import com.revilla.homestuff.exception.unauthorize.UnauthorizedPermissionException;
 import com.revilla.homestuff.repository.RoleRepository;
+import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.service.RoleService;
 import com.revilla.homestuff.util.GeneralUtil;
+import com.revilla.homestuff.util.enums.MessageAction;
 import com.revilla.homestuff.util.enums.RoleName;
 import com.revilla.homestuff.utils.RoleServiceDataTestUtils;
+import com.revilla.homestuff.utils.UserServiceDataTestUtils;
+import com.revilla.homestuff.utils.dto.response.ApiResponseDataTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -22,9 +29,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Optional;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,6 +44,14 @@ class RoleServiceImpTest {
     private RoleRepository roleRepository;
     @MockBean
     private ModelMapper modelMapper;
+
+    private final Long roleId = 1L;
+    private final Long userId = 1L;
+    private final String username = "kirenai";
+    private final String password = "kirenai";
+    private final String firstName = "kirenai";
+    private final String lastName = "kirenai";
+    private final Byte age = 22;
 
     @BeforeEach
     void setUp() {
@@ -86,7 +101,6 @@ class RoleServiceImpTest {
     @Test
     @DisplayName("Should throw an exception when a role by id is not found")
     void shouldThrowExceptionWhenRoleByIdIsNotFound() {
-        Long roleId = 1L;
         String expected = GeneralUtil.simpleNameClass(Role.class)
                 + " don't found with id: " + roleId;
 
@@ -105,8 +119,74 @@ class RoleServiceImpTest {
     @DisplayName("Should update a Role when found by id")
     @Disabled
     void shouldUpdateARole() {
-        Long roleId = 1L;
         Role role = RoleServiceDataTestUtils.getMockRole(roleId, RoleName.ROLE_USER);
         Mockito.when(this.roleRepository.findById(roleId)).thenReturn(Optional.of(role));
     }
+
+    @Test
+    @DisplayName("Should throw an exception when a role is not found by id")
+    void shouldThrowExceptionWhenRoleIsNotFoundById() {
+        String expected = GeneralUtil.simpleNameClass(Role.class)
+                + " don't found with id: " + roleId;
+        Mockito.when(this.roleRepository.findById(roleId))
+                .thenReturn(Optional.empty());
+
+        EntityNoSuchElementException ex =
+                assertThrows(EntityNoSuchElementException.class,
+                        () -> this.roleService.delete(roleId, null));
+
+        assertEquals(expected, ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Should throw an exception when user is unauthorized")
+    void shouldThrowExceptionWhenUserIsUnauthorized() {
+        String expected = "You don't have the permission to "
+                + MessageAction.ACCESS.name() + " this Role";
+
+        Role roleMock = RoleServiceDataTestUtils.getMockRole(roleId,
+                RoleName.ROLE_USER);
+        User userMock = UserServiceDataTestUtils.getMockUser(userId,
+                username, password, firstName, lastName, age);
+
+        AuthUserDetails userDetails = new AuthUserDetails(userMock);
+
+        Mockito.when(this.roleRepository.findById(roleId))
+                .thenReturn(Optional.of(roleMock));
+
+        UnauthorizedPermissionException ex =
+                assertThrows(UnauthorizedPermissionException.class,
+                        () -> this.roleService.delete(roleId, userDetails));
+
+        assertEquals(expected, ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Should delete a role when a role is found by id and user have authorization")
+    void shouldDeleteRoleWhenRoleIsFoundByIdAndUserHaveAuthorization() {
+        String messageAction = "successfully removed";
+
+        Role roleMock = RoleServiceDataTestUtils.getMockRole(roleId,
+                RoleName.ROLE_ADMIN);
+        User userMock = UserServiceDataTestUtils.getMockUser(userId,
+                username, password, firstName, lastName, age);
+        userMock.setRoles(Set.of(roleMock));
+        ApiResponseDto response = ApiResponseDataTestUtils
+                .getMockRoleResponse(messageAction, Role.class);
+
+        AuthUserDetails userDetails = new AuthUserDetails(userMock);
+
+        Mockito.when(this.roleRepository.findById(roleId))
+                .thenReturn(Optional.of(roleMock));
+        Mockito.doNothing().when(this.roleRepository).delete(any(Role.class));
+
+        ApiResponseDto deleteResponse = this.roleService.delete(roleId, userDetails);
+
+        assertEquals(response.getMessage(), deleteResponse.getMessage());
+        assertTrue(deleteResponse.getSuccess());
+
+        Mockito.verify(this.roleRepository).findById(roleId);
+        Mockito.verify(this.roleRepository).delete(roleMock);
+    }
+
 }
