@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: "Home Stuff"
+  config:
+    active:
+     on-profile: "dev"
+  datasource:
+    driver-class-name: "com.mysql.cj.jdbc.Driver"
+    platform: "mysql"
+    url: "jdbc:mysql://localhost:3306/household_things_inventory?serverTimezone=UTC"
+    username: "root"
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: "update"
+    generate-ddl: "true"
+    show-sql: "true"
+    properties:
+      hibernate:
+        format_sql: "true"
+        dialect: "org.hibernate.dialect.MySQL8Dialect"
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: "false"
+    time-zone: "UTC"

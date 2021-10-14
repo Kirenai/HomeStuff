@@ -3,16 +3,19 @@ package com.revilla.homestuff.service.imp;
 import com.revilla.homestuff.dto.UserDto;
 import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.exception.entity.EntityDuplicateConstraintViolationException;
+import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
+import com.revilla.homestuff.exception.unauthorize.UnauthorizedPermissionException;
 import com.revilla.homestuff.repository.RoleRepository;
 import com.revilla.homestuff.repository.UserRepository;
+import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.service.UserService;
 import com.revilla.homestuff.util.GeneralUtil;
+import com.revilla.homestuff.util.enums.MessageAction;
 import com.revilla.homestuff.utils.UserServiceDataTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +23,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
@@ -41,54 +45,100 @@ class UserServiceImpTest {
     @MockBean
     private ModelMapper modelMapper;
 
-    private final Long userId = 1L;
-    private final String username = "kirenai";
-    private final String password = "kirenai";
-    private final String firstName = "kirenai";
-    private final String lastName = "kirenai";
-    private final Byte age = 22;
+    private User userMock;
+    private User userMockAuth;
+    private UserDto userDtoMock;
 
     @BeforeEach
     void setUp() {
+        Long userId = 1L;
+        Long userIdAuth = 2L;
+        String username = "kirenai";
+        String password = "kirenai";
+        String firstName = "kirenai";
+        String lastName = "kirenai";
+        Byte age = 22;
+        this.userMock = UserServiceDataTestUtils.getMockUser(userId, username,
+                password, firstName, lastName, age);
+        this.userDtoMock = UserServiceDataTestUtils.getMockUserDto(userId, username,
+                password, firstName, lastName, age);
+        this.userMockAuth = UserServiceDataTestUtils.getMockUser(userIdAuth, username,
+                password, firstName, lastName, age);
 
     }
 
     @Test
     @DisplayName("Should throw an exception when username is already exits")
     void shouldThrowExceptionWhenUsernameAlreadyExits() {
-        var userDtoMock = UserServiceDataTestUtils.getMockUserDto(userId, username,
-                password, firstName, lastName, age);
         String expected = GeneralUtil.simpleNameClass(User.class)
-                + " is already exists with name: " + userDtoMock.getUsername();
+                + " is already exists with name: " + this.userDtoMock.getUsername();
 
         when(this.userRepository.existsByUsername(anyString())).thenReturn(true);
 
         EntityDuplicateConstraintViolationException ex =
                 assertThrows(EntityDuplicateConstraintViolationException.class,
-                        () -> this.userService.create(userDtoMock));
+                        () -> this.userService.create(this.userDtoMock));
 
         assertEquals(expected, ex.getMessage());
 
-        verify(this.userRepository).existsByUsername(userDtoMock.getUsername());
+        verify(this.userRepository).existsByUsername(this.userDtoMock.getUsername());
     }
 
     @Test
-    void createTest() {
-        var user = UserServiceDataTestUtils.getMockUser(userId, username, password, firstName, lastName, age);
-        var userDto = UserServiceDataTestUtils.getMockUserDto(userId, username, password, firstName, lastName, age);
-
-        when(this.modelMapper.map(userDto, User.class)).thenReturn(user);
-        when(this.userRepository.save(user)).thenReturn(user);
-        when(this.modelMapper.map(user, UserDto.class)).thenReturn(userDto);
-
-        UserDto userSaved = this.userService.create(userDto);
+    @DisplayName("Should create a user")
+    void shouldCreateUser() {
         String expected = GeneralUtil.simpleNameClass(User.class)
                 + " created successfully by admin";
+        when(this.modelMapper.map(this.userDtoMock, User.class)).thenReturn(this.userMock);
+        when(this.userRepository.save(any(User.class))).thenReturn(this.userMock);
+        when(this.modelMapper.map(this.userMock, UserDto.class)).thenReturn(this.userDtoMock);
+
+        UserDto userSaved = this.userService.create(this.userDtoMock);
+
         assertEquals(expected, userSaved.getMessage());
 
-        Mockito.verify(this.modelMapper).map(userDto, User.class);
-        Mockito.verify(this.userRepository).save(user);
-        Mockito.verify(this.modelMapper).map(user, UserDto.class);
+        verify(this.modelMapper).map(this.userDtoMock, User.class);
+        verify(this.userRepository).save(this.userMock);
+        verify(this.modelMapper).map(this.userMock, UserDto.class);
+    }
+
+    @Test
+    @DisplayName("Should throw a exception when user is not found by id when updating")
+    void shouldThrowExceptionWhenUserIsNotFoundById() {
+        Long userIdToFind  = 1L;
+        String expected = GeneralUtil.simpleNameClass(User.class)
+                + " don't found with id: " + this.userDtoMock.getUserId();
+
+        when(this.userRepository.findById(any(Long.class))).thenReturn(Optional.empty());
+
+        EntityNoSuchElementException ex =
+                assertThrows(EntityNoSuchElementException.class,
+                        () -> this.userService.update(userIdToFind, null, null));
+
+        assertEquals(expected, ex.getMessage());
+
+        verify(this.userRepository).findById(userIdToFind);
+    }
+
+    @Test
+    @DisplayName("Should throw a exception when Unauthorized by user and userDetails id")
+    void shouldThrowExceptionWhenUnauthorized() {
+        Long userIdToFind = 1L;
+        String expected = "You don't have the permission to "
+                + MessageAction.UPDATE.name() + " this profile";
+
+        AuthUserDetails userDetails = new AuthUserDetails(this.userMockAuth);
+
+        when(this.userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(userMock));
+
+        UnauthorizedPermissionException ex =
+                assertThrows(UnauthorizedPermissionException.class,
+                        () -> this.userService.update(userIdToFind, null, userDetails));
+
+        assertEquals(expected, ex.getMessage());
+
+        verify(this.userRepository).findById(userIdToFind);
     }
 
 }
