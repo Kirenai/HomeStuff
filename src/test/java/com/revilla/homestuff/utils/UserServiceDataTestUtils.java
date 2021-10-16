@@ -44,4 +44,18 @@ public class UserServiceDataTestUtils {
                 .build();
     }
 
+    public static UserDto getMockUserWithOutId(String username,
+                                   String password,
+                                   String firstName,
+                                   String lastName,
+                                   Byte age) {
+        return new UserDto(
+                username,
+                password,
+                firstName,
+                lastName,
+                age
+        );
+    }
+
 }

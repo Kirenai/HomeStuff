@@ -50,6 +50,14 @@ public class UserDto extends UserDtoOnly {
         this.roles = roles;
     }
 
+    public UserDto(@NotEmpty @Size(min = 2, max = 50) String username,
+                   @NotEmpty @Size(min = 8, max = 64) String password,
+                   @NotEmpty @Size(min = 2, max = 50) String firstName,
+                   @NotEmpty @Size(min = 2, max = 50) String lastName,
+                   @Min(value = 0) @Max(value = 100) Byte age) {
+        super(null, username, password, firstName, lastName, age);
+    }
+
     /**
      * Adding a message to the response
      *

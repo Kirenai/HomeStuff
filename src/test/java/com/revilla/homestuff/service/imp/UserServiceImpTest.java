@@ -1,6 +1,7 @@
 package com.revilla.homestuff.service.imp;
 
 import com.revilla.homestuff.dto.UserDto;
+import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.exception.entity.EntityDuplicateConstraintViolationException;
 import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
@@ -25,8 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -46,13 +46,16 @@ class UserServiceImpTest {
     private ModelMapper modelMapper;
 
     private User userMock;
-    private User userMockAuth;
+    private User userMockAuthSameData;
+    private User userMockAuthDifferentData;
     private UserDto userDtoMock;
+    private UserDto userDtoMockToUpdate;
 
     @BeforeEach
     void setUp() {
         Long userId = 1L;
-        Long userIdAuth = 2L;
+        Long userIdAuthSame = 1L;
+        Long userIdAuthDifferent = 2L;
         String username = "kirenai";
         String password = "kirenai";
         String firstName = "kirenai";
@@ -60,11 +63,21 @@ class UserServiceImpTest {
         Byte age = 22;
         this.userMock = UserServiceDataTestUtils.getMockUser(userId, username,
                 password, firstName, lastName, age);
-        this.userDtoMock = UserServiceDataTestUtils.getMockUserDto(userId, username,
-                password, firstName, lastName, age);
-        this.userMockAuth = UserServiceDataTestUtils.getMockUser(userIdAuth, username,
-                password, firstName, lastName, age);
-
+        this.userDtoMock = UserServiceDataTestUtils.getMockUserDto(userId,
+                username, password, firstName, lastName, age);
+        this.userMockAuthDifferentData = UserServiceDataTestUtils
+                .getMockUser(userIdAuthDifferent, username, password,
+                        firstName, lastName, age);
+        this.userMockAuthSameData = UserServiceDataTestUtils
+                .getMockUser(userIdAuthSame, username, password, firstName,
+                        lastName, age);
+        this.userDtoMockToUpdate = UserServiceDataTestUtils.getMockUserWithOutId(
+                "KIRENAI",
+                "KIRENAI",
+                "KIRENAI",
+                "KIRENAI",
+                (byte) 23
+        );
     }
 
     @Test
@@ -127,7 +140,7 @@ class UserServiceImpTest {
         String expected = "You don't have the permission to "
                 + MessageAction.UPDATE.name() + " this profile";
 
-        AuthUserDetails userDetails = new AuthUserDetails(this.userMockAuth);
+        AuthUserDetails userDetails = new AuthUserDetails(this.userMockAuthDifferentData);
 
         when(this.userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(userMock));
@@ -141,4 +154,24 @@ class UserServiceImpTest {
         verify(this.userRepository).findById(userIdToFind);
     }
 
+    @Test
+    @DisplayName("Should update an user when have authorization")
+    void shouldUpdateUserWhenHaveAuthorization() {
+        Long userIdToFind = 1L;
+        String expected = GeneralUtil.simpleNameClass(User.class)
+                + " updated successfully";
+
+        when(this.userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(this.userMock));
+
+        AuthUserDetails userDetails = new AuthUserDetails(this.userMockAuthSameData);
+
+        ApiResponseDto response = this.userService.update(userIdToFind,
+                this.userDtoMockToUpdate, userDetails);
+
+        assertEquals(expected, response.getMessage());
+        assertTrue(response.getSuccess());
+
+        verify(this.userRepository).findById(userIdToFind); 
+    }
 }
