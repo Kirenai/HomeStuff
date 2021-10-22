@@ -1,7 +1,10 @@
 package com.revilla.homestuff.service.imp;
 
+import com.revilla.homestuff.dto.RoleDto;
 import com.revilla.homestuff.dto.UserDto;
+import com.revilla.homestuff.dto.request.RegisterRequestDto;
 import com.revilla.homestuff.dto.response.ApiResponseDto;
+import com.revilla.homestuff.entity.Role;
 import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.exception.entity.EntityDuplicateConstraintViolationException;
 import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
@@ -12,7 +15,11 @@ import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.service.UserService;
 import com.revilla.homestuff.util.GeneralUtil;
 import com.revilla.homestuff.util.enums.MessageAction;
+import com.revilla.homestuff.util.enums.RoleName;
+import com.revilla.homestuff.utils.RoleServiceDataTestUtils;
 import com.revilla.homestuff.utils.UserServiceDataTestUtils;
+import com.revilla.homestuff.utils.dto.request.RegisterRequestDtoDataTest;
+import com.revilla.homestuff.utils.dto.response.ApiResponseDataTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,6 +32,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -50,6 +58,7 @@ class UserServiceImpTest {
     private User userMockAuthDifferentData;
     private UserDto userDtoMock;
     private UserDto userDtoMockToUpdate;
+    private RegisterRequestDto registerDtoMock;
 
     @BeforeEach
     void setUp() {
@@ -78,6 +87,49 @@ class UserServiceImpTest {
                 "KIRENAI",
                 (byte) 23
         );
+        this.registerDtoMock = RegisterRequestDtoDataTest
+                .getMockRegisterRequestDto(username, password, firstName, lastName, age);
+    }
+
+    @Test
+    @DisplayName("Should throw an exception when a user wants to register with and existing username")
+    void shouldThrowExceptionWhenUserWantRegisterWithExistingUsername() {
+        String expected = GeneralUtil.simpleNameClass(User.class)
+                + " is already exists with name: " + this.registerDtoMock.getUsername();
+
+
+        when(this.userRepository.existsByUsername(anyString())).thenReturn(true);
+
+        EntityDuplicateConstraintViolationException ex =
+                assertThrows(EntityDuplicateConstraintViolationException.class,
+                        () -> this.userService.register(this.registerDtoMock));
+
+        assertEquals(expected, ex.getMessage());
+
+        verify(this.userRepository).existsByUsername(this.registerDtoMock.getUsername());
+    }
+
+    @Test
+    @DisplayName("Should register a user")
+    void shouldRegisterUser() {
+        ApiResponseDto expected = ApiResponseDataTestUtils
+                .getMockRoleResponse("registered successfully", User.class);
+        Role roleMock = RoleServiceDataTestUtils.getMockRole(1L, RoleName.ROLE_USER);
+
+        when(this.userRepository.existsByUsername(anyString())).thenReturn(false);
+        when(this.modelMapper.map(this.registerDtoMock, User.class)).thenReturn(this.userMock);
+        when(this.roleRepository.findByName(any(RoleName.class))).thenReturn(Optional.of(roleMock));
+        when(this.userRepository.save(any(User.class))).thenReturn(this.userMock);
+
+        ApiResponseDto response = this.userService.register(this.registerDtoMock);
+
+        assertEquals(expected.getMessage(), response.getMessage());
+        assertTrue(response.getSuccess());
+
+        verify(this.userRepository).existsByUsername(this.registerDtoMock.getUsername());
+        verify(this.modelMapper).map(this.registerDtoMock, User.class);
+        verify(this.roleRepository).findByName(roleMock.getName());
+        verify(this.userRepository).save(this.userMock);
     }
 
     @Test
@@ -118,7 +170,7 @@ class UserServiceImpTest {
     @Test
     @DisplayName("Should throw a exception when user is not found by id when updating")
     void shouldThrowExceptionWhenUserIsNotFoundById() {
-        Long userIdToFind  = 1L;
+        Long userIdToFind = 1L;
         String expected = GeneralUtil.simpleNameClass(User.class)
                 + " don't found with id: " + this.userDtoMock.getUserId();
 
@@ -172,6 +224,36 @@ class UserServiceImpTest {
         assertEquals(expected, response.getMessage());
         assertTrue(response.getSuccess());
 
-        verify(this.userRepository).findById(userIdToFind); 
+        verify(this.userRepository).findById(userIdToFind);
+    }
+
+    @Test
+    @DisplayName("Should update an user with roles when have authorization")
+    void shouldUpdateUserWhenHaveAuthorizationWithRoles() {
+        Long userIdToFind = 1L;
+        String expected = GeneralUtil.simpleNameClass(User.class)
+                + " updated successfully";
+
+        Role roleMock = RoleServiceDataTestUtils.getMockRole(1L, RoleName.ROLE_ADMIN);
+        this.userMock.setRoles(Set.of(roleMock));
+        when(this.userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(this.userMock));
+        when(this.roleRepository.findByName(any(RoleName.class)))
+                .thenReturn(Optional.of(roleMock));
+
+        Role roleMockAdmin = RoleServiceDataTestUtils.getMockRole(1L, RoleName.ROLE_ADMIN);
+        this.userMockAuthSameData.setRoles(Set.of(roleMockAdmin));
+        AuthUserDetails userDetails = new AuthUserDetails(this.userMockAuthSameData);
+
+        RoleDto roleDtoMock = RoleServiceDataTestUtils.getMockRoleDto(1L, RoleName.ROLE_ADMIN);
+        this.userDtoMockToUpdate.setRoles(Set.of(roleDtoMock));
+        ApiResponseDto response = this.userService.update(userIdToFind,
+                this.userDtoMockToUpdate, userDetails);
+
+        assertEquals(expected, response.getMessage());
+        assertTrue(response.getSuccess());
+
+        verify(this.userRepository).findById(userIdToFind);
+        verify(this.roleRepository).findByName(roleDtoMock.getName());
     }
 }

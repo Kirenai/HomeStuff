@@ -136,6 +136,8 @@ class RoleServiceImpTest {
                         () -> this.roleService.delete(roleId, null));
 
         assertEquals(expected, ex.getMessage());
+
+        Mockito.verify(this.roleRepository).findById(this.roleId);
     }
 
     @Test
@@ -159,6 +161,8 @@ class RoleServiceImpTest {
                         () -> this.roleService.delete(roleId, userDetails));
 
         assertEquals(expected, ex.getMessage());
+
+        Mockito.verify(this.roleRepository).findById(this.roleId);
     }
 
     @Test
