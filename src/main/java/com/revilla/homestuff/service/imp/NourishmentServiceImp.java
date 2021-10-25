@@ -1,7 +1,7 @@
 package com.revilla.homestuff.service.imp;
 
 import java.util.Objects;
-import com.revilla.homestuff.dto.AmountNourishementDto;
+import com.revilla.homestuff.dto.AmountNourishmentDto;
 import com.revilla.homestuff.dto.NourishmentDto;
 import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.entity.AmountNourishment;
@@ -78,7 +78,7 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
                     n.setName(data.getName());
                     n.setImagePath(data.getImagePath());
                     n.setDescription(data.getDescription());
-                    AmountNourishementDto amountNourishmentDto = data.getAmountNourishment();
+                    AmountNourishmentDto amountNourishmentDto = data.getAmountNourishment();
                     AmountNourishment amountNourishment = n.getAmountNourishment();
                     if (Objects.nonNull(amountNourishmentDto)
                             && Objects.nonNull(amountNourishmentDto.getUnit())

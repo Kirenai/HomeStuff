@@ -6,16 +6,15 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.revilla.homestuff.dto.CategoryDto;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 /**
  * NourishmentDto
  * @author Kirenai
  */
 @Data
+@SuperBuilder
 @ToString(exclude = {"category"})
 @AllArgsConstructor
 @NoArgsConstructor

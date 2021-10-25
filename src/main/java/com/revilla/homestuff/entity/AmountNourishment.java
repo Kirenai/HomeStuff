@@ -11,16 +11,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+
+import lombok.*;
 
 /**
  * AmountNourishment
  * @author Kirenai
  */
 @Data
+@Builder
 @ToString(exclude = {"nourishment"})
 @AllArgsConstructor
 @NoArgsConstructor
