@@ -51,14 +51,14 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
                 + GeneralUtil.simpleNameClass(this.getClass()));
         GeneralUtil.validateDuplicateConstraintViolation(data.getName(), this.nourishmentRepository,
                 Nourishment.class);
-        User user = GeneralUtil.getEntityByIdOrThrow(userId, this.userRepository, User.class);
         Nourishment nourishment = super.getModelMapper().map(data, super.getThirdGenericClass());
+        User user = GeneralUtil.getEntityByIdOrThrow(userId, this.userRepository, User.class);
         nourishment.setUser(user);
         GeneralUtil.validateAuthorizationPermissionOrThrow(nourishment, userDetails,
                 MessageAction.CREATE);
-        nourishment.setIsAvailable(true);
         Category category = GeneralUtil.getEntityByIdOrThrow(categoryId, this.categoryRepository,
                 Category.class);
+        nourishment.setIsAvailable(true);
         nourishment.setCategory(category);
         nourishment.getAmountNourishment().setNourishment(nourishment);
         Nourishment nourishmentSaved = this.nourishmentRepository.save(nourishment);
