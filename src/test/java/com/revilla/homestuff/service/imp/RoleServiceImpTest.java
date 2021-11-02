@@ -58,7 +58,7 @@ class RoleServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should throw exception when role name is duplicated")
+    @DisplayName("Should throw an exception when role name is duplicated")
     void shouldThrowExceptionWhenRoleNameIsDuplicated() {
         RoleDto roleDto = RoleServiceDataTestUtils.getMockRoleDto(1L, RoleName.ROLE_USER);
 
@@ -77,7 +77,7 @@ class RoleServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should not throw exception when role name is not duplicated and create a role")
+    @DisplayName("Should not throw an exception when role name is not duplicated and create a role")
     void shouldNotThrowExceptionWhenRoleNameIsNotDuplicatedAndCreateRole() {
         String expected = "ROLE_USER";
         Role role = RoleServiceDataTestUtils.getMockRole(1L, RoleName.ROLE_USER);
@@ -166,7 +166,7 @@ class RoleServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should delete a role when a role is found by id and user have authorization")
+    @DisplayName("Should delete a role when a role is found by id and user has authorization")
     void shouldDeleteRoleWhenRoleIsFoundByIdAndUserHaveAuthorization() {
         String messageAction = "successfully removed";
 

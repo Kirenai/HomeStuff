@@ -110,7 +110,7 @@ class UserServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should register a user")
+    @DisplayName("Should register an user")
     void shouldRegisterUser() {
         ApiResponseDto expected = ApiResponseDataTestUtils
                 .getMockRoleResponse("registered successfully", User.class);
@@ -150,7 +150,7 @@ class UserServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should create a user")
+    @DisplayName("Should create an user")
     void shouldCreateUser() {
         String expected = GeneralUtil.simpleNameClass(User.class)
                 + " created successfully by admin";
@@ -168,7 +168,7 @@ class UserServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should throw a exception when user is not found by id when updating")
+    @DisplayName("Should throw an exception when user is not found by id when updating")
     void shouldThrowExceptionWhenUserIsNotFoundById() {
         Long userIdToFind = 1L;
         String expected = GeneralUtil.simpleNameClass(User.class)
@@ -186,7 +186,7 @@ class UserServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should throw a exception when Unauthorized by user and userDetails id")
+    @DisplayName("Should throw an exception when Unauthorized by user and userDetails id")
     void shouldThrowExceptionWhenUnauthorized() {
         Long userIdToFind = 1L;
         String expected = "You don't have the permission to "

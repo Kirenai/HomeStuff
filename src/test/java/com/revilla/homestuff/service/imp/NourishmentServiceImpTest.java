@@ -104,7 +104,7 @@ class NourishmentServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should throw a exception when nourishment name is already exists")
+    @DisplayName("Should throw an exception when nourishment name is already exists")
     void shouldThrowExceptionWhenNourishmentNameIsAlreadyExists() {
         Long userIdToFind = 1L;
         Long categoryIdToFind = 1L;
@@ -125,7 +125,7 @@ class NourishmentServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should throw a exception when user entity is not found")
+    @DisplayName("Should throw an exception when user entity is not found")
     void shouldThrowExceptionWhenUserEntityIsNotFound() {
         Long userIdToFind = 1L;
         Long categoryIdToFind = 1L;
@@ -149,7 +149,7 @@ class NourishmentServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should throw a exception when the user is unauthorized")
+    @DisplayName("Should throw an exception when the user is unauthorized")
     void shouldThrowExceptionWhenUserIsUnauthorized() {
         Long userIdToFind = 1L;
         Long categoryIdToFind = 1L;
@@ -178,7 +178,7 @@ class NourishmentServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should throw a exception when category is not found")
+    @DisplayName("Should throw an exception when category is not found")
     void shouldThrowExceptionWhenCategoryIsNotFound() {
         Long userIdToFind = 1L;
         Long categoryIdToFind = 1L;
