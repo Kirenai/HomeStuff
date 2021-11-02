@@ -3,6 +3,7 @@ package com.revilla.homestuff.service.imp;
 import com.revilla.homestuff.dto.AmountNourishmentDto;
 import com.revilla.homestuff.dto.NourishmentDto;
 import com.revilla.homestuff.entity.AmountNourishment;
+import com.revilla.homestuff.entity.Category;
 import com.revilla.homestuff.entity.Nourishment;
 import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.exception.entity.EntityDuplicateConstraintViolationException;
@@ -16,6 +17,7 @@ import com.revilla.homestuff.service.NourishmentService;
 import com.revilla.homestuff.util.GeneralUtil;
 import com.revilla.homestuff.util.enums.MessageAction;
 import com.revilla.homestuff.utils.AmountNourishmentServiceDataTestUtils;
+import com.revilla.homestuff.utils.CategoryServiceDataTestUtils;
 import com.revilla.homestuff.utils.NourishmentServiceDataTestUtils;
 import com.revilla.homestuff.utils.UserServiceDataTestUtils;
 import org.junit.jupiter.api.Assertions;
@@ -30,8 +32,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.transaction.interceptor.NoRollbackRuleAttribute;
 
 import java.util.Optional;
 
@@ -54,6 +54,7 @@ class NourishmentServiceImpTest {
     private User userTwo;
     private Nourishment nourishmentOne;
     private NourishmentDto nourishmentDtoOne;
+    private Category categoryOne;
 
     @BeforeEach
     void setUp() {
@@ -79,6 +80,9 @@ class NourishmentServiceImpTest {
         String lastNameTwo = "kirenai2";
         Byte ageTwo = 22;
 
+        Long categoryIdOne = 1L;
+        String categoryNameOne = "Fruits";
+
         AmountNourishment amountNourishmentOne = AmountNourishmentServiceDataTestUtils
                 .getAmountNourishmentMock(amountNourishmentIdOne, unitOne);
         this.nourishmentOne = NourishmentServiceDataTestUtils
@@ -94,6 +98,8 @@ class NourishmentServiceImpTest {
                 passwordOne, firstNameOne, lastNameOne, ageOne);
         this.userTwo = UserServiceDataTestUtils.getMockUser(userIdTwo, usernameTwo,
                 passwordTwo, firstNameTwo, lastNameTwo, ageTwo);
+        this.categoryOne = CategoryServiceDataTestUtils.getCategoryMock(categoryIdOne,
+                categoryNameOne);
 
     }
 
@@ -171,5 +177,72 @@ class NourishmentServiceImpTest {
         Mockito.verify(this.userRepository).findById(userIdToFind);
     }
 
+    @Test
+    @DisplayName("Should throw a exception when category is not found")
+    void shouldThrowExceptionWhenCategoryIsNotFound() {
+        Long userIdToFind = 1L;
+        Long categoryIdToFind = 1L;
+        String expected = GeneralUtil.simpleNameClass(Category.class)
+                + " don't found with id: " + categoryIdToFind;
+
+        Mockito.when(this.nourishmentRepository.existsByName(ArgumentMatchers.anyString()))
+                .thenReturn(false);
+        Mockito.when(this.modelMapper.map(this.nourishmentDtoOne, Nourishment.class))
+                .thenReturn(this.nourishmentOne);
+        Mockito.when(this.userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(this.userOne));
+        Mockito.when(this.categoryRepository.findById(ArgumentMatchers.anyLong()))
+                .thenReturn(Optional.empty());
+
+        AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
+
+        EntityNoSuchElementException ex = Assertions.assertThrows(EntityNoSuchElementException.class,
+                () -> this.nourishmentService.create(userIdToFind, categoryIdToFind,
+                        this.nourishmentDtoOne, userDetails)
+        );
+
+        Assertions.assertEquals(expected, ex.getMessage());
+
+        Mockito.verify(this.nourishmentRepository).existsByName(this.nourishmentDtoOne.getName());
+        Mockito.verify(this.modelMapper).map(this.nourishmentDtoOne, Nourishment.class);
+        Mockito.verify(this.userRepository).findById(userIdToFind);
+        Mockito.verify(this.categoryRepository).findById(categoryIdToFind);
+    }
+
+    @Test
+    @DisplayName("Should create a nourishment when everything is alright")
+    void shouldCreateNourishmentWhenEverythingAlright() {
+        Long userIdToFind = 1L;
+        Long categoryIdToFind = 1L;
+        String expectedMessage = GeneralUtil.simpleNameClass(Nourishment.class)
+                + " created successfully";
+
+        Mockito.when(this.nourishmentRepository.existsByName(ArgumentMatchers.anyString()))
+                .thenReturn(false);
+        Mockito.when(this.modelMapper.map(this.nourishmentDtoOne, Nourishment.class))
+                .thenReturn(this.nourishmentOne);
+        Mockito.when(this.userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(this.userOne));
+        Mockito.when(this.categoryRepository.findById(ArgumentMatchers.anyLong()))
+                .thenReturn(Optional.of(this.categoryOne));
+        Mockito.when(this.nourishmentRepository.save(ArgumentMatchers.any(Nourishment.class)))
+                .thenReturn(this.nourishmentOne);
+        Mockito.when(this.modelMapper.map(this.nourishmentOne, NourishmentDto.class))
+                .thenReturn(this.nourishmentDtoOne);
+
+        AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
+
+        NourishmentDto response = this.nourishmentService.create(userIdToFind, categoryIdToFind,
+                this.nourishmentDtoOne, userDetails);
+
+        Assertions.assertEquals(expectedMessage, response.getMessage());
+
+        Mockito.verify(this.nourishmentRepository).existsByName(this.nourishmentDtoOne.getName());
+        Mockito.verify(this.modelMapper).map(this.nourishmentDtoOne, Nourishment.class);
+        Mockito.verify(this.userRepository).findById(userIdToFind);
+        Mockito.verify(this.categoryRepository).findById(categoryIdToFind);
+        Mockito.verify(this.nourishmentRepository).save(this.nourishmentOne);
+        Mockito.verify(this.modelMapper).map(this.nourishmentOne, NourishmentDto.class);
+    }
 
 }

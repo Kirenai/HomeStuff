@@ -7,10 +7,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+
+import lombok.*;
 
 /**
  * Categories
@@ -18,6 +16,7 @@ import lombok.ToString;
  */
 @Data
 @ToString
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
