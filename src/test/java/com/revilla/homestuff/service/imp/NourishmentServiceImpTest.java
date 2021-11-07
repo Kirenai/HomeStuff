@@ -2,6 +2,7 @@ package com.revilla.homestuff.service.imp;
 
 import com.revilla.homestuff.dto.AmountNourishmentDto;
 import com.revilla.homestuff.dto.NourishmentDto;
+import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.entity.AmountNourishment;
 import com.revilla.homestuff.entity.Category;
 import com.revilla.homestuff.entity.Nourishment;
@@ -32,7 +33,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -101,6 +105,55 @@ class NourishmentServiceImpTest {
         this.categoryOne = CategoryServiceDataTestUtils.getCategoryMock(categoryIdOne,
                 categoryNameOne);
 
+    }
+
+    @Test
+    @DisplayName("Should find a list of nourishment")
+    void shouldFindAllNourishment() {
+        int expectedSize = 3;
+        Pageable pageableMock = Mockito.mock(Pageable.class);
+        Page<Nourishment> nourishmentPageMock = NourishmentServiceDataTestUtils
+                .getNourishmentPage();
+        List<NourishmentDto> nourishmentDtoListMock = NourishmentServiceDataTestUtils
+                .getNourishmentDtoList();
+
+        Mockito.when(nourishmentRepository.findAll(pageableMock))
+                .thenReturn(nourishmentPageMock);
+        Mockito.when(modelMapper.map(nourishmentPageMock.getContent().get(0), NourishmentDto.class))
+                .thenReturn(nourishmentDtoListMock.get(0));
+        Mockito.when(modelMapper.map(nourishmentPageMock.getContent().get(1), NourishmentDto.class))
+                .thenReturn(nourishmentDtoListMock.get(1));
+        Mockito.when(modelMapper.map(nourishmentPageMock.getContent().get(2), NourishmentDto.class))
+                .thenReturn(nourishmentDtoListMock.get(2));
+
+        List<NourishmentDto> response = nourishmentService.findAll(pageableMock);
+
+        Assertions.assertEquals(expectedSize, response.size());
+        Assertions.assertEquals(nourishmentDtoListMock, response);
+
+        Mockito.verify(nourishmentRepository, Mockito.times(1)).findAll(pageableMock);
+        Mockito.verify(modelMapper, Mockito.times(3)).map(ArgumentMatchers.any(), ArgumentMatchers.any());
+    }
+
+    @Test
+    @DisplayName("Should find a nourishment")
+    void shouldFindNourishment() {
+        Long nourishmentIdToFind = 1L;
+
+        this.nourishmentOne.setUser(this.userOne);
+        Mockito.when(nourishmentRepository.findById(ArgumentMatchers.anyLong()))
+                .thenReturn(Optional.of(this.nourishmentOne));
+        Mockito.when(modelMapper.map(ArgumentMatchers.any(), ArgumentMatchers.any()))
+                .thenReturn(this.nourishmentDtoOne);
+
+        AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
+
+        NourishmentDto result = nourishmentService.findOne(nourishmentIdToFind, userDetails);
+
+        Assertions.assertEquals(this.nourishmentDtoOne, result);
+
+        Mockito.verify(nourishmentRepository, Mockito.times(1)).findById(nourishmentIdToFind);
+        Mockito.verify(modelMapper, Mockito.times(1)).map(this.nourishmentOne, NourishmentDto.class);
     }
 
     @Test
@@ -243,6 +296,75 @@ class NourishmentServiceImpTest {
         Mockito.verify(this.categoryRepository).findById(categoryIdToFind);
         Mockito.verify(this.nourishmentRepository).save(this.nourishmentOne);
         Mockito.verify(this.modelMapper).map(this.nourishmentOne, NourishmentDto.class);
+    }
+
+    @Test
+    @DisplayName("Should throw an exception when nourishment is not found when updating")
+    void shouldThrowExceptionWhenNourishmentNotFoundWhenUpdating() {
+        Long nourishmentIdToFind = 1L;
+        String expected = GeneralUtil.simpleNameClass(Nourishment.class)
+                + " don't found with id: " + nourishmentIdToFind;
+
+        Mockito.when(this.nourishmentRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.empty());
+
+        AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
+
+        EntityNoSuchElementException ex = Assertions.assertThrows(EntityNoSuchElementException.class,
+                () -> this.nourishmentService.update(nourishmentIdToFind,
+                        this.nourishmentDtoOne, userDetails)
+        );
+
+        Assertions.assertEquals(expected, ex.getMessage());
+
+        Mockito.verify(this.nourishmentRepository).findById(nourishmentIdToFind);
+    }
+
+    @Test
+    @DisplayName("Should throw an exception when nourishment is not found when updating")
+    void shouldThrowExceptionWhenUserUnauthenticatedWhenUpdating() {
+        Long nourishmentIdToFind = 1L;
+        String expected = "You don't have the permission to "
+                + MessageAction.UPDATE.name() + " this nourishment";
+
+        this.nourishmentOne.setUser(this.userTwo);
+        Mockito.when(this.nourishmentRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(this.nourishmentOne));
+
+        AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
+
+        UnauthorizedPermissionException ex = Assertions.assertThrows(UnauthorizedPermissionException.class,
+                () -> this.nourishmentService.update(nourishmentIdToFind,
+                        this.nourishmentDtoOne, userDetails)
+        );
+
+        Assertions.assertEquals(expected, ex.getMessage());
+
+        Mockito.verify(this.nourishmentRepository).findById(nourishmentIdToFind);
+    }
+
+    @Test
+    @DisplayName("Should update a nourishment")
+    void shouldUpdateNourishment() {
+        Long nourishmentIdToFind = 1L;
+        String expectedMessage = GeneralUtil.simpleNameClass(Nourishment.class)
+                + " updated successfully";
+
+        this.nourishmentOne.setUser(this.userOne);
+        Mockito.when(this.nourishmentRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(this.nourishmentOne));
+        Mockito.when(this.nourishmentRepository.save(ArgumentMatchers.any(Nourishment.class)))
+                .thenReturn(this.nourishmentOne);
+
+        AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
+
+        ApiResponseDto response = this.nourishmentService.update(nourishmentIdToFind,
+                this.nourishmentDtoOne, userDetails);
+
+        Assertions.assertEquals(expectedMessage, response.getMessage());
+        Assertions.assertTrue(response.getSuccess());
+
+        Mockito.verify(this.nourishmentRepository).findById(nourishmentIdToFind);
     }
 
 }
