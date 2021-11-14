@@ -5,16 +5,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.revilla.homestuff.dto.only.UserDtoOnly;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 /**
  * ConsumptionDto
  * @author Kirenai
  */
 @Data
+@Builder
 @ToString(exclude = {"user"})
 @AllArgsConstructor
 @NoArgsConstructor

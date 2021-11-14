@@ -56,7 +56,7 @@ public class RoleServiceImp extends GeneralServiceImp<RoleDto, Long, Role> imple
                 })
                 .orElseThrow(() -> new EntityNoSuchElementException(
                         GeneralUtil.simpleNameClass(Role.class)
-                                + " don't found with id: " + id)
+                                + " not found with id: " + id)
                 );
     }
 

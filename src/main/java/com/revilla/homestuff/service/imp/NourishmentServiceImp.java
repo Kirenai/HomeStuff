@@ -94,7 +94,7 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
                             "updated successfully");
                 })
                 .orElseThrow(() -> new EntityNoSuchElementException(
-                        GeneralUtil.simpleNameClass(Nourishment.class) + " don't found with id: "
+                        GeneralUtil.simpleNameClass(Nourishment.class) + " not found with id: "
                                 + id));
     }
 

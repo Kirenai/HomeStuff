@@ -118,7 +118,7 @@ class UserServiceImpTest {
     @DisplayName("Should throw exception when user don't exists by id when find one")
     void shouldThrowExceptionWhenUserNotExistsByIdWhenFindOne() {
         Long userIdToFind = 1L;
-        String expectedMessage = "User don't found with id: " + userIdToFind;
+        String expectedMessage = "User not found with id: " + userIdToFind;
         Mockito.when(userRepository.findById(ArgumentMatchers.anyLong()))
                 .thenReturn(Optional.empty());
         EntityNoSuchElementException ex = Assertions.assertThrows(EntityNoSuchElementException.class,
@@ -225,7 +225,7 @@ class UserServiceImpTest {
     void shouldThrowExceptionWhenUserIsNotFoundById() {
         Long userIdToFind = 1L;
         String expected = GeneralUtil.simpleNameClass(User.class)
-                + " don't found with id: " + this.userDtoMockOne.getUserId();
+                + " not found with id: " + this.userDtoMockOne.getUserId();
 
         Mockito.when(this.userRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
 
@@ -315,7 +315,7 @@ class UserServiceImpTest {
     void shouldThrowExceptionWhenUserNotFoundWhenDeleting() {
         Long userIdToFind = 1L;
         String expected = GeneralUtil.simpleNameClass(User.class)
-                + " don't found with id: " + userIdToFind;
+                + " not found with id: " + userIdToFind;
 
         Mockito.when(this.userRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
 
@@ -354,7 +354,7 @@ class UserServiceImpTest {
     void shouldDeleteUserWhenDeleting() {
         Long userIdToFind = 1L;
         String expected = GeneralUtil.simpleNameClass(User.class)
-                + " successfully removed";
+                + " deleted successfully";
 
         Mockito.when(this.userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.of(this.userMockOne));
@@ -370,4 +370,5 @@ class UserServiceImpTest {
         Mockito.verify(this.userRepository).findById(userIdToFind);
         Mockito.verify(this.userRepository).delete(this.userMockOne);
     }
+
 }

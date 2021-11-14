@@ -108,7 +108,7 @@ class NourishmentServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should find a list of nourishment")
+    @DisplayName("Should find a list nourishment we call find all")
     void shouldFindAllNourishment() {
         int expectedSize = 3;
         Pageable pageableMock = Mockito.mock(Pageable.class);
@@ -136,8 +136,27 @@ class NourishmentServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should find a nourishment")
-    void shouldFindNourishment() {
+    @DisplayName("Should throw exception when nourishment isn't found by id when finding one")
+    void shouldThrowExceptionWhenNourishmentNotFoundByIdWhenFindingOne() {
+        Long nourishmentIdToFind = 1L;
+        String expected = "Nourishment not found with id: " + nourishmentIdToFind;
+
+        Mockito.when(nourishmentRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.empty());
+
+        EntityNoSuchElementException ex =
+                Assertions.assertThrows(EntityNoSuchElementException.class,
+                        () -> nourishmentService.findOne(nourishmentIdToFind, null)
+                );
+
+        Assertions.assertEquals(expected, ex.getMessage());
+
+        Mockito.verify(nourishmentRepository, Mockito.times(1)).findById(nourishmentIdToFind);
+    }
+
+    @Test
+    @DisplayName("Should find a nourishment when it exists by id when find one")
+    void shouldFindNourishmentWhenExistsByIdWhenFindOne() {
         Long nourishmentIdToFind = 1L;
 
         this.nourishmentOne.setUser(this.userOne);
@@ -157,7 +176,7 @@ class NourishmentServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should throw an exception when nourishment name is already exists")
+    @DisplayName("Should throw an exception when nourishment name is already exists when creating")
     void shouldThrowExceptionWhenNourishmentNameIsAlreadyExists() {
         Long userIdToFind = 1L;
         Long categoryIdToFind = 1L;
@@ -178,12 +197,11 @@ class NourishmentServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should throw an exception when user entity is not found")
+    @DisplayName("Should throw an exception when user entity is not found when creating")
     void shouldThrowExceptionWhenUserEntityIsNotFound() {
         Long userIdToFind = 1L;
         Long categoryIdToFind = 1L;
-        String expected = GeneralUtil.simpleNameClass(User.class)
-                + " don't found with id: " + userIdToFind;
+        String expected = "User not found with id: " + userIdToFind;
 
         Mockito.when(this.nourishmentRepository.existsByName(Mockito.anyString()))
                 .thenReturn(false);
@@ -202,7 +220,7 @@ class NourishmentServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should throw an exception when the user is unauthorized")
+    @DisplayName("Should throw an exception when the user is unauthorized when creating")
     void shouldThrowExceptionWhenUserIsUnauthorized() {
         Long userIdToFind = 1L;
         Long categoryIdToFind = 1L;
@@ -231,12 +249,11 @@ class NourishmentServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should throw an exception when category is not found")
+    @DisplayName("Should throw an exception when category is not found when creating")
     void shouldThrowExceptionWhenCategoryIsNotFound() {
         Long userIdToFind = 1L;
         Long categoryIdToFind = 1L;
-        String expected = GeneralUtil.simpleNameClass(Category.class)
-                + " don't found with id: " + categoryIdToFind;
+        String expected = "Category not found with id: " + categoryIdToFind;
 
         Mockito.when(this.nourishmentRepository.existsByName(ArgumentMatchers.anyString()))
                 .thenReturn(false);
@@ -263,7 +280,7 @@ class NourishmentServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should create a nourishment when everything is alright")
+    @DisplayName("Should create a nourishment when everything is alright when creating")
     void shouldCreateNourishmentWhenEverythingAlright() {
         Long userIdToFind = 1L;
         Long categoryIdToFind = 1L;
@@ -302,8 +319,7 @@ class NourishmentServiceImpTest {
     @DisplayName("Should throw an exception when nourishment is not found when updating")
     void shouldThrowExceptionWhenNourishmentNotFoundWhenUpdating() {
         Long nourishmentIdToFind = 1L;
-        String expected = GeneralUtil.simpleNameClass(Nourishment.class)
-                + " don't found with id: " + nourishmentIdToFind;
+        String expected = "Nourishment not found with id: " + nourishmentIdToFind;
 
         Mockito.when(this.nourishmentRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.empty());
@@ -321,7 +337,7 @@ class NourishmentServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should throw an exception when nourishment is not found when updating")
+    @DisplayName("Should throw an exception when user is unauthorized  when updating")
     void shouldThrowExceptionWhenUserUnauthenticatedWhenUpdating() {
         Long nourishmentIdToFind = 1L;
         String expected = "You don't have the permission to "
@@ -344,7 +360,7 @@ class NourishmentServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should update a nourishment")
+    @DisplayName("Should update a nourishment when updating")
     void shouldUpdateNourishment() {
         Long nourishmentIdToFind = 1L;
         String expectedMessage = GeneralUtil.simpleNameClass(Nourishment.class)
@@ -360,6 +376,71 @@ class NourishmentServiceImpTest {
 
         ApiResponseDto response = this.nourishmentService.update(nourishmentIdToFind,
                 this.nourishmentDtoOne, userDetails);
+
+        Assertions.assertEquals(expectedMessage, response.getMessage());
+        Assertions.assertTrue(response.getSuccess());
+
+        Mockito.verify(this.nourishmentRepository).findById(nourishmentIdToFind);
+    }
+
+    @Test
+    @DisplayName("Should throw an exception when nourishment is not found when deleting")
+    void shouldThrowExceptionWhenNourishmentNotFoundWhenDeleting() {
+        Long nourishmentIdToFind = 1L;
+        String expected = "Nourishment not found with id: " + nourishmentIdToFind;
+
+        Mockito.when(this.nourishmentRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.empty());
+
+        AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
+
+        EntityNoSuchElementException ex = Assertions.assertThrows(EntityNoSuchElementException.class,
+                () -> this.nourishmentService.delete(nourishmentIdToFind, userDetails)
+        );
+
+        Assertions.assertEquals(expected, ex.getMessage());
+
+        Mockito.verify(this.nourishmentRepository).findById(nourishmentIdToFind);
+    }
+
+    @Test
+    @DisplayName("Should throw an exception when user is unauthorized  when deleting")
+    void shouldThrowExceptionWhenUserUnauthenticatedWhenDeleting() {
+        Long nourishmentIdToFind = 1L;
+        String expected = "You don't have the permission to "
+                + MessageAction.DELETE.name() + " this nourishment";
+
+        this.nourishmentOne.setUser(this.userTwo);
+        Mockito.when(this.nourishmentRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(this.nourishmentOne));
+
+        AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
+
+        UnauthorizedPermissionException ex = Assertions.assertThrows(UnauthorizedPermissionException.class,
+                () -> this.nourishmentService.delete(nourishmentIdToFind, userDetails)
+        );
+
+        Assertions.assertEquals(expected, ex.getMessage());
+
+        Mockito.verify(this.nourishmentRepository).findById(nourishmentIdToFind);
+    }
+
+    @Test
+    @DisplayName("Should delete a nourishment when deleting")
+    void shouldDeleteNourishment() {
+        Long nourishmentIdToFind = 1L;
+        String expectedMessage = GeneralUtil.simpleNameClass(Nourishment.class)
+                + " deleted successfully";
+
+        this.nourishmentOne.setUser(this.userOne);
+        Mockito.when(this.nourishmentRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(this.nourishmentOne));
+        Mockito.when(this.nourishmentRepository.save(ArgumentMatchers.any(Nourishment.class)))
+                .thenReturn(this.nourishmentOne);
+
+        AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
+
+        ApiResponseDto response = this.nourishmentService.delete(nourishmentIdToFind, userDetails);
 
         Assertions.assertEquals(expectedMessage, response.getMessage());
         Assertions.assertTrue(response.getSuccess());

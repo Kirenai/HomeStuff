@@ -34,7 +34,7 @@ public class GeneralUtil {
         return repo.findById(id)
                 .orElseThrow(() -> new EntityNoSuchElementException(
                         GeneralUtil.simpleNameClass(entityClass)
-                                + " don't found with id: " + id)
+                                + " not found with id: " + id)
                 );
     }
 
@@ -89,14 +89,14 @@ public class GeneralUtil {
                             .contains(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
                 return;
             }
-            errorMessage = "You don't have the permission to " + action.name() + " this Consumption";
+            errorMessage = "You don't have the permission to " + action.name() + " this consumption";
         }
         if (obj instanceof Role) {
             if (userDetails.getAuthorities()
                     .contains(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
                 return;
             }
-            errorMessage = "You don't have the permission to " + action.name() + " this Role";
+            errorMessage = "You don't have the permission to " + action.name() + " this role";
         }
         throw new UnauthorizedPermissionException(errorMessage);
     }

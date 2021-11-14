@@ -5,16 +5,14 @@ import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 /**
  * Consumption
  * @author Kirenai
  */
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(exclude = {"nourishment"})

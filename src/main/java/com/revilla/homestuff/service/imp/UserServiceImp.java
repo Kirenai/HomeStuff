@@ -95,7 +95,7 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
                 })
                 .orElseThrow(() -> new EntityNoSuchElementException(
                         GeneralUtil.simpleNameClass(User.class)
-                                + " don't found with id: " + id
+                                + " not found with id: " + id
                 ));
     }
 

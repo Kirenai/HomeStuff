@@ -89,7 +89,7 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
         GeneralUtil.validateAuthorizationPermissionOrThrow(obj, userDetails, MessageAction.DELETE);
         this.getRepo().delete(obj);
         return GeneralUtil.responseMessageAction(obj, this.getThirdGenericClass(),
-                "successfully removed");
+                "deleted successfully");
     }
 
     public abstract JpaRepository<E, ID> getRepo();

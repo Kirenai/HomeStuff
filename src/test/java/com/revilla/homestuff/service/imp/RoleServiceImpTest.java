@@ -102,7 +102,7 @@ class RoleServiceImpTest {
     @DisplayName("Should throw an exception when a role by id is not found")
     void shouldThrowExceptionWhenRoleByIdIsNotFound() {
         String expected = GeneralUtil.simpleNameClass(Role.class)
-                + " don't found with id: " + roleId;
+                + " not found with id: " + roleId;
 
         Mockito.when(this.roleRepository.findById(roleId)).thenReturn(Optional.empty());
 
@@ -127,7 +127,7 @@ class RoleServiceImpTest {
     @DisplayName("Should throw an exception when a role is not found by id")
     void shouldThrowExceptionWhenRoleIsNotFoundById() {
         String expected = GeneralUtil.simpleNameClass(Role.class)
-                + " don't found with id: " + roleId;
+                + " not found with id: " + roleId;
         Mockito.when(this.roleRepository.findById(roleId))
                 .thenReturn(Optional.empty());
 
@@ -144,7 +144,7 @@ class RoleServiceImpTest {
     @DisplayName("Should throw an exception when user is unauthorized")
     void shouldThrowExceptionWhenUserIsUnauthorized() {
         String expected = "You don't have the permission to "
-                + MessageAction.ACCESS.name() + " this Role";
+                + MessageAction.DELETE.name() + " this role";
 
         Role roleMock = RoleServiceDataTestUtils.getMockRole(roleId,
                 RoleName.ROLE_USER);
@@ -168,7 +168,7 @@ class RoleServiceImpTest {
     @Test
     @DisplayName("Should delete a role when a role is found by id and user has authorization")
     void shouldDeleteRoleWhenRoleIsFoundByIdAndUserHaveAuthorization() {
-        String messageAction = "successfully removed";
+        String messageAction = "deleted successfully";
 
         Role roleMock = RoleServiceDataTestUtils.getMockRole(roleId,
                 RoleName.ROLE_ADMIN);
