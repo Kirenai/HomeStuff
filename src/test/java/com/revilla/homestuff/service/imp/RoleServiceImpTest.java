@@ -21,13 +21,17 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -53,12 +57,118 @@ class RoleServiceImpTest {
     private final String lastName = "kirenai";
     private final Byte age = 22;
 
+    private User userOne;
+    private Role roleUser;
+    private Role roleAdmin;
+    private RoleDto roleUserDto;
+    private RoleDto roleAdminDto;
+
     @BeforeEach
     void setUp() {
+        Long userIdOne = 1L;
+        String usernameOne = "kirenai";
+        String passwordOne = "kirenai";
+        String firstNameOne = "kirenai";
+        String lastNameOne = "kirenai";
+        Byte ageOne = 22;
+
+        Long roleIdOne = 1L;
+        Long roleIdTwo = 2L;
+
+        this.userOne = UserServiceDataTestUtils.getMockUser(userIdOne, usernameOne,
+                passwordOne, firstNameOne, lastNameOne, ageOne);
+        this.roleUser = RoleServiceDataTestUtils.getMockRole(roleIdOne, RoleName.ROLE_USER);
+        this.roleAdmin = RoleServiceDataTestUtils.getMockRole(roleIdTwo, RoleName.ROLE_ADMIN);
+        this.roleUserDto = RoleServiceDataTestUtils.getMockRoleDto(roleIdOne, RoleName.ROLE_USER);
+        this.roleAdminDto = RoleServiceDataTestUtils.getMockRoleDto(roleIdTwo, RoleName.ROLE_ADMIN);
     }
 
     @Test
-    @DisplayName("Should throw an exception when role name is duplicated")
+    @DisplayName("Should find a list of roles")
+    void shouldFindListOfRoles() {
+        int expectedSize = 2;
+        Pageable pageableMock = Mockito.mock(Pageable.class);
+
+        Mockito.when(this.roleRepository.findAll(ArgumentMatchers.any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(this.roleUser, this.roleAdmin)));
+        Mockito.when(this.modelMapper.map(Mockito.any(), Mockito.eq(RoleDto.class)))
+                .thenReturn(this.roleUserDto, this.roleAdminDto);
+
+        List<RoleDto> response = this.roleService.findAll(pageableMock);
+
+        assertEquals(expectedSize, response.size());
+        assertEquals(this.roleUserDto, response.get(0));
+        assertEquals(this.roleAdminDto, response.get(1));
+
+        Mockito.verify(this.roleRepository, Mockito.times(1))
+                .findAll(pageableMock);
+        Mockito.verify(this.modelMapper, Mockito.times(2))
+                .map(Mockito.any(), Mockito.eq(RoleDto.class));
+    }
+
+    @Test
+    @DisplayName("Should throw exception when role isn't found by id when finding one")
+    void shouldThrowExceptionWhenRoleNotFoundByIdWhenFindingOne() {
+        Long roleIdToFind = 1L;
+        String messageExpected = "Role not found with id: " + roleIdToFind;
+
+        Mockito.when(this.roleRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.empty());
+
+        EntityNoSuchElementException ex = assertThrows(EntityNoSuchElementException.class,
+                () -> this.roleService.findOne(roleIdToFind, null)
+        );
+
+        assertEquals(messageExpected, ex.getMessage());
+
+        Mockito.verify(this.roleRepository).findById(roleIdToFind);
+    }
+
+    @Test
+    @DisplayName("Should throw exception when user hasn't authorization when finding one")
+    void shouldThrowExceptionWhenUserHasNotAuthorizationWhenFindingOne() {
+        Long roleIdToFind = 1L;
+        String messageExpected = "You don't have the permission to "
+                + MessageAction.ACCESS.name() + " this role";
+
+
+        Mockito.when(this.roleRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(new Role()));
+
+        AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
+
+        UnauthorizedPermissionException ex = assertThrows(UnauthorizedPermissionException.class,
+                () -> this.roleService.findOne(roleIdToFind, userDetails)
+        );
+
+        assertEquals(messageExpected, ex.getMessage());
+
+        Mockito.verify(this.roleRepository).findById(roleIdToFind);
+    }
+
+    @Test
+    @DisplayName("Should find a role when finding one")
+    void shouldFindRoleWhenFindingOne() {
+        Long roleIdToFind = 1L;
+
+        Mockito.when(this.roleRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(this.roleUser));
+        Mockito.when(this.modelMapper.map(Mockito.any(), Mockito.eq(RoleDto.class)))
+                .thenReturn(this.roleUserDto);
+
+        this.userOne.setRoles(Set.of(this.roleAdmin));
+        AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
+
+        RoleDto response = this.roleService.findOne(roleIdToFind, userDetails);
+
+        assertEquals(this.roleUserDto, response);
+
+        Mockito.verify(this.roleRepository).findById(roleIdToFind);
+        Mockito.verify(this.modelMapper).map(this.roleUser, RoleDto.class);
+    }
+
+    @Test
+    @DisplayName("Should throw an exception when role name is duplicated when creating")
     void shouldThrowExceptionWhenRoleNameIsDuplicated() {
         RoleDto roleDto = RoleServiceDataTestUtils.getMockRoleDto(1L, RoleName.ROLE_USER);
 
@@ -77,8 +187,8 @@ class RoleServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should not throw an exception when role name is not duplicated and create a role")
-    void shouldNotThrowExceptionWhenRoleNameIsNotDuplicatedAndCreateRole() {
+    @DisplayName("Should create a role when creating")
+    void shouldCreateRoleWhenCreating() {
         String expected = "ROLE_USER";
         Role role = RoleServiceDataTestUtils.getMockRole(1L, RoleName.ROLE_USER);
         RoleDto roleDto = RoleServiceDataTestUtils.getMockRoleDto(1L, RoleName.ROLE_USER);
@@ -99,7 +209,7 @@ class RoleServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should throw an exception when a role by id is not found")
+    @DisplayName("Should throw an exception when a role by id is not found when updating")
     void shouldThrowExceptionWhenRoleByIdIsNotFound() {
         String expected = GeneralUtil.simpleNameClass(Role.class)
                 + " not found with id: " + roleId;
@@ -124,7 +234,7 @@ class RoleServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should throw an exception when a role is not found by id")
+    @DisplayName("Should throw an exception when a role is not found by id when deleting")
     void shouldThrowExceptionWhenRoleIsNotFoundById() {
         String expected = GeneralUtil.simpleNameClass(Role.class)
                 + " not found with id: " + roleId;
@@ -141,7 +251,7 @@ class RoleServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should throw an exception when user is unauthorized")
+    @DisplayName("Should throw an exception when user is unauthorized when deleting")
     void shouldThrowExceptionWhenUserIsUnauthorized() {
         String expected = "You don't have the permission to "
                 + MessageAction.DELETE.name() + " this role";
@@ -166,8 +276,8 @@ class RoleServiceImpTest {
     }
 
     @Test
-    @DisplayName("Should delete a role when a role is found by id and user has authorization")
-    void shouldDeleteRoleWhenRoleIsFoundByIdAndUserHaveAuthorization() {
+    @DisplayName("Should delete a role when user has authorization when deleting")
+    void shouldDeleteRoleWhenUserHasAuthorizationWhenDeleting() {
         String messageAction = "deleted successfully";
 
         Role roleMock = RoleServiceDataTestUtils.getMockRole(roleId,
