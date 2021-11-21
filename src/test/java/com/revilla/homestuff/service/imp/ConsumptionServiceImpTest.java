@@ -21,13 +21,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,7 +56,9 @@ class ConsumptionServiceImpTest {
     private User userTwo;
     private Nourishment nourishmentOne;
     private Consumption consumptionOne;
+    private Consumption consumptionTwo;
     private ConsumptionDto consumptionDtoOne;
+    private ConsumptionDto consumptionDtoTwo;
 
     @BeforeEach
     void setUp() {
@@ -73,6 +79,7 @@ class ConsumptionServiceImpTest {
         Byte unitOne = 15;
 
         Byte unitConsumptionOne = 10;
+        Byte unitConsumptionTwo = 5;
 
         this.userOne = UserServiceDataTestUtils.getMockUser(userIdOne,
                 usernameOne, passwordOne, firstNameOne, lastNameOne, ageOne);
@@ -85,8 +92,97 @@ class ConsumptionServiceImpTest {
                         descriptionOne, amountNourishmentMock);
         this.consumptionOne = ConsumptionServiceDataTestUtils
                 .getConsumptionMock(unitConsumptionOne);
+        this.consumptionTwo = ConsumptionServiceDataTestUtils
+                .getConsumptionMock(unitConsumptionTwo);
         this.consumptionDtoOne = ConsumptionServiceDataTestUtils
                 .getConsumptionDtoMock(unitConsumptionOne);
+        this.consumptionDtoTwo = ConsumptionServiceDataTestUtils
+                .getConsumptionDtoMock(unitConsumptionTwo);
+    }
+
+    @Test
+    @DisplayName("Should find a consumption list when finding all")
+    void shouldFindConsumptionListWhenFindingAll() {
+        int expectedSize = 2;
+        Pageable pageableMock = Mockito.mock(Pageable.class);
+        Mockito.when(consumptionRepository.findAll(ArgumentMatchers.any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(this.consumptionOne, this.consumptionTwo)));
+        Mockito.when(modelMapper.map(ArgumentMatchers.any(Consumption.class), ArgumentMatchers.eq(ConsumptionDto.class)))
+                .thenReturn(this.consumptionDtoOne, this.consumptionDtoTwo);
+
+        List<ConsumptionDto> response = consumptionService.findAll(pageableMock);
+
+        assertEquals(expectedSize, response.size());
+        assertEquals(List.of(this.consumptionDtoOne, this.consumptionDtoTwo), response);
+
+        Mockito.verify(consumptionRepository, Mockito.times(1))
+                .findAll(pageableMock);
+        Mockito.verify(modelMapper, Mockito.times(2))
+                .map(ArgumentMatchers.any(Consumption.class), ArgumentMatchers.eq(ConsumptionDto.class));
+    }
+
+    @Test
+    @DisplayName("Should throw an exception when user is not found by id when finding one")
+    void shouldThrowExceptionWhenUserIsNotFoundByIdWhenFindingOne() {
+        Long consumptionIdToFind = 1L;
+        String messageExpected = "Consumption not found with id: "
+                + consumptionIdToFind;
+
+        Mockito.when(this.consumptionRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.empty());
+
+        EntityNoSuchElementException ex = assertThrows(EntityNoSuchElementException.class,
+                () -> consumptionService.findOne(consumptionIdToFind, null));
+
+        assertEquals(messageExpected, ex.getMessage());
+
+        Mockito.verify(this.consumptionRepository, Mockito.times(1))
+                .findById(consumptionIdToFind);
+    }
+
+    @Test
+    @DisplayName("Should throw an exception when user is not authorized when finding one")
+    void shouldThrowExceptionWhenUserIsNotAuthorizedWhenFindingOne() {
+        Long consumptionIdToFind = 1L;
+        String messageExpected = "You don't have the permission to "
+                + MessageAction.ACCESS.name() + " this consumption";
+
+        this.consumptionOne.setUser(this.userOne);
+        Mockito.when(this.consumptionRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(this.consumptionOne));
+
+        AuthUserDetails userDetails = new AuthUserDetails(this.userTwo);
+
+        UnauthorizedPermissionException ex = assertThrows(UnauthorizedPermissionException.class,
+                () -> consumptionService.findOne(consumptionIdToFind, userDetails));
+
+        assertEquals(messageExpected, ex.getMessage());
+
+        Mockito.verify(this.consumptionRepository, Mockito.times(1))
+                .findById(consumptionIdToFind);
+    }
+
+    @Test
+    @DisplayName("Should find a consumption when finding one")
+    void shouldFindConsumptionWhenFindingOne() {
+        Long consumptionIdToFind = 1L;
+
+        this.consumptionOne.setUser(this.userOne);
+        Mockito.when(this.consumptionRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(this.consumptionOne));
+        Mockito.when(modelMapper.map(ArgumentMatchers.any(Consumption.class), ArgumentMatchers.eq(ConsumptionDto.class)))
+                .thenReturn(this.consumptionDtoOne);
+
+        AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
+
+        ConsumptionDto response = consumptionService.findOne(consumptionIdToFind, userDetails);
+
+        assertEquals(this.consumptionDtoOne, response);
+
+        Mockito.verify(this.consumptionRepository, Mockito.times(1))
+                .findById(consumptionIdToFind);
+        Mockito.verify(modelMapper, Mockito.times(1))
+                .map(this.consumptionOne, ConsumptionDto.class);
     }
 
     @Test
@@ -196,6 +292,5 @@ class ConsumptionServiceImpTest {
         Mockito.verify(modelMapper, Mockito.times(1))
                 .map(this.consumptionOne, ConsumptionDto.class);
     }
-
 
 }
