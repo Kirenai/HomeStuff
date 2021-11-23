@@ -10,6 +10,7 @@ import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.exception.entity.EntityDuplicateConstraintViolationException;
 import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
 import com.revilla.homestuff.exception.unauthorize.UnauthorizedPermissionException;
+import com.revilla.homestuff.repository.CategoryRepository;
 import com.revilla.homestuff.repository.NourishmentRepository;
 import com.revilla.homestuff.repository.RoleRepository;
 import com.revilla.homestuff.repository.UserRepository;
@@ -52,6 +53,9 @@ public class GeneralUtil {
         }
         if (repo instanceof NourishmentRepository) {
             isDuplicated = ((NourishmentRepository) repo).existsByName(toValidate);
+        }
+        if (repo instanceof CategoryRepository) {
+            isDuplicated = ((CategoryRepository) repo).existsByName(toValidate);
         }
 
         if (isDuplicated) {
