@@ -18,7 +18,7 @@ public class UserUtil {
                 .map(AuthUserDetails::new)
                 .orElseThrow(() -> new BadCredentialsException(
                         GeneralUtil.simpleNameClass(User.class)
-                                + " don't found with username: " + username
+                                + " not found with username: " + username
                 ));
     }
 

@@ -9,6 +9,7 @@ import lombok.*;
 
 /**
  * Consumption
+ *
  * @author Kirenai
  */
 @Data
@@ -33,16 +34,12 @@ public class Consumption {
 
     @JsonProperty(access = Access.WRITE_ONLY)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "nourishment_id",
-            nullable = false,
-            foreignKey = @ForeignKey(name = "fk_nourishment_id")
-    )
+    @JoinColumn(name = "nourishment_id", nullable = false)
     private Nourishment nourishment;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
 }
