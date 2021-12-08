@@ -5,5 +5,7 @@ server:
     include-binding-errors: always
     include-stacktrace: never
 spring:
+  application:
+    name: Home Stuff
   profiles:
     active: dev
