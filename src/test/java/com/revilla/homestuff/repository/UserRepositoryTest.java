@@ -61,6 +61,28 @@ class UserRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should find a user when find by username")
+    void shouldFindUserWhenFindByUsername() {
+        String usernameToFind = "userOne";
+
+        this.userRepository.save(this.userOne);
+        User userFound = this.userRepository.findByUsername(usernameToFind).orElseThrow();
+
+        Assertions.assertEquals(usernameToFind, userFound.getUsername());
+    }
+
+    @Test
+    @DisplayName("Should check if a user exists when exists by username")
+    void shouldVerifiesIfUserExistsWhenExistsByUsername() {
+        String usernameToFind = "userOne";
+
+        this.userRepository.save(this.userOne);
+        boolean exists = this.userRepository.existsByUsername(usernameToFind);
+
+        Assertions.assertTrue(exists);
+    }
+
+    @Test
     @DisplayName("Should find a user list when finding all")
     void shouldFindUserPageWhenFindingAll() {
         int sizeExcepted = 3;
@@ -92,4 +114,32 @@ class UserRepositoryTest {
         Assertions.assertEquals(this.userOne.getLastName(), userSaved.getLastName());
         Assertions.assertEquals(this.userOne.getUserId(), userSaved.getUserId());
     }
+
+    @Test
+    @DisplayName("Should update a user when updated")
+    void shouldUpdateUserWhenUpdated() {
+        String newFirstName = "newFirstName";
+        String newLastName = "newLastName";
+
+        this.userRepository.save(this.userOne);
+        User userToUpdate = this.userRepository.findById(this.userOne.getUserId())
+                .orElseThrow();
+        userToUpdate.setFirstName(newFirstName);
+        userToUpdate.setLastName(newLastName);
+        User userUpdated = this.userRepository.save(userToUpdate);
+
+        Assertions.assertEquals(newFirstName, userUpdated.getFirstName());
+        Assertions.assertEquals(newLastName, userUpdated.getLastName());
+    }
+
+    @Test
+    @DisplayName("Should delete a user when deleted")
+    void shouldDeleteUserWhenDeleted() {
+        this.userRepository.save(this.userOne);
+        this.userRepository.delete(this.userOne);
+        boolean exists = this.userRepository.existsById(this.userOne.getUserId());
+
+        Assertions.assertFalse(exists);
+    }
+
 }
