@@ -2,10 +2,7 @@ package com.revilla.homestuff.repository;
 
 import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.utils.UserServiceDataTestUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -14,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,13 +22,15 @@ class UserRepositoryTest {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private EntityManager entityManager;
 
     private User userOne;
     private User userTwo;
     private User userThree;
 
     @BeforeEach
-    void setUp() {
+    void init() {
         Long userIdOne = 1L;
         String usernameOne = "userOne";
         String passwordOne = "passwordOne";
@@ -58,6 +58,12 @@ class UserRepositoryTest {
                 passwordTwo, firstNameTwo, lastNameTwo, ageTwo);
         this.userThree = UserServiceDataTestUtils.getMockUser(userIdThree, usernameThree,
                 passwordThree, firstNameThree, lastNameThree, ageThree);
+    }
+
+    @AfterEach
+    void tearDown() {
+        this.entityManager.createNativeQuery("ALTER TABLE USERS ALTER COLUMN user_id RESTART WITH 1")
+                .executeUpdate();
     }
 
     @Test
