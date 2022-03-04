@@ -28,41 +28,38 @@ class RoleRepositoryTest {
     @Autowired
     private RoleRepository roleRepository;
 
-    private Role roleOne;
-    private Role roleTwo;
-    private Role roleThree;
+    private Role roleUser;
+    private Role roleMod;
+    private Role roleAdmin;
 
     @BeforeEach
-    void setUp() {
-        Long roleIdOne = 1L;
+    void init() {
         RoleName roleNameOne = RoleName.ROLE_USER;
-
-        Long roleIdTwo = 2L;
         RoleName roleNameTwo = RoleName.ROLE_MODERATOR;
-
-        Long roleIdThree = 3L;
         RoleName roleNameThree = RoleName.ROLE_ADMIN;
 
-        this.roleOne = RoleServiceDataTestUtils.getMockRole(roleIdOne, roleNameOne);
-        this.roleTwo = RoleServiceDataTestUtils.getMockRole(roleIdTwo, roleNameTwo);
-        this.roleThree = RoleServiceDataTestUtils.getMockRole(roleIdThree, roleNameThree);
+        this.roleUser = RoleServiceDataTestUtils.getMockRole(roleNameOne);
+        this.roleMod = RoleServiceDataTestUtils.getMockRole(roleNameTwo);
+        this.roleAdmin = RoleServiceDataTestUtils.getMockRole(roleNameThree);
     }
 
     @Test
     @DisplayName("Should find role by name")
     void shouldFindRoleByName() {
-        this.roleRepository.save(this.roleOne);
+        RoleName name = this.roleRepository.save(this.roleUser).getName();
 
-        Optional<Role> roleFound = roleRepository.findByName(this.roleOne.getName());
+        Optional<Role> roleFound = roleRepository.findByName(name);
 
         assertTrue(roleFound.isPresent());
-        assertEquals(this.roleOne.getName(), roleFound.get().getName());
+        assertEquals(name, roleFound.get().getName());
     }
 
     @Test
     @DisplayName("Should check if role exists when exists by name")
     void shouldCheckIfRoleExistsWhenExistsByName() {
-        boolean roleExists = roleRepository.existsByName(this.roleOne.getName());
+        RoleName name = this.roleRepository.save(this.roleUser).getName();
+
+        boolean roleExists = roleRepository.existsByName(name);
 
         assertTrue(roleExists);
     }
@@ -70,15 +67,16 @@ class RoleRepositoryTest {
     @Test
     @DisplayName("Should find a list of roles when find all")
     void shouldFindAListOfRolesWhenFindAll() {
-        Long expectedSize = 3L;
         Pageable pageableMock = Mockito.mock(Pageable.class);
 
-        this.roleRepository.saveAll(List.of(this.roleOne, this.roleTwo, this.roleThree));
+        int size = this.roleRepository
+                .saveAll(List.of(this.roleUser, this.roleMod, this.roleAdmin))
+                .size();
 
         Page<Role> rolesFound = this.roleRepository.findAll(pageableMock);
 
         assertNotNull(rolesFound);
-        assertEquals(expectedSize, rolesFound.getContent().size());
+        assertEquals(size, rolesFound.getContent().size());
     }
 
 }

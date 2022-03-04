@@ -27,6 +27,14 @@ public class UserServiceDataTestUtils {
         );
     }
 
+    public static User getMockUser(String username,
+                                   String password,
+                                   String firstName,
+                                   String lastName,
+                                   Byte age) {
+        return getMockUser(null, username, password, firstName, lastName, age);
+    }
+
     public static User getMockUser(Long userId,
                                    String username,
                                    String password,
@@ -45,10 +53,10 @@ public class UserServiceDataTestUtils {
     }
 
     public static UserDto getMockUserWithOutId(String username,
-                                   String password,
-                                   String firstName,
-                                   String lastName,
-                                   Byte age) {
+                                               String password,
+                                               String firstName,
+                                               String lastName,
+                                               Byte age) {
         return new UserDto(
                 username,
                 password,

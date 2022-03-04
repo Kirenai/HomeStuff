@@ -12,9 +12,13 @@ public class RoleServiceDataTestUtils {
         return new RoleDto(roleID, roleName, Collections.emptySet());
     }
 
-    public static Role getMockRole(Long roleID, RoleName roleName) {
+    public static Role getMockRole(RoleName roleName) {
+        return getMockRole(null, roleName);
+    }
+
+    public static Role getMockRole(Long roleId, RoleName roleName) {
         return Role.builder()
-                .roleId(roleID)
+                .roleId(roleId)
                 .name(roleName)
                 .users(Collections.emptySet())
                 .build();
