@@ -8,6 +8,10 @@ import com.revilla.homestuff.entity.Category;
  */
 public class CategoryServiceDataTestUtils {
 
+    public static Category getCategoryMock(String categoryName) {
+        return getCategoryMock(null, categoryName);
+    }
+
     public static Category getCategoryMock(Long categoryId, String categoryName) {
         return Category.builder()
                 .categoryId(categoryId)

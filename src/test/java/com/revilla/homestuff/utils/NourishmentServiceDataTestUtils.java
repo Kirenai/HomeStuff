@@ -14,6 +14,13 @@ import static com.revilla.homestuff.utils.AmountNourishmentServiceDataTestUtils.
 
 public class NourishmentServiceDataTestUtils {
 
+    public static Nourishment getNourishmentMock(String name) {
+        return Nourishment.builder()
+                .name(name)
+                .isAvailable(true)
+                .build();
+    }
+
     public static Nourishment getNourishmentMock(Long id,
                                                  String name,
                                                  String path,
