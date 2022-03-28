@@ -11,6 +11,7 @@ import com.revilla.homestuff.repository.UserRepository;
 import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.service.ConsumptionService;
 import com.revilla.homestuff.util.GeneralUtil;
+import com.revilla.homestuff.util.consumption.CheckingValueAmountAndProcessing;
 import com.revilla.homestuff.util.enums.MessageAction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +20,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.math.BigDecimal;
-import java.util.Objects;
 
 /**
  * ConsumptionService
@@ -60,29 +59,7 @@ public class ConsumptionServiceImp extends GeneralServiceImp<ConsumptionDto, Lon
         GeneralUtil.validateAuthorizationPermissionOrThrow(consumption, userDetails,
                 MessageAction.CREATE);
         AmountNourishment amountNourishment = nourishment.getAmountNourishment();
-        if (Objects.nonNull(data.getUnit())) { // then, refactor
-            if (Byte.toUnsignedInt(data.getUnit()) > Byte
-                    .toUnsignedInt(amountNourishment.getUnit())) {
-                throw new IllegalStateException("amount exceeded");
-            }
-            int unitUpdatedValue = (Byte.toUnsignedInt(amountNourishment.getUnit())
-                    - Byte.toUnsignedInt(data.getUnit()));
-            amountNourishment.setUnit((byte) unitUpdatedValue);
-            if (amountNourishment.getUnit() == 0) {
-                nourishment.setIsAvailable(false);
-            }
-        } else if (Objects.nonNull(data.getPercentage())) { // then, refactor
-            if (data.getPercentage().doubleValue() > amountNourishment.getPercentage()
-                    .doubleValue()) {
-                throw new IllegalStateException("percentage exceeded");
-            }
-            double percentageUpdatedValue = (amountNourishment.getPercentage().doubleValue()
-                    - data.getPercentage().doubleValue());
-            amountNourishment.setPercentage(new BigDecimal(percentageUpdatedValue));
-            if (amountNourishment.getPercentage().doubleValue() == 0.00) {
-                nourishment.setIsAvailable(false);
-            }
-        }
+        CheckingValueAmountAndProcessing.process(data, amountNourishment, nourishment);
         consumption.setNourishment(nourishment);
         Consumption consumptionSaved = this.consumptionRepository.save(consumption);
         return super.getModelMapper().map(consumptionSaved, super.getFirstGenericClass())
