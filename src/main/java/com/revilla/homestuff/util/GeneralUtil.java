@@ -1,6 +1,7 @@
 package com.revilla.homestuff.util;
 
 import java.io.Serializable;
+
 import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.entity.Category;
 import com.revilla.homestuff.entity.Consumption;
@@ -45,17 +46,17 @@ public class GeneralUtil {
             @NotNull Class<E> entityClass) {
         Boolean isDuplicated = false;
 
-        if (repo instanceof UserRepository) {
-            isDuplicated = ((UserRepository) repo).existsByUsername(toValidate);
+        if (repo instanceof UserRepository userRepository) {
+            isDuplicated = userRepository.existsByUsername(toValidate);
         }
-        if (repo instanceof RoleRepository) {
-            isDuplicated = ((RoleRepository) repo).existsByName(RoleName.valueOf(toValidate));
+        if (repo instanceof RoleRepository roleRepository) {
+            isDuplicated = roleRepository.existsByName(RoleName.valueOf(toValidate));
         }
-        if (repo instanceof NourishmentRepository) {
-            isDuplicated = ((NourishmentRepository) repo).existsByName(toValidate);
+        if (repo instanceof NourishmentRepository nourishmentRepository) {
+            isDuplicated = nourishmentRepository.existsByName(toValidate);
         }
-        if (repo instanceof CategoryRepository) {
-            isDuplicated = ((CategoryRepository) repo).existsByName(toValidate);
+        if (repo instanceof CategoryRepository categoryRepository) {
+            isDuplicated = categoryRepository.existsByName(toValidate);
         }
 
         if (isDuplicated) {
@@ -71,26 +72,26 @@ public class GeneralUtil {
             @NotNull AuthUserDetails userDetails,
             @NotNull MessageAction action) {
         String errorMessage = null;
-        if (obj instanceof User) {
-            if (((User) obj).getUserId().equals(userDetails.getUserId())
+        if (obj instanceof User user) {
+            if (user.getUserId().equals(userDetails.getUserId())
                     || userDetails.getAuthorities()
-                            .contains(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
+                    .contains(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
                 return;
             }
             errorMessage = "You don't have the permission to " + action.name() + " this profile";
         }
-        if (obj instanceof Nourishment) {
-            if (((Nourishment) obj).getUser().getUserId().equals(userDetails.getUserId())
+        if (obj instanceof Nourishment nourishment) {
+            if (nourishment.getUser().getUserId().equals(userDetails.getUserId())
                     || userDetails.getAuthorities()
-                            .contains(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
+                    .contains(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
                 return;
             }
             errorMessage = "You don't have the permission to " + action.name() + " this nourishment";
         }
-        if (obj instanceof Consumption) {
-            if (((Consumption) obj).getUser().getUserId().equals(userDetails.getUserId())
+        if (obj instanceof Consumption consumption) {
+            if (consumption.getUser().getUserId().equals(userDetails.getUserId())
                     || userDetails.getAuthorities()
-                            .contains(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
+                    .contains(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
                 return;
             }
             errorMessage = "You don't have the permission to " + action.name() + " this consumption";
@@ -106,8 +107,8 @@ public class GeneralUtil {
     }
 
     public static <E> ApiResponseDto responseMessageAction(@NotNull E obj,
-            @NotNull Class<E> clazz,
-            @NotNull String messageAction) {
+                                                           @NotNull Class<E> clazz,
+                                                           @NotNull String messageAction) {
         StringBuilder message = new StringBuilder();
         if (obj instanceof User) {
             message.append(simpleNameClass(clazz)).append(" ").append(messageAction);
