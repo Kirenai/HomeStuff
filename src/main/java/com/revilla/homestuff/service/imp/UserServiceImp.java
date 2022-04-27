@@ -55,7 +55,7 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(RoleUtil.getSetOfRolesOrThrow(null, this.roleRepository));
         this.userRepository.save(user);
-        return GeneralUtil.responseMessageAction(user, User.class, "registered successfully");
+        return GeneralUtil.responseMessageAction(User.class, "registered successfully");
     }
 
     @Transactional
@@ -77,6 +77,7 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
     @Transactional
     @Override
     public ApiResponseDto update(Long id, UserDto data, AuthUserDetails userDetails) {
+        log.info("Calling the update method in " + GeneralUtil.simpleNameClass(this.getClass()));
         return this.userRepository.findById(id)
                 .map(user -> {
                     GeneralUtil.validateAuthorizationPermissionOrThrow(user, userDetails,
@@ -91,7 +92,7 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
                                     new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
                         user.setRoles(RoleUtil.getSetOfRolesOrThrow(data.getRoles(), this.roleRepository));
                     }
-                    return GeneralUtil.responseMessageAction(user, User.class, "updated successfully");
+                    return GeneralUtil.responseMessageAction(User.class, "updated successfully");
                 })
                 .orElseThrow(() -> new EntityNoSuchElementException(
                         GeneralUtil.simpleNameClass(User.class)

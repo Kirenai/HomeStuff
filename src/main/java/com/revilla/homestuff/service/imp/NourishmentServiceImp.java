@@ -90,7 +90,7 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
                             && Objects.nonNull(amountNourishment.getPercentage())) {
                         amountNourishment.setPercentage(amountNourishmentDto.getPercentage());
                     }
-                    return GeneralUtil.responseMessageAction(n, Nourishment.class,
+                    return GeneralUtil.responseMessageAction(Nourishment.class,
                             "updated successfully");
                 })
                 .orElseThrow(() -> new EntityNoSuchElementException(

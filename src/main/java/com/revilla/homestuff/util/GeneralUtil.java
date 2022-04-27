@@ -87,23 +87,9 @@ public class GeneralUtil {
         throw new UnauthorizedPermissionException(errorMessage);
     }
 
-    public static <E> ApiResponseDto responseMessageAction(@NotNull E obj,
-                                                           @NotNull Class<E> clazz,
+    public static <E> ApiResponseDto responseMessageAction(@NotNull Class<E> clazz,
                                                            @NotNull String messageAction) {
-        StringBuilder message = new StringBuilder();
-        if (obj instanceof User) {
-            message.append(simpleNameClass(clazz)).append(" ").append(messageAction);
-        }
-        if (obj instanceof Nourishment) {
-            message.append(simpleNameClass(clazz)).append(" ").append(messageAction);
-        }
-        if (obj instanceof Role) {
-            message.append(simpleNameClass(clazz)).append(" ").append(messageAction);
-        }
-        if (obj instanceof Category) {
-            message.append(simpleNameClass(clazz)).append(" ").append(messageAction);
-        }
-        return new ApiResponseDto(Boolean.TRUE, message.toString());
+        return new ApiResponseDto(Boolean.TRUE, simpleNameClass(clazz) + " " + messageAction);
     }
 
     public static String simpleNameClass(@NotNull Class<?> clazzGeneric) {

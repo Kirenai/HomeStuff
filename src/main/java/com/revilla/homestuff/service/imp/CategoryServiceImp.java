@@ -50,7 +50,7 @@ public class CategoryServiceImp extends GeneralServiceImp<CategoryDto, Long, Cat
         log.info("Calling the update method in " + getClass());
         return this.categoryRepository.findById(id).map(c -> {
             c.setName(data.getName());
-            return GeneralUtil.responseMessageAction(c, Category.class, "updated successfully");
+            return GeneralUtil.responseMessageAction(Category.class, "updated successfully");
         }).orElseThrow(() -> new EntityNoSuchElementException(
                 GeneralUtil.simpleNameClass(Category.class) + " don't found with id: " + id));
     }

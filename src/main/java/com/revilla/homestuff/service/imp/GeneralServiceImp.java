@@ -88,7 +88,7 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
                 this.getThirdGenericClass());
         GeneralUtil.validateAuthorizationPermissionOrThrow(obj, userDetails, MessageAction.DELETE);
         this.getRepo().delete(obj);
-        return GeneralUtil.responseMessageAction(obj, this.getThirdGenericClass(),
+        return GeneralUtil.responseMessageAction(this.getThirdGenericClass(),
                 "deleted successfully");
     }
 

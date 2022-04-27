@@ -51,7 +51,7 @@ public class RoleServiceImp extends GeneralServiceImp<RoleDto, Long, Role> imple
         return this.roleRepository.findById(id)
                 .map(role -> {
                     role.setName(data.getName().name());
-                    return GeneralUtil.responseMessageAction(role, Role.class,
+                    return GeneralUtil.responseMessageAction(Role.class,
                             "updated successfully");
                 })
                 .orElseThrow(() -> new EntityNoSuchElementException(
