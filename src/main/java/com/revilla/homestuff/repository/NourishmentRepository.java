@@ -12,8 +12,9 @@ import java.util.Optional;
  * @author Kirenai
  */
 @Repository
-public interface NourishmentRepository extends JpaRepository<Nourishment, Long> {
+public interface NourishmentRepository extends JpaRepository<Nourishment, Long>, ExitsByProperty {
 
+    @Override
     Boolean existsByName(String name);
-    
+
 }

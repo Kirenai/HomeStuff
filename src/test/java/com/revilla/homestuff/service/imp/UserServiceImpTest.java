@@ -151,7 +151,7 @@ class UserServiceImpTest {
                 + " is already exists with name: " + this.registerDtoMock.getUsername();
 
 
-        Mockito.when(this.userRepository.existsByUsername(Mockito.anyString())).thenReturn(true);
+        Mockito.when(this.userRepository.existsByName(Mockito.anyString())).thenReturn(true);
 
         EntityDuplicateConstraintViolationException ex =
                 Assertions.assertThrows(EntityDuplicateConstraintViolationException.class,
@@ -159,7 +159,7 @@ class UserServiceImpTest {
 
         Assertions.assertEquals(expected, ex.getMessage());
 
-        Mockito.verify(this.userRepository).existsByUsername(this.registerDtoMock.getUsername());
+        Mockito.verify(this.userRepository).existsByName(this.registerDtoMock.getUsername());
     }
 
     @Test
@@ -169,9 +169,9 @@ class UserServiceImpTest {
                 .getMockRoleResponse("registered successfully", User.class);
         Role roleMock = RoleServiceDataTestUtils.getMockRole(1L, RoleName.ROLE_USER);
 
-        Mockito.when(this.userRepository.existsByUsername(Mockito.anyString())).thenReturn(false);
+        Mockito.when(this.userRepository.existsByName(Mockito.anyString())).thenReturn(false);
         Mockito.when(this.modelMapper.map(this.registerDtoMock, User.class)).thenReturn(this.userMockOne);
-        Mockito.when(this.roleRepository.findByName(ArgumentMatchers.any(RoleName.class))).thenReturn(Optional.of(roleMock));
+        Mockito.when(this.roleRepository.findByName(ArgumentMatchers.any(String.class))).thenReturn(Optional.of(roleMock));
         Mockito.when(this.userRepository.save(ArgumentMatchers.any(User.class))).thenReturn(this.userMockOne);
 
         ApiResponseDto response = this.userService.register(this.registerDtoMock);
@@ -179,7 +179,7 @@ class UserServiceImpTest {
         Assertions.assertEquals(expected.getMessage(), response.getMessage());
         Assertions.assertTrue(response.getSuccess());
 
-        Mockito.verify(this.userRepository).existsByUsername(this.registerDtoMock.getUsername());
+        Mockito.verify(this.userRepository).existsByName(this.registerDtoMock.getUsername());
         Mockito.verify(this.modelMapper).map(this.registerDtoMock, User.class);
         Mockito.verify(this.roleRepository).findByName(roleMock.getName());
         Mockito.verify(this.userRepository).save(this.userMockOne);
@@ -191,7 +191,7 @@ class UserServiceImpTest {
         String expected = GeneralUtil.simpleNameClass(User.class)
                 + " is already exists with name: " + this.userDtoMockOne.getUsername();
 
-        Mockito.when(this.userRepository.existsByUsername(Mockito.anyString())).thenReturn(true);
+        Mockito.when(this.userRepository.existsByName(Mockito.anyString())).thenReturn(true);
 
         EntityDuplicateConstraintViolationException ex =
                 Assertions.assertThrows(EntityDuplicateConstraintViolationException.class,
@@ -199,7 +199,7 @@ class UserServiceImpTest {
 
         Assertions.assertEquals(expected, ex.getMessage());
 
-        Mockito.verify(this.userRepository).existsByUsername(this.userDtoMockOne.getUsername());
+        Mockito.verify(this.userRepository).existsByName(this.userDtoMockOne.getUsername());
     }
 
     @Test
@@ -291,7 +291,7 @@ class UserServiceImpTest {
         this.userMockOne.setRoles(Set.of(roleMock));
         Mockito.when(this.userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.of(this.userMockOne));
-        Mockito.when(this.roleRepository.findByName(ArgumentMatchers.any(RoleName.class)))
+        Mockito.when(this.roleRepository.findByName(ArgumentMatchers.any(String.class)))
                 .thenReturn(Optional.of(roleMock));
 
         Role roleMockAdmin = RoleServiceDataTestUtils.getMockRole(1L, RoleName.ROLE_ADMIN);
@@ -307,7 +307,7 @@ class UserServiceImpTest {
         Assertions.assertTrue(response.getSuccess());
 
         Mockito.verify(this.userRepository).findById(userIdToFind);
-        Mockito.verify(this.roleRepository).findByName(roleDtoMock.getName());
+        Mockito.verify(this.roleRepository).findByName(roleDtoMock.getName().name());
     }
 
     @Test

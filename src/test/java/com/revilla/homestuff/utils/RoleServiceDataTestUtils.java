@@ -19,7 +19,7 @@ public class RoleServiceDataTestUtils {
     public static Role getMockRole(Long roleId, RoleName roleName) {
         return Role.builder()
                 .roleId(roleId)
-                .name(roleName)
+                .name(roleName.name())
                 .users(Collections.emptySet())
                 .build();
     }

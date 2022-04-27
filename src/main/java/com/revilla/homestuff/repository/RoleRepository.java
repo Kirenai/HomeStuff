@@ -1,7 +1,6 @@
 package com.revilla.homestuff.repository;
 
 import com.revilla.homestuff.entity.Role;
-import com.revilla.homestuff.util.enums.RoleName;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
@@ -10,10 +9,11 @@ import java.util.Optional;
  * RoleCategory
  * @author Kirenai
  */
-public interface RoleRepository extends JpaRepository<Role, Long> {
+public interface RoleRepository extends JpaRepository<Role, Long>, ExitsByProperty {
 
-    Optional<Role> findByName(RoleName name);
+    Optional<Role> findByName(String name);
 
-    Boolean existsByName(RoleName name);
+    @Override
+    Boolean existsByName(String name);
 
 }

@@ -73,7 +73,7 @@ class UserRepositoryTest {
     void shouldVerifiesIfUserExistsWhenExistsByUsername() {
         String username = this.userRepository.save(this.funwiz)
                 .getUsername();
-        boolean exists = this.userRepository.existsByUsername(username);
+        boolean exists = this.userRepository.existsByName(username);
 
         Assertions.assertTrue(exists);
     }

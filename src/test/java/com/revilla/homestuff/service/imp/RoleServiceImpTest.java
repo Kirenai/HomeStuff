@@ -172,7 +172,7 @@ class RoleServiceImpTest {
     void shouldThrowExceptionWhenRoleNameIsDuplicated() {
         RoleDto roleDto = RoleServiceDataTestUtils.getMockRoleDto(1L, RoleName.ROLE_USER);
 
-        Mockito.when(this.roleRepository.existsByName(RoleName.ROLE_USER)).thenReturn(true);
+        Mockito.when(this.roleRepository.existsByName(RoleName.ROLE_USER.name())).thenReturn(true);
 
         EntityDuplicateConstraintViolationException ex = assertThrows(EntityDuplicateConstraintViolationException.class,
                 () -> this.roleService.create(roleDto)
@@ -183,7 +183,7 @@ class RoleServiceImpTest {
                 ex.getMessage()
         );
 
-        Mockito.verify(this.roleRepository).existsByName(RoleName.ROLE_USER);
+        Mockito.verify(this.roleRepository).existsByName(RoleName.ROLE_USER.name());
     }
 
     @Test
@@ -193,7 +193,7 @@ class RoleServiceImpTest {
         Role role = RoleServiceDataTestUtils.getMockRole(1L, RoleName.ROLE_USER);
         RoleDto roleDto = RoleServiceDataTestUtils.getMockRoleDto(1L, RoleName.ROLE_USER);
 
-        Mockito.when(this.roleRepository.existsByName(RoleName.ROLE_USER)).thenReturn(false);
+        Mockito.when(this.roleRepository.existsByName(RoleName.ROLE_USER.name())).thenReturn(false);
         Mockito.when(this.modelMapper.map(roleDto, Role.class)).thenReturn(role);
         Mockito.when(this.roleRepository.save(any(Role.class))).thenReturn(role);
         Mockito.when(this.modelMapper.map(role, RoleDto.class)).thenReturn(roleDto);
@@ -202,7 +202,7 @@ class RoleServiceImpTest {
 
         assertEquals(expected, roleCreated.getName().name());
 
-        Mockito.verify(this.roleRepository).existsByName(RoleName.ROLE_USER);
+        Mockito.verify(this.roleRepository).existsByName(RoleName.ROLE_USER.name());
         Mockito.verify(this.modelMapper).map(roleDto, Role.class);
         Mockito.verify(this.roleRepository).save(role);
         Mockito.verify(this.modelMapper).map(role, RoleDto.class);

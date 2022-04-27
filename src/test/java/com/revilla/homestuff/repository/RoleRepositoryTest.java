@@ -46,9 +46,9 @@ class RoleRepositoryTest {
     @Test
     @DisplayName("Should find role by name")
     void shouldFindRoleByName() {
-        RoleName name = this.roleRepository.save(this.roleUser).getName();
+        String name = this.roleRepository.save(this.roleUser).getName();
 
-        Optional<Role> roleFound = roleRepository.findByName(name);
+        Optional<Role> roleFound = this.roleRepository.findByName(name);
 
         assertTrue(roleFound.isPresent());
         assertEquals(name, roleFound.get().getName());
@@ -57,9 +57,9 @@ class RoleRepositoryTest {
     @Test
     @DisplayName("Should check if role exists when exists by name")
     void shouldCheckIfRoleExistsWhenExistsByName() {
-        RoleName name = this.roleRepository.save(this.roleUser).getName();
+        String name = this.roleRepository.save(this.roleUser).getName();
 
-        boolean roleExists = roleRepository.existsByName(name);
+        boolean roleExists = this.roleRepository.existsByName(name);
 
         assertTrue(roleExists);
     }

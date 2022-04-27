@@ -50,7 +50,7 @@ public class RoleServiceImp extends GeneralServiceImp<RoleDto, Long, Role> imple
                 + GeneralUtil.simpleNameClass(this.getClass()));
         return this.roleRepository.findById(id)
                 .map(role -> {
-                    role.setName(data.getName());
+                    role.setName(data.getName().name());
                     return GeneralUtil.responseMessageAction(role, Role.class,
                             "updated successfully");
                 })

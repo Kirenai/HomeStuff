@@ -1,12 +1,10 @@
 package com.revilla.homestuff.entity;
 
-import java.util.Collection;
-import javax.persistence.*;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.revilla.homestuff.util.enums.RoleName;
 import lombok.*;
-import org.hibernate.annotations.NaturalId;
+
+import javax.persistence.*;
+import java.util.Collection;
 
 /**
  * Role
@@ -29,10 +27,8 @@ public class Role {
     @Column(name = "role_id", nullable = false)
     private Long roleId;
 
-    @Enumerated(value = EnumType.STRING)
-    @NaturalId
     @Column(name = "name", nullable = false, length = 20)
-    private RoleName name;
+    private String name;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToMany(mappedBy = "roles")

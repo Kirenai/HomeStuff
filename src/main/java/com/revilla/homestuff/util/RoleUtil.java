@@ -20,7 +20,7 @@ public class RoleUtil {
 
     public static Role getRoleByNameOrThrow(RoleName name,
                                             RoleRepository repo) {
-        return repo.findByName(name)
+        return repo.findByName(name.name())
                 .orElseThrow(() -> new EntityNoSuchElementException(
                         GeneralUtil.simpleNameClass(Role.class)
                                 + " don't found with username: " + name

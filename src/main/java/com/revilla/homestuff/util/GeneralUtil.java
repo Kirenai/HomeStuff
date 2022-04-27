@@ -1,26 +1,19 @@
 package com.revilla.homestuff.util;
 
-import java.io.Serializable;
-
 import com.revilla.homestuff.dto.response.ApiResponseDto;
-import com.revilla.homestuff.entity.Category;
-import com.revilla.homestuff.entity.Consumption;
-import com.revilla.homestuff.entity.Nourishment;
-import com.revilla.homestuff.entity.Role;
-import com.revilla.homestuff.entity.User;
+import com.revilla.homestuff.entity.*;
 import com.revilla.homestuff.exception.entity.EntityDuplicateConstraintViolationException;
 import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
 import com.revilla.homestuff.exception.unauthorize.UnauthorizedPermissionException;
-import com.revilla.homestuff.repository.CategoryRepository;
-import com.revilla.homestuff.repository.NourishmentRepository;
-import com.revilla.homestuff.repository.RoleRepository;
-import com.revilla.homestuff.repository.UserRepository;
+import com.revilla.homestuff.repository.ExitsByProperty;
 import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.util.enums.MessageAction;
 import com.revilla.homestuff.util.enums.RoleName;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import java.io.Serializable;
 
 /**
  * GeneralUtil
@@ -42,22 +35,10 @@ public class GeneralUtil {
 
     public static <E> void validateDuplicateConstraintViolation(
             @NotNull String toValidate,
-            @NotNull JpaRepository<E, Long> repo,
+            @NotNull ExitsByProperty repo,
             @NotNull Class<E> entityClass) {
-        Boolean isDuplicated = false;
 
-        if (repo instanceof UserRepository userRepository) {
-            isDuplicated = userRepository.existsByUsername(toValidate);
-        }
-        if (repo instanceof RoleRepository roleRepository) {
-            isDuplicated = roleRepository.existsByName(RoleName.valueOf(toValidate));
-        }
-        if (repo instanceof NourishmentRepository nourishmentRepository) {
-            isDuplicated = nourishmentRepository.existsByName(toValidate);
-        }
-        if (repo instanceof CategoryRepository categoryRepository) {
-            isDuplicated = categoryRepository.existsByName(toValidate);
-        }
+        Boolean isDuplicated = repo.existsByName(toValidate);
 
         if (isDuplicated) {
             throw new EntityDuplicateConstraintViolationException(
