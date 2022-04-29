@@ -1,6 +1,9 @@
 package com.revilla.homestuff.service.imp;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
 import com.revilla.homestuff.dto.AmountNourishmentDto;
 import com.revilla.homestuff.dto.NourishmentDto;
 import com.revilla.homestuff.dto.response.ApiResponseDto;
@@ -41,6 +44,15 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
     @Override
     public JpaRepository<Nourishment, Long> getRepo() {
         return this.nourishmentRepository;
+    }
+
+    @Override
+    public List<NourishmentDto> findAllNourishmentByStatus(boolean isAvailable) {
+        log.info("findAllNourishmentByStatus({})", isAvailable);
+        return this.nourishmentRepository.findByIsAvailable(isAvailable)
+                .stream()
+                .map(nourishment -> super.getModelMapper().map(nourishment, super.getFirstGenericClass()))
+                .collect(Collectors.toList());
     }
 
     @Transactional

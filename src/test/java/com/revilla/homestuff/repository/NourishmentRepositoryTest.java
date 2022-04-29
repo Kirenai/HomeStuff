@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -86,6 +88,33 @@ class NourishmentRepositoryTest {
         this.nourishmentRepository.save(this.apple);
 
         assertFalse(this.nourishmentRepository.existsByName(this.banana.getName()));
+    }
+
+    @Test
+    @DisplayName("should return a list of nourishments when isAvailable is true")
+    void shouldReturnAListOfNourishmentsWhenIsAvailableIsTrue() {
+        User funwiz = this.userRepository.save(this.funwiz);
+        Category fruit = this.categoryRepository.save(this.fruit);
+        this.apple.setUser(funwiz);
+        this.apple.setCategory(fruit);
+        this.nourishmentRepository.save(this.apple); // isAvailable = true
+
+        List<Nourishment> nourishmentList = this.nourishmentRepository.findByIsAvailable(true);
+        assertEquals(1, nourishmentList.size());
+        assertTrue(nourishmentList.get(0).getIsAvailable());
+
+    }
+
+    @Test
+    @DisplayName("should return a empty list of nourishments when isAvailable is false")
+    void shouldReturnAEmptyListOfNourishmentsWhenIsAvailableIsFalse() {
+        User funwiz = this.userRepository.save(this.funwiz);
+        Category fruit = this.categoryRepository.save(this.fruit);
+        this.apple.setUser(funwiz);
+        this.apple.setCategory(fruit);
+        this.nourishmentRepository.save(this.apple); // isAvailable = true
+
+        assertEquals(0, this.nourishmentRepository.findByIsAvailable(false).size());
     }
 
 }

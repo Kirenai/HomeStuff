@@ -176,6 +176,40 @@ class NourishmentServiceImpTest {
     }
 
     @Test
+    @DisplayName("Should find all nourishments by status when find all by status when isAvailable is true")
+    void shouldFindAllNourishmentsByStatusWhenFindAllByStatusWhenIsAvailableIsTrue() {
+        Mockito.when(this.nourishmentRepository.findByIsAvailable(ArgumentMatchers.anyBoolean()))
+                .thenReturn(List.of(this.nourishmentOne));
+        Mockito.when(this.modelMapper.map(ArgumentMatchers.any(), ArgumentMatchers.any()))
+                .thenReturn(this.nourishmentDtoOne);
+
+        List<NourishmentDto> allNourishmentByStatus = this.nourishmentService.findAllNourishmentByStatus(true);
+
+        Assertions.assertTrue(allNourishmentByStatus.get(0).getIsAvailable());
+
+        Mockito.verify(this.nourishmentRepository, Mockito.times(1)).findByIsAvailable(true);
+        Mockito.verify(this.modelMapper, Mockito.times(1)).map(this.nourishmentOne, NourishmentDto.class);
+    }
+
+    @Test
+    @DisplayName("Should find all nourishments by status when find all by status when isAvailable is false")
+    void shouldFindAllNourishmentsByStatusWhenFindAllByStatusWhenIsAvailableIsFalse() {
+        this.nourishmentOne.setIsAvailable(false);
+        this.nourishmentDtoOne.setIsAvailable(false);
+        Mockito.when(this.nourishmentRepository.findByIsAvailable(ArgumentMatchers.anyBoolean()))
+                .thenReturn(List.of(this.nourishmentOne));
+        Mockito.when(this.modelMapper.map(ArgumentMatchers.any(), ArgumentMatchers.any()))
+                .thenReturn(this.nourishmentDtoOne);
+
+        List<NourishmentDto> allNourishmentByStatus = this.nourishmentService.findAllNourishmentByStatus(false);
+
+        Assertions.assertFalse(allNourishmentByStatus.get(0).getIsAvailable());
+
+        Mockito.verify(this.nourishmentRepository, Mockito.times(1)).findByIsAvailable(false);
+        Mockito.verify(this.modelMapper, Mockito.times(1)).map(this.nourishmentOne, NourishmentDto.class);
+    }
+
+    @Test
     @DisplayName("Should throw an exception when nourishment name is already exists when creating")
     void shouldThrowExceptionWhenNourishmentNameIsAlreadyExists() {
         Long userIdToFind = 1L;

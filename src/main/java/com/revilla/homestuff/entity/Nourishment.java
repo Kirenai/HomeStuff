@@ -43,7 +43,7 @@ public class Nourishment {
     @Column(name = "name", nullable = false, length = 35)
     private String name;
 
-    @Column(name = "image_path", nullable = false, length = 45)
+    @Column(name = "image_path")
     private String imagePath;
 
     @Column(columnDefinition = "TEXT", name = "description")

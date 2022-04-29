@@ -5,7 +5,6 @@ import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.security.CurrentUser;
 import com.revilla.homestuff.service.NourishmentService;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -24,10 +23,10 @@ import java.util.List;
  */
 @RequiredArgsConstructor
 @RestController
+@CrossOrigin
 @RequestMapping("/api/nourishments")
 public class NourishmentResource {
 
-    @Qualifier("nourishment.service")
     private final NourishmentService nourishmentService;
 
     @GetMapping
@@ -53,8 +52,16 @@ public class NourishmentResource {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @GetMapping("/stock/{is_available}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
+    public ResponseEntity<List<NourishmentDto>> getNourishmentStockStatus(
+            @PathVariable("is_available") boolean isAvailable) {
+        List<NourishmentDto> response = this.nourishmentService.findAllNourishmentByStatus(isAvailable);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     @PostMapping("/user/{userId}/category/{categoryId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<NourishmentDto> createNourishment(
             @PathVariable Long userId,
             @PathVariable Long categoryId,
