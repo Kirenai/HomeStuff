@@ -1,6 +1,6 @@
 # Home Stuff
 
-Este proyecto backend sirve para almacenar, administrar y obtener las cosas de hogar. Tener una forma de saber si los alimentos del hogar estan disponibles para el consumo o para el abastecimiento.
+Este proyecto backend sirve para almacenar, administrar y obtener las cosas de hogar. Tener una forma de saber si los alimentos del hogar están disponibles para el consumo o para el abastecimiento.
 
 # Tecnologías
 
@@ -33,7 +33,7 @@ Home stuff usa Maven como sistema de compilación.
 
 # Comandos
 
-Clonar el repoositorio
+Clonar el repositorio
 
 ```github
 git clone https://github.com/Kirenai/home-stuff.git
