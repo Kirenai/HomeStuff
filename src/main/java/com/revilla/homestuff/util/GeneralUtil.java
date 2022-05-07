@@ -33,21 +33,6 @@ public class GeneralUtil {
                 );
     }
 
-    public static <E> void validateDuplicateConstraintViolation(
-            @NotNull String toValidate,
-            @NotNull ExitsByProperty repo,
-            @NotNull Class<E> entityClass) {
-
-        Boolean isDuplicated = repo.existsByName(toValidate);
-
-        if (isDuplicated) {
-            throw new EntityDuplicateConstraintViolationException(
-                    GeneralUtil.simpleNameClass(entityClass)
-                            + " is already exists with name: " + toValidate
-            );
-        }
-    }
-
     public static <E> void validateAuthorizationPermissionOrThrow(
             @NotNull E obj,
             @NotNull AuthUserDetails userDetails,

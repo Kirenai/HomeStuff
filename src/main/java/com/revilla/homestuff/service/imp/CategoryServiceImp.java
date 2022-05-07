@@ -6,6 +6,7 @@ import com.revilla.homestuff.entity.Category;
 import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
 import com.revilla.homestuff.repository.CategoryRepository;
 import com.revilla.homestuff.service.CategoryService;
+import com.revilla.homestuff.util.ConstraintViolation;
 import com.revilla.homestuff.util.GeneralUtil;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -37,7 +38,7 @@ public class CategoryServiceImp extends GeneralServiceImp<CategoryDto, Long, Cat
     @Override
     public CategoryDto create(CategoryDto data) {
         log.info("Calling the create method in " + getClass());
-        GeneralUtil.validateDuplicateConstraintViolation(data.getName(),
+        ConstraintViolation.validateDuplicate(data.getName(),
                 this.categoryRepository, Category.class);
         Category category = super.getModelMapper().map(data, super.getThirdGenericClass());
         Category categorySaved = this.categoryRepository.save(category);

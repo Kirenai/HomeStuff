@@ -9,6 +9,7 @@ import com.revilla.homestuff.repository.RoleRepository;
 import com.revilla.homestuff.repository.UserRepository;
 import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.service.UserService;
+import com.revilla.homestuff.util.ConstraintViolation;
 import com.revilla.homestuff.util.GeneralUtil;
 import com.revilla.homestuff.util.RoleUtil;
 import com.revilla.homestuff.util.enums.MessageAction;
@@ -49,7 +50,7 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
     public ApiResponseDto register(RegisterRequestDto requestDto) {
         log.info("Calling the register method in "
                 + GeneralUtil.simpleNameClass(this.getClass()));
-        GeneralUtil.validateDuplicateConstraintViolation(requestDto.getUsername(),
+        ConstraintViolation.validateDuplicate(requestDto.getUsername(),
                 this.userRepository, User.class);
         User user = super.getModelMapper().map(requestDto, super.getThirdGenericClass());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -63,7 +64,7 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
     public UserDto create(UserDto data) {
         log.info("Calling the create method in "
                 + GeneralUtil.simpleNameClass(this.getClass()));
-        GeneralUtil.validateDuplicateConstraintViolation(data.getUsername(),
+        ConstraintViolation.validateDuplicate(data.getUsername(),
                 this.userRepository, User.class);
         User user = super.getModelMapper().map(data, super.getThirdGenericClass());
         user.setPassword(passwordEncoder.encode(user.getPassword()));

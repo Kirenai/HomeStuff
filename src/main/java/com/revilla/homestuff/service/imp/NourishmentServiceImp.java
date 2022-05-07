@@ -17,6 +17,7 @@ import com.revilla.homestuff.repository.NourishmentRepository;
 import com.revilla.homestuff.repository.UserRepository;
 import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.service.NourishmentService;
+import com.revilla.homestuff.util.ConstraintViolation;
 import com.revilla.homestuff.util.GeneralUtil;
 import com.revilla.homestuff.util.enums.MessageAction;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -61,7 +62,7 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
             AuthUserDetails userDetails) {
         log.info("Calling the create method in "
                 + GeneralUtil.simpleNameClass(this.getClass()));
-        GeneralUtil.validateDuplicateConstraintViolation(data.getName(), this.nourishmentRepository,
+        ConstraintViolation.validateDuplicate(data.getName(), this.nourishmentRepository,
                 Nourishment.class);
         Nourishment nourishment = super.getModelMapper().map(data, super.getThirdGenericClass());
         User user = GeneralUtil.getEntityByIdOrThrow(userId, this.userRepository, User.class);

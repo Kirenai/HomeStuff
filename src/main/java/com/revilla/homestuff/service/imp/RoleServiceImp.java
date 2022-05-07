@@ -6,6 +6,7 @@ import com.revilla.homestuff.entity.Role;
 import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
 import com.revilla.homestuff.repository.RoleRepository;
 import com.revilla.homestuff.service.RoleService;
+import com.revilla.homestuff.util.ConstraintViolation;
 import com.revilla.homestuff.util.GeneralUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,6 +14,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import javax.validation.Constraint;
 
 /**
  * RoleServiceImp
@@ -37,7 +40,7 @@ public class RoleServiceImp extends GeneralServiceImp<RoleDto, Long, Role> imple
     public RoleDto create(RoleDto data) {
         log.info("Calling the create method in "
                 + GeneralUtil.simpleNameClass(this.getClass()));
-        GeneralUtil.validateDuplicateConstraintViolation(data.getName().name(),
+        ConstraintViolation.validateDuplicate(data.getName().name(),
                 this.roleRepository, Role.class);
         Role role = super.getModelMapper().map(data, super.getThirdGenericClass());
         Role roleSaved = this.roleRepository.save(role);
