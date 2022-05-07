@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.service.GeneralService;
+import com.revilla.homestuff.util.Entity;
 import com.revilla.homestuff.util.GeneralUtil;
 import com.revilla.homestuff.util.enums.MessageAction;
 import org.modelmapper.ModelMapper;
@@ -73,7 +74,7 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
     public T findOne(ID id, AuthUserDetails userDetails) {
         log.info("Calling the findOne method in "
                 + GeneralUtil.simpleNameClass(this.getClass()));
-        E obj = GeneralUtil.getEntityByIdOrThrow(id, this.getRepo(),
+        E obj = Entity.getById(id, this.getRepo(),
                 this.getThirdGenericClass());
         GeneralUtil.validateAuthorizationPermissionOrThrow(obj, userDetails, MessageAction.ACCESS);
         return this.modelMapper.map(obj, this.getFirstGenericClass());
@@ -84,7 +85,7 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
     public ApiResponseDto delete(ID id, AuthUserDetails userDetails) {
         log.info("Calling the delete method in "
                 + GeneralUtil.simpleNameClass(this.getClass()));
-        E obj = GeneralUtil.getEntityByIdOrThrow(id, this.getRepo(),
+        E obj = Entity.getById(id, this.getRepo(),
                 this.getThirdGenericClass());
         GeneralUtil.validateAuthorizationPermissionOrThrow(obj, userDetails, MessageAction.DELETE);
         this.getRepo().delete(obj);

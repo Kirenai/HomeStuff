@@ -22,17 +22,6 @@ import java.io.Serializable;
  */
 public class GeneralUtil {
 
-    public static <E, ID extends Serializable, R extends JpaRepository<E, ID>> E getEntityByIdOrThrow(
-            @NotNull ID id,
-            @NotNull R repo,
-            @NotNull Class<E> entityClass) {
-        return repo.findById(id)
-                .orElseThrow(() -> new EntityNoSuchElementException(
-                        GeneralUtil.simpleNameClass(entityClass)
-                                + " not found with id: " + id)
-                );
-    }
-
     public static <E> void validateAuthorizationPermissionOrThrow(
             @NotNull E obj,
             @NotNull AuthUserDetails userDetails,

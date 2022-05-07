@@ -18,6 +18,7 @@ import com.revilla.homestuff.repository.UserRepository;
 import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.service.NourishmentService;
 import com.revilla.homestuff.util.ConstraintViolation;
+import com.revilla.homestuff.util.Entity;
 import com.revilla.homestuff.util.GeneralUtil;
 import com.revilla.homestuff.util.enums.MessageAction;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -65,11 +66,11 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
         ConstraintViolation.validateDuplicate(data.getName(), this.nourishmentRepository,
                 Nourishment.class);
         Nourishment nourishment = super.getModelMapper().map(data, super.getThirdGenericClass());
-        User user = GeneralUtil.getEntityByIdOrThrow(userId, this.userRepository, User.class);
+        User user = Entity.getById(userId, this.userRepository, User.class);
         nourishment.setUser(user);
         GeneralUtil.validateAuthorizationPermissionOrThrow(nourishment, userDetails,
                 MessageAction.CREATE);
-        Category category = GeneralUtil.getEntityByIdOrThrow(categoryId, this.categoryRepository,
+        Category category = Entity.getById(categoryId, this.categoryRepository,
                 Category.class);
         nourishment.setIsAvailable(true);
         nourishment.setCategory(category);
