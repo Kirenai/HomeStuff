@@ -1,24 +1,24 @@
 spring:
   config:
     active:
-     on-profile: "test"
+     on-profile: test
   datasource:
-    driver-class-name: "org.h2.Driver"
-    platform: "mysql"
-    url: "jdbc:h2:mem:test"
-    username: "sa"
-    password: ""
-    initialization-mode: "never"
+    driver-class-name: org.h2.Driver
+    platform: mysql
+    url: jdbc:h2:mem:test
+    username: sa
+    password:
+    initialization-mode: never
   jpa:
     hibernate:
-      ddl-auto: "update"
-    generate-ddl: "true"
-    show-sql: "true"
+      ddl-auto: update
+    generate-ddl: true
+    show-sql: true
     properties:
       hibernate:
-        format_sql: "true"
-        dialect: "org.hibernate.dialect.H2Dialect"
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
   jackson:
     serialization:
-      WRITE_DATES_AS_TIMESTAMPS: "false"
-    time-zone: "UTC"
+      WRITE_DATES_AS_TIMESTAMPS: false
+    time-zone: UTC

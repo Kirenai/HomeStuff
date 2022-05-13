@@ -1,15 +1,15 @@
 # Home Stuff
 
-Este proyecto backend sirve para almacenar, administrar y obtener las cosas de hogar. Tener una forma de saber si los alimentos del hogar están disponibles para el consumo o para el abastecimiento.
+This backend project is used to store, manage and retrieve household items. Have a way of knowing if household food is available for consumption or for provisioning.
 
-# Tecnologías
+# Tecnologies
 
 * Maven
 * Java
 * DBMS MySQL
 * Git
 
-# Dependencias
+# Dependencies
 
 * Spring Boot
     * Spring Framework
@@ -23,27 +23,41 @@ Este proyecto backend sirve para almacenar, administrar y obtener las cosas de h
 * Model Mapper
 * Jetbrains Annotations
 
-# Compilación
+# Compilation
 
-Home stuff usa Maven como sistema de compilación.
+Home stuff use Maven as compilation system.
 
-# Requisitos
+# Requirements
 
-[Maven](https://maven.apache.org/download.cgi), [Git](https://git-scm.com) y [JDK17](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html).
+Have [Maven](https://maven.apache.org/download.cgi), [Git](https://git-scm.com) and [JDK17](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html) installed.
 
-# Comandos
+# Commands
 
-Clonar el repositorio
+Clone repository
 
 ```github
 git clone https://github.com/Kirenai/home-stuff.git
 ```
 
-Compilar proyecto, en la raiz del proyecto
+Go to the root of the project and run the command. </br>
+The environment variables passed to maven are used to configure the application-dev.yml file.
 
 ```maven
-mvn clean install
+mvn clean install -DMYSQL_HOST={my_host} -DMYSQL_PORT={my_port} -DMYSQL_USER={my_root} -DMYSQL_PASSWORD={my_password}
 ```
+
+Build the image in the root of the project. 
+
+```docker
+docker build -t homestuff:0.0.1 .
+```
+
+Finally, run the services with docker-compose.
+
+```docker
+docker-compose up -d
+```
+
 
 
 

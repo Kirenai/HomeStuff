@@ -1,24 +1,23 @@
 spring:
   config:
     active:
-     on-profile: "dev"
+      on-profile: dev
   datasource:
-    driver-class-name: "com.mysql.cj.jdbc.Driver"
-    platform: "mysql"
-    url: "jdbc:mysql://localhost:3306/household_things_inventory?serverTimezone=UTC"
-    username: "root"
-    password: ""
-    initialization-mode: never
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    platform: mysql
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/household_things_inventory?serverTimezone=UTC
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:}
   jpa:
     hibernate:
-      ddl-auto: "update"
-    generate-ddl: "true"
-    show-sql: "true"
+      ddl-auto: update
+    generate-ddl: true
+    show-sql: true
     properties:
       hibernate:
-        format_sql: "true"
-        dialect: "org.hibernate.dialect.MySQL8Dialect"
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
   jackson:
     serialization:
-      WRITE_DATES_AS_TIMESTAMPS: "false"
-    time-zone: "UTC"
+      WRITE_DATES_AS_TIMESTAMPS: false
+    time-zone: UTC
