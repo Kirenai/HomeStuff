@@ -1,19 +1,16 @@
 package com.revilla.homestuff.util;
 
 import com.revilla.homestuff.dto.response.ApiResponseDto;
-import com.revilla.homestuff.entity.*;
-import com.revilla.homestuff.exception.entity.EntityDuplicateConstraintViolationException;
-import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
+import com.revilla.homestuff.entity.Consumption;
+import com.revilla.homestuff.entity.Nourishment;
+import com.revilla.homestuff.entity.Role;
+import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.exception.unauthorize.UnauthorizedPermissionException;
-import com.revilla.homestuff.repository.ExitsByProperty;
 import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.util.enums.MessageAction;
 import com.revilla.homestuff.util.enums.RoleName;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
-import java.io.Serializable;
 
 /**
  * GeneralUtil
