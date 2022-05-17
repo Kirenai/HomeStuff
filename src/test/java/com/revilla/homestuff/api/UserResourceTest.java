@@ -1,53 +1,77 @@
 package com.revilla.homestuff.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revilla.homestuff.dto.UserDto;
+import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.repository.UserRepository;
+import com.revilla.homestuff.security.jwt.JwtAuthenticationEntryPoint;
+import com.revilla.homestuff.security.jwt.JwtTokenFilter;
+import com.revilla.homestuff.security.jwt.JwtTokenProvider;
 import com.revilla.homestuff.service.UserService;
+import com.revilla.homestuff.service.imp.AuthUserDetailsServiceImp;
 import com.revilla.homestuff.util.enums.RoleName;
 import com.revilla.homestuff.utils.RoleServiceDataTestUtils;
 import com.revilla.homestuff.utils.UserServiceDataTestUtils;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+import com.revilla.homestuff.utils.dto.response.ApiResponseDataTestUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-@ExtendWith(MockitoExtension.class)
-@SpringBootTest
-@AutoConfigureMockMvc
+@WebMvcTest(value = UserResource.class, includeFilters = {
+        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtTokenProvider.class)
+})
 class UserResourceTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    private UserRepository userRepository;
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private JwtTokenFilter tokenFilter;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockBean
     private UserService userService;
 
-    private User userMockOne;
+    @MockBean
+    private UserRepository userRepository;
+
+    @MockBean
+    private AuthUserDetailsServiceImp userDetailsServiceImp;
+
+    @MockBean
+    private PasswordEncoder passwordEncoder;
+
+    @MockBean
+    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
     private UserDto userDtoMockOne;
 
+    private final StringBuilder URL = new StringBuilder("/api/users");
     private String token;
 
     @BeforeEach
@@ -60,22 +84,22 @@ class UserResourceTest {
         String lastName = "kirenai";
         Byte age = 22;
 
-        String SECRET_KEY = "secretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecret";
-        this.token = Jwts.builder()
-                .setSubject(username)
-                .setExpiration(java.sql.Date.valueOf(LocalDate.now()
-                        .plusDays(1)))
-                .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
-                .compact();
-
-        this.userMockOne = UserServiceDataTestUtils.getMockUser(userIdOne, username,
+        User userMockOne = UserServiceDataTestUtils.getMockUser(userIdOne, username,
                 password, firstName, lastName, age);
-        this.userMockOne.setRoles(List.of(RoleServiceDataTestUtils.getMockRole(1L, RoleName.ROLE_ADMIN)));
+        userMockOne.setRoles(List.of(RoleServiceDataTestUtils.getMockRole(1L, RoleName.ROLE_ADMIN)));
         this.userDtoMockOne = UserServiceDataTestUtils.getMockUserDto(userIdOne,
                 username, password, firstName, lastName, age);
 
+        this.token = this.jwtTokenProvider.getTokenPrefix() +
+                this.jwtTokenProvider.generateJwtToken(
+                        new UsernamePasswordAuthenticationToken(
+                                userMockOne.getUsername(),
+                                userMockOne.getPassword()
+                        )
+                );
+
         Mockito.when(this.userRepository.findByUsername(Mockito.anyString()))
-                        .thenReturn(Optional.of(userMockOne));
+                .thenReturn(Optional.of(userMockOne));
     }
 
     @AfterEach
@@ -83,15 +107,14 @@ class UserResourceTest {
     }
 
     @Test
+    @DisplayName("Should get users")
     void shouldGetUsers() throws Exception {
-        Mockito.when(this.userRepository.findAll(Mockito.any(Pageable.class)))
-                .thenReturn(new PageImpl<>(List.of(userMockOne)));
         Mockito.when(this.userService.findAll(Mockito.any(Pageable.class)))
                 .thenReturn(List.of(userDtoMockOne));
 
         RequestBuilder request = MockMvcRequestBuilders
-                .get("/api/users")
-                .header("Authorization", "Bearer " + this.token)
+                .get(this.URL.toString())
+                .header(HttpHeaders.AUTHORIZATION, this.token)
                 .accept(MediaType.APPLICATION_JSON);
 
         this.mockMvc
@@ -103,15 +126,14 @@ class UserResourceTest {
     }
 
     @Test
+    @DisplayName("Should get user")
     void shouldGetUser() throws Exception {
-        Mockito.when(this.userRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.of(userMockOne));
         Mockito.when(this.userService.findOne(Mockito.anyLong(), Mockito.any()))
                 .thenReturn(userDtoMockOne);
 
         RequestBuilder request = MockMvcRequestBuilders
-                .get("/api/users/1")
-                .header("Authorization", "Bearer " + this.token)
+                .get(this.URL.append("/1").toString())
+                .header(HttpHeaders.AUTHORIZATION, this.token)
                 .accept(MediaType.APPLICATION_JSON);
 
         this.mockMvc
@@ -119,6 +141,66 @@ class UserResourceTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.userId").value(this.userDtoMockOne.getUserId()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.username").value(this.userDtoMockOne.getUsername()));
+    }
+
+    @Test
+    @DisplayName("Should create user")
+    void shouldCreateUser() throws Exception {
+        Mockito.when(this.userService.create(Mockito.any(UserDto.class)))
+                .thenReturn(this.userDtoMockOne);
+
+        RequestBuilder request = MockMvcRequestBuilders
+                .post(this.URL.toString())
+                .header(HttpHeaders.AUTHORIZATION, this.token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(this.objectMapper.writeValueAsString(userDtoMockOne));
+
+        this.mockMvc
+                .perform(request)
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.userId").value(this.userDtoMockOne.getUserId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value(this.userDtoMockOne.getUsername()));
+    }
+
+    @Test
+    @DisplayName("Should update user")
+    void shouldUpdateUser() throws Exception {
+        ApiResponseDto updateResponse = ApiResponseDataTestUtils
+                .getMockRoleResponse("updated successfully", User.class);
+        Mockito.when(this.userService.update(Mockito.anyLong(), Mockito.any(UserDto.class), Mockito.any()))
+                .thenReturn(updateResponse);
+
+        RequestBuilder request = MockMvcRequestBuilders
+                .put(this.URL.append("/1").toString())
+                .header(HttpHeaders.AUTHORIZATION, this.token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(this.objectMapper.writeValueAsString(userDtoMockOne));
+
+        this.mockMvc
+                .perform(request)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.success").value(updateResponse.getSuccess()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(updateResponse.getMessage()));
+    }
+
+    @Test
+    @DisplayName("Should delete user")
+    void shouldDeleteUser() throws Exception {
+        ApiResponseDto deleteResponse = ApiResponseDataTestUtils
+                .getMockRoleResponse("deleted successfully", User.class);
+        Mockito.when(this.userService.delete(Mockito.anyLong(), Mockito.any()))
+                .thenReturn(deleteResponse);
+
+        RequestBuilder request = MockMvcRequestBuilders
+                .delete(this.URL.append("/1").toString())
+                .header(HttpHeaders.AUTHORIZATION, this.token)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        this.mockMvc
+                .perform(request)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.success").value(deleteResponse.getSuccess()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(deleteResponse.getMessage()));
     }
 
 }

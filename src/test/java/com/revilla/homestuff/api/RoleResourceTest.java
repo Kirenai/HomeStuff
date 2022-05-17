@@ -64,7 +64,7 @@ class RoleResourceTest {
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     private final StringBuilder URL = new StringBuilder("/api/roles");
-    private User userMockOne;
+    private String token;
 
     @BeforeEach
     void setUp() {
@@ -76,9 +76,17 @@ class RoleResourceTest {
         String lastName = "kirenai";
         Byte age = 22;
 
-        this.userMockOne = UserServiceDataTestUtils.getMockUser(userIdOne, username,
+        User userMockOne = UserServiceDataTestUtils.getMockUser(userIdOne, username,
                 password, firstName, lastName, age);
-        this.userMockOne.setRoles(List.of(RoleServiceDataTestUtils.getMockRole(1L, RoleName.ROLE_ADMIN)));
+        userMockOne.setRoles(List.of(RoleServiceDataTestUtils.getMockRole(1L, RoleName.ROLE_ADMIN)));
+
+        this.token = this.jwtTokenProvider.getTokenPrefix() +
+                this.jwtTokenProvider.generateJwtToken(
+                        new UsernamePasswordAuthenticationToken(
+                                userMockOne.getUsername(),
+                                userMockOne.getPassword()
+                        )
+                );
 
         Mockito.when(this.userRepository.findByUsername(Mockito.anyString()))
                 .thenReturn(Optional.of(userMockOne));
@@ -97,11 +105,7 @@ class RoleResourceTest {
 
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
                 .get(this.URL.toString())
-                .header(HttpHeaders.AUTHORIZATION, this.jwtTokenProvider.getTokenPrefix() +
-                        this.jwtTokenProvider.generateJwtToken(
-                                new UsernamePasswordAuthenticationToken(this.userMockOne.getUsername(), this.userMockOne.getPassword())
-                        )
-                )
+                .header(HttpHeaders.AUTHORIZATION, this.token)
                 .accept(MediaType.APPLICATION_JSON);
 
         this.mockMvc.perform(request)
