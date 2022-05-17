@@ -5,6 +5,7 @@ import com.revilla.homestuff.entity.Role;
 import com.revilla.homestuff.util.enums.RoleName;
 
 import java.util.Collections;
+import java.util.List;
 
 public class RoleServiceDataTestUtils {
 
@@ -22,6 +23,14 @@ public class RoleServiceDataTestUtils {
                 .name(roleName.name())
                 .users(Collections.emptySet())
                 .build();
+    }
+
+    public static List<RoleDto> getMockRoleDtoList() {
+        return List.of(
+                getMockRoleDto(1L, RoleName.ROLE_USER),
+                getMockRoleDto(2L, RoleName.ROLE_MODERATOR),
+                getMockRoleDto(3L, RoleName.ROLE_ADMIN)
+        );
     }
 
 }
