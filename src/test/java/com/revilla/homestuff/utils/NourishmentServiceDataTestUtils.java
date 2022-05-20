@@ -51,6 +51,22 @@ public class NourishmentServiceDataTestUtils {
                 .build();
     }
 
+    public static NourishmentDto getNourishmentDtoMock(Long id,
+                                                       String name,
+                                                       String path,
+                                                       String description,
+                                                       Boolean isAvailable,
+                                                       AmountNourishmentDto amount) {
+        return NourishmentDto.builder()
+                .nourishmentId(id)
+                .name(name)
+                .imagePath(path)
+                .description(description)
+                .isAvailable(isAvailable)
+                .amountNourishment(amount)
+                .build();
+    }
+
     public static Page<Nourishment> getNourishmentPage() {
         Byte unit = 1;
         return new PageImpl<>(List.of(
@@ -63,9 +79,9 @@ public class NourishmentServiceDataTestUtils {
     public static List<NourishmentDto> getNourishmentDtoList() {
         Byte unit = 1;
         return List.of(
-                getNourishmentDtoMock(1L, "name1", "path1", "description1", getAmountNourishmentDtoMock(unit)),
-                getNourishmentDtoMock(2L, "name2", "path2", "description2", getAmountNourishmentDtoMock(unit)),
-                getNourishmentDtoMock(3L, "name3", "path3", "description3", getAmountNourishmentDtoMock(unit))
+                getNourishmentDtoMock(1L, "name1", "path1", "description1", true, getAmountNourishmentDtoMock(unit)),
+                getNourishmentDtoMock(2L, "name2", "path2", "description2", true, getAmountNourishmentDtoMock(unit)),
+                getNourishmentDtoMock(3L, "name3", "path3", "description3", true, getAmountNourishmentDtoMock(unit))
         );
     }
 }
