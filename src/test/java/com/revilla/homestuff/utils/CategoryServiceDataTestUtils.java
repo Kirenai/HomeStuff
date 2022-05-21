@@ -3,6 +3,8 @@ package com.revilla.homestuff.utils;
 import com.revilla.homestuff.dto.CategoryDto;
 import com.revilla.homestuff.entity.Category;
 
+import java.util.List;
+
 /**
  * @author Kirenai
  */
@@ -24,6 +26,14 @@ public class CategoryServiceDataTestUtils {
                 .categoryId(categoryId)
                 .name(categoryName)
                 .build();
+    }
+
+    public static List<CategoryDto> getCategoryDtoListMock() {
+        return List.of(
+                getCategoryDtoMock(1L, "Category 1"),
+                getCategoryDtoMock(2L, "Category 2"),
+                getCategoryDtoMock(3L, "Category 3")
+        );
     }
 
 }
