@@ -10,7 +10,22 @@ public class RegisterRequestDtoDataTest {
             String firstName,
             String lastName,
             Byte age) {
-        return new RegisterRequestDto(username, password, firstName, lastName, age);
+        return RegisterRequestDto.builder()
+                .username(username)
+                .password(password)
+                .firstName(firstName)
+                .lastName(lastName)
+                .age(age)
+                .build();
+    }
+
+    public static RegisterRequestDto getMockRegisterRequestDto() {
+        return getMockRegisterRequestDto(
+                "kirenai",
+                "kirenai361",
+                "kirenai",
+                "kirenai",
+                (byte) 22);
     }
 
 }

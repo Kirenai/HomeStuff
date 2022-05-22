@@ -47,20 +47,6 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
 
     @Transactional
     @Override
-    public ApiResponseDto register(RegisterRequestDto requestDto) {
-        log.info("Calling the register method in "
-                + GeneralUtil.simpleNameClass(this.getClass()));
-        ConstraintViolation.validateDuplicate(requestDto.getUsername(),
-                this.userRepository, User.class);
-        User user = super.getModelMapper().map(requestDto, super.getThirdGenericClass());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRoles(RoleUtil.getSetOfRolesOrThrow(null, this.roleRepository));
-        this.userRepository.save(user);
-        return GeneralUtil.responseMessageAction(User.class, "registered successfully");
-    }
-
-    @Transactional
-    @Override
     public UserDto create(UserDto data) {
         log.info("Calling the create method in "
                 + GeneralUtil.simpleNameClass(this.getClass()));

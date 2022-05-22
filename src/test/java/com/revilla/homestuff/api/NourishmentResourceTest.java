@@ -242,7 +242,7 @@ class NourishmentResourceTest {
     void updateNourishment() throws Exception {
         Long nourishmentId = 1L;
         ApiResponseDto apiResponseDto = ApiResponseDataTestUtils
-                .getMockRoleResponse("updated successfully", Nourishment.class);
+                .getApiResponseMock("updated successfully", Nourishment.class);
         Mockito.when(this.nourishmentService.update(Mockito.anyLong(), Mockito.any(NourishmentDto.class), Mockito.any()))
                 .thenReturn(apiResponseDto);
 
@@ -263,7 +263,7 @@ class NourishmentResourceTest {
     void deleteNourishment() throws Exception {
         Long nourishmentId = 1L;
         ApiResponseDto apiResponseDto = ApiResponseDataTestUtils
-                .getMockRoleResponse("deleted successfully", Nourishment.class);
+                .getApiResponseMock("deleted successfully", Nourishment.class);
         Mockito.when(this.nourishmentService.delete(Mockito.anyLong(), Mockito.any()))
                 .thenReturn(apiResponseDto);
 

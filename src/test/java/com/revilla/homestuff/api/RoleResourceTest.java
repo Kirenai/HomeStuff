@@ -175,7 +175,7 @@ class RoleResourceTest {
     void updateRoleWhenUpdateRole() throws Exception {
         Long roleId = 1L;
         ApiResponseDto apiResponseDto = ApiResponseDataTestUtils
-                .getMockRoleResponse("updated successfully", Role.class);
+                .getApiResponseMock("updated successfully", Role.class);
         Mockito.when(this.roleService.update(Mockito.anyLong(), Mockito.any(RoleDto.class)))
                 .thenReturn(apiResponseDto);
 

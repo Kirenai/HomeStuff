@@ -288,7 +288,7 @@ class RoleServiceImpTest {
                 username, password, firstName, lastName, age);
         userMock.setRoles(Set.of(roleMock));
         ApiResponseDto response = ApiResponseDataTestUtils
-                .getMockRoleResponse(messageAction, Role.class);
+                .getApiResponseMock(messageAction, Role.class);
 
         AuthUserDetails userDetails = new AuthUserDetails(userMock);
 

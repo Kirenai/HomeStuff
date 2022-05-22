@@ -168,7 +168,7 @@ class UserResourceTest {
     @DisplayName("Should update user")
     void shouldUpdateUser() throws Exception {
         ApiResponseDto updateResponse = ApiResponseDataTestUtils
-                .getMockRoleResponse("updated successfully", User.class);
+                .getApiResponseMock("updated successfully", User.class);
         Mockito.when(this.userService.update(Mockito.anyLong(), Mockito.any(UserDto.class), Mockito.any()))
                 .thenReturn(updateResponse);
 
@@ -189,7 +189,7 @@ class UserResourceTest {
     @DisplayName("Should delete user")
     void shouldDeleteUser() throws Exception {
         ApiResponseDto deleteResponse = ApiResponseDataTestUtils
-                .getMockRoleResponse("deleted successfully", User.class);
+                .getApiResponseMock("deleted successfully", User.class);
         Mockito.when(this.userService.delete(Mockito.anyLong(), Mockito.any()))
                 .thenReturn(deleteResponse);
 

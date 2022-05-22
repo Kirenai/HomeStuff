@@ -167,7 +167,7 @@ class CategoryResourceTest {
     void when_updateCategory_then_returnApiResponseDto() throws Exception {
         Long categoryId = 1L;
         ApiResponseDto response = ApiResponseDataTestUtils
-                .getMockRoleResponse("updated successfully", Category.class);
+                .getApiResponseMock("updated successfully", Category.class);
         Mockito.when(this.categoryService.update(Mockito.anyLong(), Mockito.any(CategoryDto.class)))
                 .thenReturn(response);
 

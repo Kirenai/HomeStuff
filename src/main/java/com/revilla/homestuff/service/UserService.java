@@ -11,8 +11,6 @@ import com.revilla.homestuff.security.AuthUserDetails;
  */
 public interface UserService extends GeneralService<UserDto, Long> {
 
-    ApiResponseDto register(RegisterRequestDto requestDto);
-
     UserDto create(UserDto data);
 
     ApiResponseDto update(Long id, UserDto data, AuthUserDetails userDetails);

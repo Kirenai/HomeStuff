@@ -2,7 +2,6 @@ package com.revilla.homestuff.service.imp;
 
 import com.revilla.homestuff.dto.RoleDto;
 import com.revilla.homestuff.dto.UserDto;
-import com.revilla.homestuff.dto.request.RegisterRequestDto;
 import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.entity.Role;
 import com.revilla.homestuff.entity.User;
@@ -18,8 +17,6 @@ import com.revilla.homestuff.util.enums.MessageAction;
 import com.revilla.homestuff.util.enums.RoleName;
 import com.revilla.homestuff.utils.RoleServiceDataTestUtils;
 import com.revilla.homestuff.utils.UserServiceDataTestUtils;
-import com.revilla.homestuff.utils.dto.request.RegisterRequestDtoDataTest;
-import com.revilla.homestuff.utils.dto.response.ApiResponseDataTestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -63,7 +60,6 @@ class UserServiceImpTest {
     private UserDto userDtoMockOne;
     private UserDto userDtoMockTwo;
     private UserDto userDtoMockToUpdate;
-    private RegisterRequestDto registerDtoMock;
 
     @BeforeEach
     void setUp() {
@@ -94,8 +90,6 @@ class UserServiceImpTest {
                 "KIRENAI",
                 (byte) 23
         );
-        this.registerDtoMock = RegisterRequestDtoDataTest
-                .getMockRegisterRequestDto(username, password, firstName, lastName, age);
     }
 
     @Test
@@ -146,46 +140,6 @@ class UserServiceImpTest {
         Mockito.verify(userRepository, Mockito.times(1)).findById(userIdToFind);
     }
 
-    @Test
-    @DisplayName("Should throw an exception when a user wants to register with and existing username")
-    void shouldThrowExceptionWhenUserWantRegisterWithExistingUsername() {
-        String expected = GeneralUtil.simpleNameClass(User.class)
-                + " is already exists with name: " + this.registerDtoMock.getUsername();
-
-
-        Mockito.when(this.userRepository.existsByName(Mockito.anyString())).thenReturn(true);
-
-        EntityDuplicateConstraintViolationException ex =
-                Assertions.assertThrows(EntityDuplicateConstraintViolationException.class,
-                        () -> this.userService.register(this.registerDtoMock));
-
-        Assertions.assertEquals(expected, ex.getMessage());
-
-        Mockito.verify(this.userRepository).existsByName(this.registerDtoMock.getUsername());
-    }
-
-    @Test
-    @DisplayName("Should register an user")
-    void shouldRegisterUser() {
-        ApiResponseDto expected = ApiResponseDataTestUtils
-                .getMockRoleResponse("registered successfully", User.class);
-        Role roleMock = RoleServiceDataTestUtils.getMockRole(1L, RoleName.ROLE_USER);
-
-        Mockito.when(this.userRepository.existsByName(Mockito.anyString())).thenReturn(false);
-        Mockito.when(this.modelMapper.map(this.registerDtoMock, User.class)).thenReturn(this.userMockOne);
-        Mockito.when(this.roleRepository.findByName(ArgumentMatchers.any(String.class))).thenReturn(Optional.of(roleMock));
-        Mockito.when(this.userRepository.save(ArgumentMatchers.any(User.class))).thenReturn(this.userMockOne);
-
-        ApiResponseDto response = this.userService.register(this.registerDtoMock);
-
-        Assertions.assertEquals(expected.getMessage(), response.getMessage());
-        Assertions.assertTrue(response.getSuccess());
-
-        Mockito.verify(this.userRepository).existsByName(this.registerDtoMock.getUsername());
-        Mockito.verify(this.modelMapper).map(this.registerDtoMock, User.class);
-        Mockito.verify(this.roleRepository).findByName(roleMock.getName());
-        Mockito.verify(this.userRepository).save(this.userMockOne);
-    }
 
     @Test
     @DisplayName("Should throw an exception when username is already exits")
