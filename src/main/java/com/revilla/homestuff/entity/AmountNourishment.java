@@ -28,7 +28,7 @@ import lombok.*;
 public class AmountNourishment {
 
     @Id
-    @Column(name = "amountn_id")
+    @Column(name = "amount_id")
     private Long amountNourishmentId;
 
     @Column(name = "unit")
@@ -40,7 +40,7 @@ public class AmountNourishment {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @MapsId
     @JoinColumn(
-            name = "amountn_id",
+            name = "amount_id",
             foreignKey = @ForeignKey(name = "fk_nourishment_id")
     )
     private Nourishment nourishment;
