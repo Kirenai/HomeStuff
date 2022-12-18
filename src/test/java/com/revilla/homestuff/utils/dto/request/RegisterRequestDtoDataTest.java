@@ -4,7 +4,7 @@ import com.revilla.homestuff.dto.request.RegisterRequestDto;
 
 public class RegisterRequestDtoDataTest {
 
-    public static RegisterRequestDto getMockRegisterRequestDto(
+    public static RegisterRequestDto getRegisterRequestDtoMock(
             String username,
             String password,
             String firstName,
@@ -19,8 +19,8 @@ public class RegisterRequestDtoDataTest {
                 .build();
     }
 
-    public static RegisterRequestDto getMockRegisterRequestDto() {
-        return getMockRegisterRequestDto(
+    public static RegisterRequestDto getRegisterRequestDtoMock() {
+        return getRegisterRequestDtoMock(
                 "kirenai",
                 "kirenai361",
                 "kirenai",

@@ -28,18 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public abstract class GeneralServiceImp<T, ID extends Serializable, E> implements GeneralService<T, ID> {
 
-    private ModelMapper modelMapper;
     private Class<T> firstGeneric;
     private Class<E> thirdGeneric;
-
-    @Autowired
-    public final void setModelMapper(ModelMapper modelMapper) {
-        this.modelMapper = modelMapper;
-    }
-
-    public final ModelMapper getModelMapper() {
-        return this.modelMapper;
-    }
 
     @SuppressWarnings("unchecked") // idk, but work
     public Class<T> getFirstGenericClass() {
@@ -66,7 +56,7 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
         return this.getRepo().findAll(pageable)
                 .getContent()
                 .stream()
-                .map(obj -> this.modelMapper.map(obj, this.getFirstGenericClass()))
+                .map(obj -> this.getModelMapper().map(obj, this.getFirstGenericClass()))
                 .collect(Collectors.toList());
     }
 
@@ -74,10 +64,9 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
     public T findOne(ID id, AuthUserDetails userDetails) {
         log.info("Calling the findOne method in "
                 + GeneralUtil.simpleNameClass(this.getClass()));
-        E obj = Entity.getById(id, this.getRepo(),
-                this.getThirdGenericClass());
+        E obj = Entity.getById(id, this.getRepo(), this.getThirdGenericClass());
         GeneralUtil.validateAuthorizationPermissionOrThrow(obj, userDetails, MessageAction.ACCESS);
-        return this.modelMapper.map(obj, this.getFirstGenericClass());
+        return this.getModelMapper().map(obj, this.getFirstGenericClass());
     }
 
     @Override
@@ -85,8 +74,7 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
     public ApiResponseDto delete(ID id, AuthUserDetails userDetails) {
         log.info("Calling the delete method in "
                 + GeneralUtil.simpleNameClass(this.getClass()));
-        E obj = Entity.getById(id, this.getRepo(),
-                this.getThirdGenericClass());
+        E obj = Entity.getById(id, this.getRepo(), this.getThirdGenericClass());
         GeneralUtil.validateAuthorizationPermissionOrThrow(obj, userDetails, MessageAction.DELETE);
         this.getRepo().delete(obj);
         return GeneralUtil.responseMessageAction(this.getThirdGenericClass(),
@@ -94,5 +82,7 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
     }
 
     public abstract JpaRepository<E, ID> getRepo();
+
+    public abstract ModelMapper getModelMapper();
 
 }

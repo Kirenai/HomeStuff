@@ -21,6 +21,7 @@ import com.revilla.homestuff.util.ConstraintViolation;
 import com.revilla.homestuff.util.Entity;
 import com.revilla.homestuff.util.GeneralUtil;
 import com.revilla.homestuff.util.enums.MessageAction;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,7 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
     private final NourishmentRepository nourishmentRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public JpaRepository<Nourishment, Long> getRepo() {
@@ -49,11 +51,16 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
     }
 
     @Override
+    public ModelMapper getModelMapper() {
+        return this.modelMapper;
+    }
+
+    @Override
     public List<NourishmentDto> findAllNourishmentByStatus(boolean isAvailable) {
         log.info("findAllNourishmentByStatus({})", isAvailable);
         return this.nourishmentRepository.findByIsAvailable(isAvailable)
                 .stream()
-                .map(nourishment -> super.getModelMapper().map(nourishment, super.getFirstGenericClass()))
+                .map(nourishment -> this.getModelMapper().map(nourishment, super.getFirstGenericClass()))
                 .collect(Collectors.toList());
     }
 
@@ -65,7 +72,7 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
                 + GeneralUtil.simpleNameClass(this.getClass()));
         ConstraintViolation.validateDuplicate(data.getName(), this.nourishmentRepository,
                 Nourishment.class);
-        Nourishment nourishment = super.getModelMapper().map(data, super.getThirdGenericClass());
+        Nourishment nourishment = this.getModelMapper().map(data, super.getThirdGenericClass());
         User user = Entity.getById(userId, this.userRepository, User.class);
         nourishment.setUser(user);
         GeneralUtil.validateAuthorizationPermissionOrThrow(nourishment, userDetails,
@@ -76,7 +83,7 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
         nourishment.setCategory(category);
         nourishment.getAmountNourishment().setNourishment(nourishment);
         Nourishment nourishmentSaved = this.nourishmentRepository.save(nourishment);
-        return super.getModelMapper().map(nourishmentSaved, super.getFirstGenericClass())
+        return this.getModelMapper().map(nourishmentSaved, super.getFirstGenericClass())
                 .setMessage(
                         GeneralUtil.simpleNameClass(Nourishment.class) + " created successfully");
     }

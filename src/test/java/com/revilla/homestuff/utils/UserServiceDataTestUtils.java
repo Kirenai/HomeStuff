@@ -8,7 +8,7 @@ import java.util.Collections;
 
 public class UserServiceDataTestUtils {
 
-    public static UserDto getMockUserDto(Long userId,
+    public static UserDto getUserDtoMock(Long userId,
                                          String username,
                                          String password,
                                          String firstName,
@@ -27,15 +27,15 @@ public class UserServiceDataTestUtils {
         );
     }
 
-    public static User getMockUser(String username,
+    public static User getUserMock(String username,
                                    String password,
                                    String firstName,
                                    String lastName,
                                    Byte age) {
-        return getMockUser(null, username, password, firstName, lastName, age);
+        return getUserMock(null, username, password, firstName, lastName, age);
     }
 
-    public static User getMockUser(Long userId,
+    public static User getUserMock(Long userId,
                                    String username,
                                    String password,
                                    String firstName,
@@ -52,7 +52,7 @@ public class UserServiceDataTestUtils {
                 .build();
     }
 
-    public static UserDto getMockUserWithOutId(String username,
+    public static UserDto getUserMockWithOutId(String username,
                                                String password,
                                                String firstName,
                                                String lastName,

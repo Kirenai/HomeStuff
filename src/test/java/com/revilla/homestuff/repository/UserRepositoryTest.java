@@ -49,11 +49,11 @@ class UserRepositoryTest {
         String lastNameThree = "lastNameThree";
         Byte ageThree = 40;
 
-        this.funwiz = UserServiceDataTestUtils.getMockUser(usernameOne,
+        this.funwiz = UserServiceDataTestUtils.getUserMock(usernameOne,
                 passwordOne, firstName, lastName, age);
-        this.shande = UserServiceDataTestUtils.getMockUser(usernameTwo,
+        this.shande = UserServiceDataTestUtils.getUserMock(usernameTwo,
                 passwordTwo, firstNameTwo, lastNameTwo, ageTwo);
-        this.jk = UserServiceDataTestUtils.getMockUser(usernameThree,
+        this.jk = UserServiceDataTestUtils.getUserMock(usernameThree,
                 passwordThree, firstNameThree, lastNameThree, ageThree);
     }
 

@@ -8,6 +8,7 @@ import com.revilla.homestuff.repository.CategoryRepository;
 import com.revilla.homestuff.service.CategoryService;
 import com.revilla.homestuff.util.ConstraintViolation;
 import com.revilla.homestuff.util.GeneralUtil;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -28,10 +29,16 @@ public class CategoryServiceImp extends GeneralServiceImp<CategoryDto, Long, Cat
         implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public JpaRepository<Category, Long> getRepo() {
         return this.categoryRepository;
+    }
+
+    @Override
+    public ModelMapper getModelMapper() {
+        return this.modelMapper;
     }
 
     @Transactional
@@ -40,9 +47,9 @@ public class CategoryServiceImp extends GeneralServiceImp<CategoryDto, Long, Cat
         log.info("Calling the create method in " + getClass());
         ConstraintViolation.validateDuplicate(data.getName(),
                 this.categoryRepository, Category.class);
-        Category category = super.getModelMapper().map(data, super.getThirdGenericClass());
+        Category category = this.getModelMapper().map(data, super.getThirdGenericClass());
         Category categorySaved = this.categoryRepository.save(category);
-        return super.getModelMapper().map(categorySaved, super.getFirstGenericClass());
+        return this.getModelMapper().map(categorySaved, super.getFirstGenericClass());
     }
 
     @Transactional

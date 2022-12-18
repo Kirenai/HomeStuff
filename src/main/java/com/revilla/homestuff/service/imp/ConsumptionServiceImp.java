@@ -16,6 +16,7 @@ import com.revilla.homestuff.util.consumption.CheckingValueAmountAndProcessing;
 import com.revilla.homestuff.util.enums.MessageAction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -37,10 +38,16 @@ public class ConsumptionServiceImp extends GeneralServiceImp<ConsumptionDto, Lon
     private final ConsumptionRepository consumptionRepository;
     private final NourishmentRepository nourishmentRepository;
     private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public JpaRepository<Consumption, Long> getRepo() {
         return this.consumptionRepository;
+    }
+
+    @Override
+    public ModelMapper getModelMapper() {
+        return this.modelMapper;
     }
 
     @Transactional
@@ -55,7 +62,7 @@ public class ConsumptionServiceImp extends GeneralServiceImp<ConsumptionDto, Lon
         User user = Entity.getById(userId, this.userRepository, User.class);
         Nourishment nourishment = Entity.getById(nourishmentId,
                 this.nourishmentRepository, Nourishment.class);
-        Consumption consumption = super.getModelMapper().map(data, super.getThirdGenericClass());
+        Consumption consumption = this.getModelMapper().map(data, super.getThirdGenericClass());
         consumption.setUser(user);
         GeneralUtil.validateAuthorizationPermissionOrThrow(consumption, userDetails,
                 MessageAction.CREATE);
@@ -63,7 +70,7 @@ public class ConsumptionServiceImp extends GeneralServiceImp<ConsumptionDto, Lon
         CheckingValueAmountAndProcessing.process(data, amountNourishment, nourishment);
         consumption.setNourishment(nourishment);
         Consumption consumptionSaved = this.consumptionRepository.save(consumption);
-        return super.getModelMapper().map(consumptionSaved, super.getFirstGenericClass())
+        return this.getModelMapper().map(consumptionSaved, super.getFirstGenericClass())
                 .setMessage(
                         GeneralUtil.simpleNameClass(Consumption.class) + " created successfully");
     }

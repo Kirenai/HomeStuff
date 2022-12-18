@@ -11,47 +11,45 @@ import com.revilla.homestuff.exception.unauthorize.UnauthorizedPermissionExcepti
 import com.revilla.homestuff.repository.RoleRepository;
 import com.revilla.homestuff.repository.UserRepository;
 import com.revilla.homestuff.security.AuthUserDetails;
-import com.revilla.homestuff.service.UserService;
 import com.revilla.homestuff.util.GeneralUtil;
 import com.revilla.homestuff.util.enums.MessageAction;
 import com.revilla.homestuff.util.enums.RoleName;
 import com.revilla.homestuff.utils.RoleServiceDataTestUtils;
 import com.revilla.homestuff.utils.UserServiceDataTestUtils;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
+
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest
-@ActiveProfiles("test")
 class UserServiceImpTest {
 
-    @Autowired
-    private UserService userService;
-    @MockBean
+    @InjectMocks
+    private UserServiceImp userService;
+    @Mock
     private UserRepository userRepository;
-    @MockBean
+    @Mock
     private RoleRepository roleRepository;
-    @MockBean
+    @Mock
     private PasswordEncoder passwordEncoder;
-    @MockBean
+    @Mock
     private ModelMapper modelMapper;
 
     private User userMockOne;
@@ -73,17 +71,17 @@ class UserServiceImpTest {
         String lastName = "kirenai";
         Byte age = 22;
 
-        this.userMockOne = UserServiceDataTestUtils.getMockUser(userIdOne, username,
+        this.userMockOne = UserServiceDataTestUtils.getUserMock(userIdOne, username,
                 password, firstName, lastName, age);
-        this.userMockTwo = UserServiceDataTestUtils.getMockUser(userIdTwo, username,
+        this.userMockTwo = UserServiceDataTestUtils.getUserMock(userIdTwo, username,
                 password, firstName, lastName, age);
-        this.userMockTree = UserServiceDataTestUtils.getMockUser(userIdTree, username,
+        this.userMockTree = UserServiceDataTestUtils.getUserMock(userIdTree, username,
                 password, firstName, lastName, age);
-        this.userDtoMockOne = UserServiceDataTestUtils.getMockUserDto(userIdOne,
+        this.userDtoMockOne = UserServiceDataTestUtils.getUserDtoMock(userIdOne,
                 username, password, firstName, lastName, age);
-        this.userDtoMockTwo = UserServiceDataTestUtils.getMockUserDto(userIdTwo, username,
+        this.userDtoMockTwo = UserServiceDataTestUtils.getUserDtoMock(userIdTwo, username,
                 password, firstName, lastName, age);
-        this.userDtoMockToUpdate = UserServiceDataTestUtils.getMockUserWithOutId(
+        this.userDtoMockToUpdate = UserServiceDataTestUtils.getUserMockWithOutId(
                 "KIRENAI",
                 "KIRENAI",
                 "KIRENAI",
@@ -96,18 +94,19 @@ class UserServiceImpTest {
     @DisplayName("Should find a list user when we call find all")
     void shouldFindUserListWhenFindAll() {
         int sizeExpected = 2;
-        Pageable pageableMock = Mockito.mock(Pageable.class);
-        Mockito.when(userRepository.findAll(ArgumentMatchers.any(Pageable.class)))
+        Pageable pageableMock = mock(Pageable.class);
+        when(userRepository.findAll(any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(this.userMockOne, this.userMockTwo)));
-        Mockito.when(modelMapper.map(this.userMockOne, UserDto.class))
-                .thenReturn(this.userDtoMockOne);
-        Mockito.when(modelMapper.map(this.userMockTwo, UserDto.class))
-                .thenReturn(this.userDtoMockTwo);
+        when(modelMapper.map(this.userMockOne, UserDto.class))
+                .thenReturn(this.userDtoMockOne, this.userDtoMockTwo);
+
         List<UserDto> response = userService.findAll(pageableMock);
-        Assertions.assertEquals(sizeExpected, response.size());
-        Assertions.assertEquals(List.of(this.userDtoMockOne, this.userDtoMockTwo), response);
-        Mockito.verify(userRepository, Mockito.times(1)).findAll(pageableMock);
-        Mockito.verify(modelMapper, Mockito.times(2)).map(ArgumentMatchers.any(), ArgumentMatchers.any());
+
+        assertNotNull(response);
+        assertEquals(sizeExpected, response.size());
+
+        verify(userRepository, times(1)).findAll(pageableMock);
+        verify(modelMapper, times(2)).map(any(), any());
     }
 
     @Test
@@ -115,12 +114,15 @@ class UserServiceImpTest {
     void shouldThrowExceptionWhenUserNotExistsByIdWhenFindOne() {
         Long userIdToFind = 1L;
         String expectedMessage = "User not found with id: " + userIdToFind;
-        Mockito.when(userRepository.findById(ArgumentMatchers.anyLong()))
+        when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.empty());
-        EntityNoSuchElementException ex = Assertions.assertThrows(EntityNoSuchElementException.class,
+
+        EntityNoSuchElementException ex = assertThrows(EntityNoSuchElementException.class,
                 () -> userService.findOne(userIdToFind, null));
-        Assertions.assertEquals(ex.getMessage(), expectedMessage);
-        Mockito.verify(userRepository, Mockito.times(1)).findById(userIdToFind);
+
+        assertEquals(ex.getMessage(), expectedMessage);
+
+        verify(userRepository, times(1)).findById(userIdToFind);
     }
 
     @Test
@@ -128,16 +130,16 @@ class UserServiceImpTest {
     void shouldFindUserWhenExistsByIdWhenFindOne() {
         Long userIdToFind = 1L;
 
-        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(userMockOne));
-        Mockito.when(modelMapper.map(userMockOne, UserDto.class)).thenReturn(userDtoMockOne);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(userMockOne));
+        when(modelMapper.map(userMockOne, UserDto.class)).thenReturn(userDtoMockOne);
 
         AuthUserDetails userDetails = new AuthUserDetails(this.userMockOne);
 
         UserDto userDto = userService.findOne(userIdToFind, userDetails);
 
-        Assertions.assertEquals(userDto, userDtoMockOne);
+        assertEquals(userDto, userDtoMockOne);
 
-        Mockito.verify(userRepository, Mockito.times(1)).findById(userIdToFind);
+        verify(userRepository, times(1)).findById(anyLong());
     }
 
 
@@ -147,15 +149,15 @@ class UserServiceImpTest {
         String expected = GeneralUtil.simpleNameClass(User.class)
                 + " is already exists with name: " + this.userDtoMockOne.getUsername();
 
-        Mockito.when(this.userRepository.existsByName(Mockito.anyString())).thenReturn(true);
+        when(this.userRepository.existsByName(Mockito.anyString())).thenReturn(true);
 
         EntityDuplicateConstraintViolationException ex =
-                Assertions.assertThrows(EntityDuplicateConstraintViolationException.class,
+                assertThrows(EntityDuplicateConstraintViolationException.class,
                         () -> this.userService.create(this.userDtoMockOne));
 
-        Assertions.assertEquals(expected, ex.getMessage());
+        assertEquals(expected, ex.getMessage());
 
-        Mockito.verify(this.userRepository).existsByName(this.userDtoMockOne.getUsername());
+        verify(this.userRepository, times(1)).existsByName(anyString());
     }
 
     @Test
@@ -163,17 +165,16 @@ class UserServiceImpTest {
     void shouldCreateUser() {
         String expected = GeneralUtil.simpleNameClass(User.class)
                 + " created successfully by admin";
-        Mockito.when(this.modelMapper.map(this.userDtoMockOne, User.class)).thenReturn(this.userMockOne);
-        Mockito.when(this.userRepository.save(ArgumentMatchers.any(User.class))).thenReturn(this.userMockOne);
-        Mockito.when(this.modelMapper.map(this.userMockOne, UserDto.class)).thenReturn(this.userDtoMockOne);
+        when(this.modelMapper.map(this.userDtoMockOne, User.class)).thenReturn(this.userMockOne);
+        when(this.userRepository.save(any(User.class))).thenReturn(this.userMockOne);
+        when(this.modelMapper.map(this.userMockOne, UserDto.class)).thenReturn(this.userDtoMockOne);
 
         UserDto userSaved = this.userService.create(this.userDtoMockOne);
 
-        Assertions.assertEquals(expected, userSaved.getMessage());
+        assertEquals(expected, userSaved.getMessage());
 
-        Mockito.verify(this.modelMapper).map(this.userDtoMockOne, User.class);
-        Mockito.verify(this.userRepository).save(this.userMockOne);
-        Mockito.verify(this.modelMapper).map(this.userMockOne, UserDto.class);
+        verify(this.modelMapper, times(2)).map(any(), any());
+        verify(this.userRepository, times(1)).save(any());
     }
 
     @Test
@@ -183,15 +184,15 @@ class UserServiceImpTest {
         String expected = GeneralUtil.simpleNameClass(User.class)
                 + " not found with id: " + this.userDtoMockOne.getUserId();
 
-        Mockito.when(this.userRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+        when(this.userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         EntityNoSuchElementException ex =
-                Assertions.assertThrows(EntityNoSuchElementException.class,
+                assertThrows(EntityNoSuchElementException.class,
                         () -> this.userService.update(userIdToFind, null, null));
 
-        Assertions.assertEquals(expected, ex.getMessage());
+        assertEquals(expected, ex.getMessage());
 
-        Mockito.verify(this.userRepository).findById(userIdToFind);
+        verify(this.userRepository, times(1)).findById(anyLong());
     }
 
     @Test
@@ -203,16 +204,16 @@ class UserServiceImpTest {
 
         AuthUserDetails userDetails = new AuthUserDetails(this.userMockTree);
 
-        Mockito.when(this.userRepository.findById(Mockito.anyLong()))
+        when(this.userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(userMockOne));
 
         UnauthorizedPermissionException ex =
-                Assertions.assertThrows(UnauthorizedPermissionException.class,
+                assertThrows(UnauthorizedPermissionException.class,
                         () -> this.userService.update(userIdToFind, null, userDetails));
 
-        Assertions.assertEquals(expected, ex.getMessage());
+        assertEquals(expected, ex.getMessage());
 
-        Mockito.verify(this.userRepository).findById(userIdToFind);
+        verify(this.userRepository).findById(anyLong());
     }
 
     @Test
@@ -222,7 +223,7 @@ class UserServiceImpTest {
         String expected = GeneralUtil.simpleNameClass(User.class)
                 + " updated successfully";
 
-        Mockito.when(this.userRepository.findById(Mockito.anyLong()))
+        when(this.userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(this.userMockOne));
 
         AuthUserDetails userDetails = new AuthUserDetails(this.userMockOne);
@@ -230,10 +231,10 @@ class UserServiceImpTest {
         ApiResponseDto response = this.userService.update(userIdToFind,
                 this.userDtoMockToUpdate, userDetails);
 
-        Assertions.assertEquals(expected, response.getMessage());
-        Assertions.assertTrue(response.getSuccess());
+        assertEquals(expected, response.getMessage());
+        assertTrue(response.getSuccess());
 
-        Mockito.verify(this.userRepository).findById(userIdToFind);
+        verify(this.userRepository, times(1)).findById(anyLong());
     }
 
     @Test
@@ -243,27 +244,29 @@ class UserServiceImpTest {
         String expected = GeneralUtil.simpleNameClass(User.class)
                 + " updated successfully";
 
-        Role roleMock = RoleServiceDataTestUtils.getMockRole(1L, RoleName.ROLE_ADMIN);
+        Role roleMock = RoleServiceDataTestUtils.getRoleMock(1L, RoleName.ROLE_ADMIN);
         this.userMockOne.setRoles(Set.of(roleMock));
-        Mockito.when(this.userRepository.findById(Mockito.anyLong()))
+
+        when(this.userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(this.userMockOne));
-        Mockito.when(this.roleRepository.findByName(ArgumentMatchers.any(String.class)))
+        when(this.roleRepository.findByName(any(String.class)))
                 .thenReturn(Optional.of(roleMock));
 
-        Role roleMockAdmin = RoleServiceDataTestUtils.getMockRole(1L, RoleName.ROLE_ADMIN);
+        Role roleMockAdmin = RoleServiceDataTestUtils.getRoleMock(1L, RoleName.ROLE_ADMIN);
         this.userMockTwo.setRoles(Set.of(roleMockAdmin));
         AuthUserDetails userDetails = new AuthUserDetails(this.userMockTwo);
 
-        RoleDto roleDtoMock = RoleServiceDataTestUtils.getMockRoleDto(1L, RoleName.ROLE_ADMIN);
+        RoleDto roleDtoMock = RoleServiceDataTestUtils.getRoleDtoMock(1L, RoleName.ROLE_ADMIN);
         this.userDtoMockToUpdate.setRoles(Set.of(roleDtoMock));
+
         ApiResponseDto response = this.userService.update(userIdToFind,
                 this.userDtoMockToUpdate, userDetails);
 
-        Assertions.assertEquals(expected, response.getMessage());
-        Assertions.assertTrue(response.getSuccess());
+        assertEquals(expected, response.getMessage());
+        assertTrue(response.getSuccess());
 
-        Mockito.verify(this.userRepository).findById(userIdToFind);
-        Mockito.verify(this.roleRepository).findByName(roleDtoMock.getName().name());
+        verify(this.userRepository, times(1)).findById(anyLong());
+        verify(this.roleRepository, times(1)).findByName(anyString());
     }
 
     @Test
@@ -273,15 +276,15 @@ class UserServiceImpTest {
         String expected = GeneralUtil.simpleNameClass(User.class)
                 + " not found with id: " + userIdToFind;
 
-        Mockito.when(this.userRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+        when(this.userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         EntityNoSuchElementException ex =
-                Assertions.assertThrows(EntityNoSuchElementException.class,
+                assertThrows(EntityNoSuchElementException.class,
                         () -> this.userService.delete(userIdToFind, null));
 
-        Assertions.assertEquals(expected, ex.getMessage());
+        assertEquals(expected, ex.getMessage());
 
-        Mockito.verify(this.userRepository).findById(userIdToFind);
+        verify(this.userRepository, times(1)).findById(anyLong());
     }
 
     @Test
@@ -291,18 +294,18 @@ class UserServiceImpTest {
         String expected = "You don't have the permission to "
                 + MessageAction.DELETE.name() + " this profile";
 
-        Mockito.when(this.userRepository.findById(Mockito.anyLong()))
+        when(this.userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(this.userMockOne));
 
         AuthUserDetails userDetails = new AuthUserDetails(this.userMockTwo);
 
         UnauthorizedPermissionException ex =
-                Assertions.assertThrows(UnauthorizedPermissionException.class,
+                assertThrows(UnauthorizedPermissionException.class,
                         () -> this.userService.delete(userIdToFind, userDetails));
 
-        Assertions.assertEquals(expected, ex.getMessage());
+        assertEquals(expected, ex.getMessage());
 
-        Mockito.verify(this.userRepository).findById(userIdToFind);
+        verify(this.userRepository, times(1)).findById(anyLong());
     }
 
     @Test
@@ -312,7 +315,7 @@ class UserServiceImpTest {
         String expected = GeneralUtil.simpleNameClass(User.class)
                 + " deleted successfully";
 
-        Mockito.when(this.userRepository.findById(Mockito.anyLong()))
+        when(this.userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(this.userMockOne));
         Mockito.doNothing().when(this.userRepository).delete(this.userMockOne);
 
@@ -320,11 +323,11 @@ class UserServiceImpTest {
 
         ApiResponseDto response = this.userService.delete(userIdToFind, userDetails);
 
-        Assertions.assertEquals(expected, response.getMessage());
-        Assertions.assertTrue(response.getSuccess());
+        assertEquals(expected, response.getMessage());
+        assertTrue(response.getSuccess());
 
-        Mockito.verify(this.userRepository).findById(userIdToFind);
-        Mockito.verify(this.userRepository).delete(this.userMockOne);
+        verify(this.userRepository, times(1)).findById(anyLong());
+        verify(this.userRepository, times(1)).delete(any());
     }
 
 }

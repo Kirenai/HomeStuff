@@ -38,9 +38,9 @@ class RoleRepositoryTest {
         RoleName roleNameTwo = RoleName.ROLE_MODERATOR;
         RoleName roleNameThree = RoleName.ROLE_ADMIN;
 
-        this.roleUser = RoleServiceDataTestUtils.getMockRole(roleNameOne);
-        this.roleMod = RoleServiceDataTestUtils.getMockRole(roleNameTwo);
-        this.roleAdmin = RoleServiceDataTestUtils.getMockRole(roleNameThree);
+        this.roleUser = RoleServiceDataTestUtils.getRoleMock(roleNameOne);
+        this.roleMod = RoleServiceDataTestUtils.getRoleMock(roleNameTwo);
+        this.roleAdmin = RoleServiceDataTestUtils.getRoleMock(roleNameThree);
     }
 
     @Test

@@ -7,7 +7,6 @@ import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.exception.entity.EntityDuplicateConstraintViolationException;
 import com.revilla.homestuff.repository.RoleRepository;
 import com.revilla.homestuff.repository.UserRepository;
-import com.revilla.homestuff.service.AuthService;
 import com.revilla.homestuff.util.GeneralUtil;
 import com.revilla.homestuff.util.enums.RoleName;
 import com.revilla.homestuff.utils.RoleServiceDataTestUtils;
@@ -19,32 +18,30 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
+
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest
-@ActiveProfiles("test")
 public class AuthServiceImpTest {
 
-    @Autowired
-    private AuthService authService;
-    @MockBean
+    @InjectMocks
+    private AuthServiceImp authService;
+    @Mock
     private UserRepository userRepository;
-    @MockBean
+    @Mock
     private RoleRepository roleRepository;
-    @MockBean
+    @Mock
     private PasswordEncoder passwordEncoder;
-    @MockBean
+    @Mock
     private ModelMapper modelMapper;
 
     private User userMockOne;
@@ -60,11 +57,11 @@ public class AuthServiceImpTest {
         String lastName = "kirenai";
         Byte age = 22;
 
-        this.userMockOne = UserServiceDataTestUtils.getMockUser(userIdOne, username,
+        this.userMockOne = UserServiceDataTestUtils.getUserMock(userIdOne, username,
                 password, firstName, lastName, age);
 
         this.registerDtoMock = RegisterRequestDtoDataTest
-                .getMockRegisterRequestDto(username, password, firstName, lastName, age);
+                .getRegisterRequestDtoMock(username, password, firstName, lastName, age);
     }
 
     @Test
@@ -73,7 +70,7 @@ public class AuthServiceImpTest {
         String expected = GeneralUtil.simpleNameClass(User.class)
                 + " is already exists with name: " + this.registerDtoMock.getUsername();
 
-        Mockito.when(this.userRepository.existsByName(Mockito.anyString())).thenReturn(true);
+        when(this.userRepository.existsByName(anyString())).thenReturn(true);
 
         EntityDuplicateConstraintViolationException ex =
                 Assertions.assertThrows(EntityDuplicateConstraintViolationException.class,
@@ -81,7 +78,7 @@ public class AuthServiceImpTest {
 
         Assertions.assertEquals(expected, ex.getMessage());
 
-        Mockito.verify(this.userRepository).existsByName(this.registerDtoMock.getUsername());
+        verify(this.userRepository, times(1)).existsByName(this.registerDtoMock.getUsername());
     }
 
     @Test
@@ -89,22 +86,22 @@ public class AuthServiceImpTest {
     void shouldRegisterUser() {
         ApiResponseDto expected = ApiResponseDataTestUtils
                 .getApiResponseMock("registered successfully", User.class);
-        Role roleMock = RoleServiceDataTestUtils.getMockRole(1L, RoleName.ROLE_USER);
+        Role roleMock = RoleServiceDataTestUtils.getRoleMock(1L, RoleName.ROLE_USER);
 
-        Mockito.when(this.userRepository.existsByName(Mockito.anyString())).thenReturn(false);
-        Mockito.when(this.modelMapper.map(this.registerDtoMock, User.class)).thenReturn(this.userMockOne);
-        Mockito.when(this.roleRepository.findByName(ArgumentMatchers.any(String.class))).thenReturn(Optional.of(roleMock));
-        Mockito.when(this.userRepository.save(ArgumentMatchers.any(User.class))).thenReturn(this.userMockOne);
+        when(this.userRepository.existsByName(anyString())).thenReturn(false);
+        when(this.modelMapper.map(this.registerDtoMock, User.class)).thenReturn(this.userMockOne);
+        when(this.roleRepository.findByName(any(String.class))).thenReturn(Optional.of(roleMock));
+        when(this.userRepository.save(any(User.class))).thenReturn(this.userMockOne);
 
         ApiResponseDto response = this.authService.register(this.registerDtoMock);
 
         Assertions.assertEquals(expected.getMessage(), response.getMessage());
         Assertions.assertTrue(response.getSuccess());
 
-        Mockito.verify(this.userRepository).existsByName(this.registerDtoMock.getUsername());
-        Mockito.verify(this.modelMapper).map(this.registerDtoMock, User.class);
-        Mockito.verify(this.roleRepository).findByName(roleMock.getName());
-        Mockito.verify(this.userRepository).save(this.userMockOne);
+        verify(this.userRepository).existsByName(this.registerDtoMock.getUsername());
+        verify(this.modelMapper).map(this.registerDtoMock, User.class);
+        verify(this.roleRepository).findByName(roleMock.getName());
+        verify(this.userRepository).save(this.userMockOne);
     }
 
 }

@@ -32,6 +32,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +45,9 @@ class ConsumptionResourceTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -75,6 +80,7 @@ class ConsumptionResourceTest {
 
     @BeforeEach
     void setUp() {
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
         Long userIdOne = 1L;
 
         String username = "kirenai";
@@ -83,9 +89,9 @@ class ConsumptionResourceTest {
         String lastName = "kirenai";
         Byte age = 22;
 
-        User userMockOne = UserServiceDataTestUtils.getMockUser(userIdOne, username,
+        User userMockOne = UserServiceDataTestUtils.getUserMock(userIdOne, username,
                 password, firstName, lastName, age);
-        userMockOne.setRoles(List.of(RoleServiceDataTestUtils.getMockRole(1L, RoleName.ROLE_ADMIN)));
+        userMockOne.setRoles(List.of(RoleServiceDataTestUtils.getRoleMock(1L, RoleName.ROLE_ADMIN)));
 
         this.consumptionDtoOneMock = ConsumptionServiceDataTestUtils.getConsumptionDtoMock(1L, (byte) 5);
 

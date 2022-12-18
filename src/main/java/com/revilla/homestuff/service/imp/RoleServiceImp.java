@@ -8,14 +8,12 @@ import com.revilla.homestuff.repository.RoleRepository;
 import com.revilla.homestuff.service.RoleService;
 import com.revilla.homestuff.util.ConstraintViolation;
 import com.revilla.homestuff.util.GeneralUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.validation.Constraint;
 
 /**
  * RoleServiceImp
@@ -28,12 +26,17 @@ import javax.validation.Constraint;
 @Qualifier("role.service")
 public class RoleServiceImp extends GeneralServiceImp<RoleDto, Long, Role> implements RoleService {
 
-    @Autowired
     private final RoleRepository roleRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public JpaRepository<Role, Long> getRepo() {
         return this.roleRepository;
+    }
+
+    @Override
+    public ModelMapper getModelMapper() {
+        return this.modelMapper;
     }
 
     @Override
@@ -42,9 +45,9 @@ public class RoleServiceImp extends GeneralServiceImp<RoleDto, Long, Role> imple
                 + GeneralUtil.simpleNameClass(this.getClass()));
         ConstraintViolation.validateDuplicate(data.getName().name(),
                 this.roleRepository, Role.class);
-        Role role = super.getModelMapper().map(data, super.getThirdGenericClass());
+        Role role = this.getModelMapper().map(data, super.getThirdGenericClass());
         Role roleSaved = this.roleRepository.save(role);
-        return super.getModelMapper().map(roleSaved, super.getFirstGenericClass());
+        return this.getModelMapper().map(roleSaved, super.getFirstGenericClass());
     }
 
     @Override

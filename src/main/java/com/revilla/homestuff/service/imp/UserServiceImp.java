@@ -1,7 +1,6 @@
 package com.revilla.homestuff.service.imp;
 
 import com.revilla.homestuff.dto.UserDto;
-import com.revilla.homestuff.dto.request.RegisterRequestDto;
 import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
@@ -15,6 +14,7 @@ import com.revilla.homestuff.util.RoleUtil;
 import com.revilla.homestuff.util.enums.MessageAction;
 import com.revilla.homestuff.util.enums.RoleName;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -31,32 +31,37 @@ import java.util.Objects;
  * @author Kirenai
  */
 @Slf4j
-@RequiredArgsConstructor
 @Service
 @Qualifier("user.service")
+@RequiredArgsConstructor
 public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
     @Override
     public JpaRepository<User, Long> getRepo() {
         return this.userRepository;
     }
 
+    @Override
+    public ModelMapper getModelMapper() {
+        return this.modelMapper;
+    }
+
     @Transactional
     @Override
     public UserDto create(UserDto data) {
-        log.info("Calling the create method in "
-                + GeneralUtil.simpleNameClass(this.getClass()));
-        ConstraintViolation.validateDuplicate(data.getUsername(),
-                this.userRepository, User.class);
-        User user = super.getModelMapper().map(data, super.getThirdGenericClass());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        log.info("Calling the create method in " + GeneralUtil.simpleNameClass(this.getClass()));
+        ConstraintViolation.validateDuplicate(data.getUsername(), this.userRepository, User.class);
+        // TODO: Add an input and output mapper in the appropriate class for all entities
+        User user = this.getModelMapper().map(data, super.getThirdGenericClass());
+        user.setPassword(this.passwordEncoder.encode(user.getPassword()));
         user.setRoles(RoleUtil.getSetOfRolesOrThrow(data.getRoles(), this.roleRepository));
         User userSaved = this.userRepository.save(user);
-        return super.getModelMapper().map(userSaved, super.getFirstGenericClass())
+        return this.getModelMapper().map(userSaved, super.getFirstGenericClass())
                 .setMessage(GeneralUtil.simpleNameClass(User.class)
                         + " created successfully by admin");
     }
@@ -76,7 +81,7 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
                     user.setAge(data.getAge());
                     if (Objects.nonNull(data.getRoles())
                             && userDetails.getAuthorities().contains(
-                                    new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
+                            new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.name()))) {
                         user.setRoles(RoleUtil.getSetOfRolesOrThrow(data.getRoles(), this.roleRepository));
                     }
                     return GeneralUtil.responseMessageAction(User.class, "updated successfully");

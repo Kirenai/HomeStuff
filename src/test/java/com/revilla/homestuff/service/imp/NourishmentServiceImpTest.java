@@ -14,7 +14,6 @@ import com.revilla.homestuff.repository.CategoryRepository;
 import com.revilla.homestuff.repository.NourishmentRepository;
 import com.revilla.homestuff.repository.UserRepository;
 import com.revilla.homestuff.security.AuthUserDetails;
-import com.revilla.homestuff.service.NourishmentService;
 import com.revilla.homestuff.util.GeneralUtil;
 import com.revilla.homestuff.util.enums.MessageAction;
 import com.revilla.homestuff.utils.AmountNourishmentServiceDataTestUtils;
@@ -26,34 +25,33 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest
-@ActiveProfiles("test")
 class NourishmentServiceImpTest {
 
-    @Autowired
-    private NourishmentService nourishmentService;
-    @MockBean
+    @InjectMocks
+    private NourishmentServiceImp nourishmentService;
+    @Mock
     private UserRepository userRepository;
-    @MockBean
+    @Mock
     private NourishmentRepository nourishmentRepository;
-    @MockBean
+    @Mock
     private CategoryRepository categoryRepository;
-    @MockBean
+    @Mock
     private ModelMapper modelMapper;
 
     private User userOne;
@@ -100,9 +98,9 @@ class NourishmentServiceImpTest {
                 .getNourishmentDtoMock(nourishmentIdOne, nameOne, imagePathOne,
                         descriptionOne, amountNourishmentDtoOne);
 
-        this.userOne = UserServiceDataTestUtils.getMockUser(userIdOne, usernameOne,
+        this.userOne = UserServiceDataTestUtils.getUserMock(userIdOne, usernameOne,
                 passwordOne, firstNameOne, lastNameOne, ageOne);
-        this.userTwo = UserServiceDataTestUtils.getMockUser(userIdTwo, usernameTwo,
+        this.userTwo = UserServiceDataTestUtils.getUserMock(userIdTwo, usernameTwo,
                 passwordTwo, firstNameTwo, lastNameTwo, ageTwo);
         this.categoryOne = CategoryServiceDataTestUtils.getCategoryMock(categoryIdOne,
                 categoryNameOne);
@@ -113,28 +111,24 @@ class NourishmentServiceImpTest {
     @DisplayName("Should find a list nourishment we call find all")
     void shouldFindAllNourishment() {
         int expectedSize = 3;
-        Pageable pageableMock = Mockito.mock(Pageable.class);
+        Pageable pageableMock = mock(Pageable.class);
         Page<Nourishment> nourishmentPageMock = NourishmentServiceDataTestUtils
                 .getNourishmentPage();
         List<NourishmentDto> nourishmentDtoListMock = NourishmentServiceDataTestUtils
                 .getNourishmentDtoList();
 
-        Mockito.when(nourishmentRepository.findAll(pageableMock))
+        when(this.nourishmentRepository.findAll(any(Pageable.class)))
                 .thenReturn(nourishmentPageMock);
-        Mockito.when(modelMapper.map(nourishmentPageMock.getContent().get(0), NourishmentDto.class))
-                .thenReturn(nourishmentDtoListMock.get(0));
-        Mockito.when(modelMapper.map(nourishmentPageMock.getContent().get(1), NourishmentDto.class))
-                .thenReturn(nourishmentDtoListMock.get(1));
-        Mockito.when(modelMapper.map(nourishmentPageMock.getContent().get(2), NourishmentDto.class))
-                .thenReturn(nourishmentDtoListMock.get(2));
+        when(this.modelMapper.map(any(Nourishment.class), eq(NourishmentDto.class)))
+                .thenReturn(nourishmentDtoListMock.get(0), nourishmentDtoListMock.get(1), nourishmentDtoListMock.get(2));
 
         List<NourishmentDto> response = nourishmentService.findAll(pageableMock);
 
-        Assertions.assertEquals(expectedSize, response.size());
-        Assertions.assertEquals(nourishmentDtoListMock, response);
+        assertEquals(expectedSize, response.size());
+        assertEquals(nourishmentDtoListMock, response);
 
-        Mockito.verify(nourishmentRepository, Mockito.times(1)).findAll(pageableMock);
-        Mockito.verify(modelMapper, Mockito.times(3)).map(ArgumentMatchers.any(), ArgumentMatchers.any());
+        verify(nourishmentRepository, times(1)).findAll(pageableMock);
+        verify(modelMapper, times(3)).map(any(), any());
     }
 
     @Test
@@ -143,7 +137,7 @@ class NourishmentServiceImpTest {
         Long nourishmentIdToFind = 1L;
         String expected = "Nourishment not found with id: " + nourishmentIdToFind;
 
-        Mockito.when(nourishmentRepository.findById(Mockito.anyLong()))
+        when(nourishmentRepository.findById(anyLong()))
                 .thenReturn(Optional.empty());
 
         EntityNoSuchElementException ex =
@@ -151,9 +145,9 @@ class NourishmentServiceImpTest {
                         () -> nourishmentService.findOne(nourishmentIdToFind, null)
                 );
 
-        Assertions.assertEquals(expected, ex.getMessage());
+        assertEquals(expected, ex.getMessage());
 
-        Mockito.verify(nourishmentRepository, Mockito.times(1)).findById(nourishmentIdToFind);
+        verify(nourishmentRepository, times(1)).findById(nourishmentIdToFind);
     }
 
     @Test
@@ -162,35 +156,35 @@ class NourishmentServiceImpTest {
         Long nourishmentIdToFind = 1L;
 
         this.nourishmentOne.setUser(this.userOne);
-        Mockito.when(nourishmentRepository.findById(ArgumentMatchers.anyLong()))
+        when(nourishmentRepository.findById(anyLong()))
                 .thenReturn(Optional.of(this.nourishmentOne));
-        Mockito.when(modelMapper.map(ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(modelMapper.map(any(), any()))
                 .thenReturn(this.nourishmentDtoOne);
 
         AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
 
         NourishmentDto result = nourishmentService.findOne(nourishmentIdToFind, userDetails);
 
-        Assertions.assertEquals(this.nourishmentDtoOne, result);
+        assertEquals(this.nourishmentDtoOne, result);
 
-        Mockito.verify(nourishmentRepository, Mockito.times(1)).findById(nourishmentIdToFind);
-        Mockito.verify(modelMapper, Mockito.times(1)).map(this.nourishmentOne, NourishmentDto.class);
+        verify(nourishmentRepository, times(1)).findById(nourishmentIdToFind);
+        verify(modelMapper, times(1)).map(this.nourishmentOne, NourishmentDto.class);
     }
 
     @Test
     @DisplayName("Should find all nourishments by status when find all by status when isAvailable is true")
     void shouldFindAllNourishmentsByStatusWhenFindAllByStatusWhenIsAvailableIsTrue() {
-        Mockito.when(this.nourishmentRepository.findByIsAvailable(ArgumentMatchers.anyBoolean()))
+        when(this.nourishmentRepository.findByIsAvailable(anyBoolean()))
                 .thenReturn(List.of(this.nourishmentOne));
-        Mockito.when(this.modelMapper.map(ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(this.modelMapper.map(any(), any()))
                 .thenReturn(this.nourishmentDtoOne);
 
         List<NourishmentDto> allNourishmentByStatus = this.nourishmentService.findAllNourishmentByStatus(true);
 
         Assertions.assertTrue(allNourishmentByStatus.get(0).getIsAvailable());
 
-        Mockito.verify(this.nourishmentRepository, Mockito.times(1)).findByIsAvailable(true);
-        Mockito.verify(this.modelMapper, Mockito.times(1)).map(this.nourishmentOne, NourishmentDto.class);
+        verify(this.nourishmentRepository, times(1)).findByIsAvailable(true);
+        verify(this.modelMapper, times(1)).map(this.nourishmentOne, NourishmentDto.class);
     }
 
     @Test
@@ -198,17 +192,17 @@ class NourishmentServiceImpTest {
     void shouldFindAllNourishmentsByStatusWhenFindAllByStatusWhenIsAvailableIsFalse() {
         this.nourishmentOne.setIsAvailable(false);
         this.nourishmentDtoOne.setIsAvailable(false);
-        Mockito.when(this.nourishmentRepository.findByIsAvailable(ArgumentMatchers.anyBoolean()))
+        when(this.nourishmentRepository.findByIsAvailable(anyBoolean()))
                 .thenReturn(List.of(this.nourishmentOne));
-        Mockito.when(this.modelMapper.map(ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(this.modelMapper.map(any(), any()))
                 .thenReturn(this.nourishmentDtoOne);
 
         List<NourishmentDto> allNourishmentByStatus = this.nourishmentService.findAllNourishmentByStatus(false);
 
         Assertions.assertFalse(allNourishmentByStatus.get(0).getIsAvailable());
 
-        Mockito.verify(this.nourishmentRepository, Mockito.times(1)).findByIsAvailable(false);
-        Mockito.verify(this.modelMapper, Mockito.times(1)).map(this.nourishmentOne, NourishmentDto.class);
+        verify(this.nourishmentRepository, times(1)).findByIsAvailable(false);
+        verify(this.modelMapper, times(1)).map(this.nourishmentOne, NourishmentDto.class);
     }
 
     @Test
@@ -218,7 +212,7 @@ class NourishmentServiceImpTest {
         Long categoryIdToFind = 1L;
         String expected = GeneralUtil.simpleNameClass(Nourishment.class)
                 + " is already exists with name: " + this.nourishmentDtoOne.getName();
-        Mockito.when(this.nourishmentRepository.existsByName(Mockito.anyString()))
+        when(this.nourishmentRepository.existsByName(Mockito.anyString()))
                 .thenReturn(true);
 
         EntityDuplicateConstraintViolationException ex = Assertions
@@ -227,9 +221,9 @@ class NourishmentServiceImpTest {
                                 categoryIdToFind, this.nourishmentDtoOne, null)
                 );
 
-        Assertions.assertEquals(expected, ex.getMessage());
+        assertEquals(expected, ex.getMessage());
 
-        Mockito.verify(this.nourishmentRepository).existsByName(this.nourishmentDtoOne.getName());
+        verify(this.nourishmentRepository).existsByName(this.nourishmentDtoOne.getName());
     }
 
     @Test
@@ -239,9 +233,9 @@ class NourishmentServiceImpTest {
         Long categoryIdToFind = 1L;
         String expected = "User not found with id: " + userIdToFind;
 
-        Mockito.when(this.nourishmentRepository.existsByName(Mockito.anyString()))
+        when(this.nourishmentRepository.existsByName(Mockito.anyString()))
                 .thenReturn(false);
-        Mockito.when(this.userRepository.findById(Mockito.anyLong()))
+        when(this.userRepository.findById(anyLong()))
                 .thenReturn(Optional.empty());
 
         EntityNoSuchElementException ex = Assertions.assertThrows(EntityNoSuchElementException.class,
@@ -249,10 +243,10 @@ class NourishmentServiceImpTest {
                         this.nourishmentDtoOne, null)
         );
 
-        Assertions.assertEquals(expected, ex.getMessage());
+        assertEquals(expected, ex.getMessage());
 
-        Mockito.verify(this.nourishmentRepository).existsByName(this.nourishmentDtoOne.getName());
-        Mockito.verify(this.userRepository).findById(userIdToFind);
+        verify(this.nourishmentRepository).existsByName(this.nourishmentDtoOne.getName());
+        verify(this.userRepository).findById(userIdToFind);
     }
 
     @Test
@@ -263,11 +257,11 @@ class NourishmentServiceImpTest {
         String expected = "You don't have the permission to "
                 + MessageAction.CREATE.name() + " this nourishment";
 
-        Mockito.when(this.nourishmentRepository.existsByName(Mockito.anyString()))
+        when(this.nourishmentRepository.existsByName(Mockito.anyString()))
                 .thenReturn(false);
-        Mockito.when(this.modelMapper.map(this.nourishmentDtoOne, Nourishment.class))
+        when(this.modelMapper.map(this.nourishmentDtoOne, Nourishment.class))
                 .thenReturn(this.nourishmentOne);
-        Mockito.when(this.userRepository.findById(Mockito.anyLong()))
+        when(this.userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(this.userOne));
 
         AuthUserDetails userDetails = new AuthUserDetails(this.userTwo);
@@ -277,11 +271,11 @@ class NourishmentServiceImpTest {
                         this.nourishmentDtoOne, userDetails)
         );
 
-        Assertions.assertEquals(expected, ex.getMessage());
+        assertEquals(expected, ex.getMessage());
 
-        Mockito.verify(this.nourishmentRepository).existsByName(this.nourishmentDtoOne.getName());
-        Mockito.verify(this.modelMapper).map(this.nourishmentDtoOne, Nourishment.class);
-        Mockito.verify(this.userRepository).findById(userIdToFind);
+        verify(this.nourishmentRepository).existsByName(this.nourishmentDtoOne.getName());
+        verify(this.modelMapper).map(this.nourishmentDtoOne, Nourishment.class);
+        verify(this.userRepository).findById(userIdToFind);
     }
 
     @Test
@@ -291,13 +285,13 @@ class NourishmentServiceImpTest {
         Long categoryIdToFind = 1L;
         String expected = "Category not found with id: " + categoryIdToFind;
 
-        Mockito.when(this.nourishmentRepository.existsByName(ArgumentMatchers.anyString()))
+        when(this.nourishmentRepository.existsByName(anyString()))
                 .thenReturn(false);
-        Mockito.when(this.modelMapper.map(this.nourishmentDtoOne, Nourishment.class))
+        when(this.modelMapper.map(this.nourishmentDtoOne, Nourishment.class))
                 .thenReturn(this.nourishmentOne);
-        Mockito.when(this.userRepository.findById(Mockito.anyLong()))
+        when(this.userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(this.userOne));
-        Mockito.when(this.categoryRepository.findById(ArgumentMatchers.anyLong()))
+        when(this.categoryRepository.findById(anyLong()))
                 .thenReturn(Optional.empty());
 
         AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
@@ -307,12 +301,12 @@ class NourishmentServiceImpTest {
                         this.nourishmentDtoOne, userDetails)
         );
 
-        Assertions.assertEquals(expected, ex.getMessage());
+        assertEquals(expected, ex.getMessage());
 
-        Mockito.verify(this.nourishmentRepository).existsByName(this.nourishmentDtoOne.getName());
-        Mockito.verify(this.modelMapper).map(this.nourishmentDtoOne, Nourishment.class);
-        Mockito.verify(this.userRepository).findById(userIdToFind);
-        Mockito.verify(this.categoryRepository).findById(categoryIdToFind);
+        verify(this.nourishmentRepository).existsByName(this.nourishmentDtoOne.getName());
+        verify(this.modelMapper).map(this.nourishmentDtoOne, Nourishment.class);
+        verify(this.userRepository).findById(userIdToFind);
+        verify(this.categoryRepository).findById(categoryIdToFind);
     }
 
     @Test
@@ -323,17 +317,17 @@ class NourishmentServiceImpTest {
         String expectedMessage = GeneralUtil.simpleNameClass(Nourishment.class)
                 + " created successfully";
 
-        Mockito.when(this.nourishmentRepository.existsByName(ArgumentMatchers.anyString()))
+        when(this.nourishmentRepository.existsByName(anyString()))
                 .thenReturn(false);
-        Mockito.when(this.modelMapper.map(this.nourishmentDtoOne, Nourishment.class))
+        when(this.modelMapper.map(this.nourishmentDtoOne, Nourishment.class))
                 .thenReturn(this.nourishmentOne);
-        Mockito.when(this.userRepository.findById(Mockito.anyLong()))
+        when(this.userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(this.userOne));
-        Mockito.when(this.categoryRepository.findById(ArgumentMatchers.anyLong()))
+        when(this.categoryRepository.findById(anyLong()))
                 .thenReturn(Optional.of(this.categoryOne));
-        Mockito.when(this.nourishmentRepository.save(ArgumentMatchers.any(Nourishment.class)))
+        when(this.nourishmentRepository.save(any(Nourishment.class)))
                 .thenReturn(this.nourishmentOne);
-        Mockito.when(this.modelMapper.map(this.nourishmentOne, NourishmentDto.class))
+        when(this.modelMapper.map(this.nourishmentOne, NourishmentDto.class))
                 .thenReturn(this.nourishmentDtoOne);
 
         AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
@@ -341,14 +335,14 @@ class NourishmentServiceImpTest {
         NourishmentDto response = this.nourishmentService.create(userIdToFind, categoryIdToFind,
                 this.nourishmentDtoOne, userDetails);
 
-        Assertions.assertEquals(expectedMessage, response.getMessage());
+        assertEquals(expectedMessage, response.getMessage());
 
-        Mockito.verify(this.nourishmentRepository).existsByName(this.nourishmentDtoOne.getName());
-        Mockito.verify(this.modelMapper).map(this.nourishmentDtoOne, Nourishment.class);
-        Mockito.verify(this.userRepository).findById(userIdToFind);
-        Mockito.verify(this.categoryRepository).findById(categoryIdToFind);
-        Mockito.verify(this.nourishmentRepository).save(this.nourishmentOne);
-        Mockito.verify(this.modelMapper).map(this.nourishmentOne, NourishmentDto.class);
+        verify(this.nourishmentRepository).existsByName(this.nourishmentDtoOne.getName());
+        verify(this.modelMapper).map(this.nourishmentDtoOne, Nourishment.class);
+        verify(this.userRepository).findById(userIdToFind);
+        verify(this.categoryRepository).findById(categoryIdToFind);
+        verify(this.nourishmentRepository).save(this.nourishmentOne);
+        verify(this.modelMapper).map(this.nourishmentOne, NourishmentDto.class);
     }
 
     @Test
@@ -357,7 +351,7 @@ class NourishmentServiceImpTest {
         Long nourishmentIdToFind = 1L;
         String expected = "Nourishment not found with id: " + nourishmentIdToFind;
 
-        Mockito.when(this.nourishmentRepository.findById(Mockito.anyLong()))
+        when(this.nourishmentRepository.findById(anyLong()))
                 .thenReturn(Optional.empty());
 
         AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
@@ -367,9 +361,9 @@ class NourishmentServiceImpTest {
                         this.nourishmentDtoOne, userDetails)
         );
 
-        Assertions.assertEquals(expected, ex.getMessage());
+        assertEquals(expected, ex.getMessage());
 
-        Mockito.verify(this.nourishmentRepository).findById(nourishmentIdToFind);
+        verify(this.nourishmentRepository).findById(nourishmentIdToFind);
     }
 
     @Test
@@ -380,7 +374,7 @@ class NourishmentServiceImpTest {
                 + MessageAction.UPDATE.name() + " this nourishment";
 
         this.nourishmentOne.setUser(this.userTwo);
-        Mockito.when(this.nourishmentRepository.findById(Mockito.anyLong()))
+        when(this.nourishmentRepository.findById(anyLong()))
                 .thenReturn(Optional.of(this.nourishmentOne));
 
         AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
@@ -390,9 +384,9 @@ class NourishmentServiceImpTest {
                         this.nourishmentDtoOne, userDetails)
         );
 
-        Assertions.assertEquals(expected, ex.getMessage());
+        assertEquals(expected, ex.getMessage());
 
-        Mockito.verify(this.nourishmentRepository).findById(nourishmentIdToFind);
+        verify(this.nourishmentRepository).findById(nourishmentIdToFind);
     }
 
     @Test
@@ -403,20 +397,18 @@ class NourishmentServiceImpTest {
                 + " updated successfully";
 
         this.nourishmentOne.setUser(this.userOne);
-        Mockito.when(this.nourishmentRepository.findById(Mockito.anyLong()))
+        when(this.nourishmentRepository.findById(anyLong()))
                 .thenReturn(Optional.of(this.nourishmentOne));
-        Mockito.when(this.nourishmentRepository.save(ArgumentMatchers.any(Nourishment.class)))
-                .thenReturn(this.nourishmentOne);
 
         AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
 
         ApiResponseDto response = this.nourishmentService.update(nourishmentIdToFind,
                 this.nourishmentDtoOne, userDetails);
 
-        Assertions.assertEquals(expectedMessage, response.getMessage());
+        assertEquals(expectedMessage, response.getMessage());
         Assertions.assertTrue(response.getSuccess());
 
-        Mockito.verify(this.nourishmentRepository).findById(nourishmentIdToFind);
+        verify(this.nourishmentRepository).findById(nourishmentIdToFind);
     }
 
     @Test
@@ -425,7 +417,7 @@ class NourishmentServiceImpTest {
         Long nourishmentIdToFind = 1L;
         String expected = "Nourishment not found with id: " + nourishmentIdToFind;
 
-        Mockito.when(this.nourishmentRepository.findById(Mockito.anyLong()))
+        when(this.nourishmentRepository.findById(anyLong()))
                 .thenReturn(Optional.empty());
 
         AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
@@ -434,9 +426,9 @@ class NourishmentServiceImpTest {
                 () -> this.nourishmentService.delete(nourishmentIdToFind, userDetails)
         );
 
-        Assertions.assertEquals(expected, ex.getMessage());
+        assertEquals(expected, ex.getMessage());
 
-        Mockito.verify(this.nourishmentRepository).findById(nourishmentIdToFind);
+        verify(this.nourishmentRepository).findById(nourishmentIdToFind);
     }
 
     @Test
@@ -447,7 +439,7 @@ class NourishmentServiceImpTest {
                 + MessageAction.DELETE.name() + " this nourishment";
 
         this.nourishmentOne.setUser(this.userTwo);
-        Mockito.when(this.nourishmentRepository.findById(Mockito.anyLong()))
+        when(this.nourishmentRepository.findById(anyLong()))
                 .thenReturn(Optional.of(this.nourishmentOne));
 
         AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
@@ -456,9 +448,9 @@ class NourishmentServiceImpTest {
                 () -> this.nourishmentService.delete(nourishmentIdToFind, userDetails)
         );
 
-        Assertions.assertEquals(expected, ex.getMessage());
+        assertEquals(expected, ex.getMessage());
 
-        Mockito.verify(this.nourishmentRepository).findById(nourishmentIdToFind);
+        verify(this.nourishmentRepository).findById(nourishmentIdToFind);
     }
 
     @Test
@@ -469,19 +461,17 @@ class NourishmentServiceImpTest {
                 + " deleted successfully";
 
         this.nourishmentOne.setUser(this.userOne);
-        Mockito.when(this.nourishmentRepository.findById(Mockito.anyLong()))
+        when(this.nourishmentRepository.findById(anyLong()))
                 .thenReturn(Optional.of(this.nourishmentOne));
-        Mockito.when(this.nourishmentRepository.save(ArgumentMatchers.any(Nourishment.class)))
-                .thenReturn(this.nourishmentOne);
 
         AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
 
         ApiResponseDto response = this.nourishmentService.delete(nourishmentIdToFind, userDetails);
 
-        Assertions.assertEquals(expectedMessage, response.getMessage());
+        assertEquals(expectedMessage, response.getMessage());
         Assertions.assertTrue(response.getSuccess());
 
-        Mockito.verify(this.nourishmentRepository).findById(nourishmentIdToFind);
+        verify(this.nourishmentRepository).findById(nourishmentIdToFind);
     }
 
 }

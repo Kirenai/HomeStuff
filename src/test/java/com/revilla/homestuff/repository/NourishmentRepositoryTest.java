@@ -59,7 +59,7 @@ class NourishmentRepositoryTest {
         this.apple = NourishmentServiceDataTestUtils.getNourishmentMock(apple);
         this.banana = NourishmentServiceDataTestUtils.getNourishmentMock(banana);
 
-        this.funwiz = UserServiceDataTestUtils.getMockUser(usernameOne,
+        this.funwiz = UserServiceDataTestUtils.getUserMock(usernameOne,
                 passwordOne, firstNameOne, lastNameOne, age);
 
         this.fruit = CategoryServiceDataTestUtils.getCategoryMock(fruit);

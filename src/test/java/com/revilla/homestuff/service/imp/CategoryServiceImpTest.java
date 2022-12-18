@@ -4,20 +4,17 @@ import com.revilla.homestuff.dto.CategoryDto;
 import com.revilla.homestuff.entity.Category;
 import com.revilla.homestuff.exception.entity.EntityDuplicateConstraintViolationException;
 import com.revilla.homestuff.repository.CategoryRepository;
-import com.revilla.homestuff.service.CategoryService;
 import com.revilla.homestuff.utils.CategoryServiceDataTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,15 +25,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Kirenai
  */
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest
-@ActiveProfiles("test")
 class CategoryServiceImpTest {
 
-    @Autowired
-    private CategoryService categoryService;
-    @MockBean
+    @InjectMocks
+    private CategoryServiceImp categoryService;
+    @Mock
     private CategoryRepository categoryRepository;
-    @MockBean
+    @Mock
     private ModelMapper modelMapper;
 
     private Category categoryOne;

@@ -38,6 +38,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +51,9 @@ class AuthResourceTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -87,6 +92,7 @@ class AuthResourceTest {
 
     @BeforeEach
     void setUp() {
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
         Long userIdOne = 1L;
 
         String username = "kirenai";
@@ -95,9 +101,9 @@ class AuthResourceTest {
         String lastName = "kirenai";
         Byte age = 22;
 
-        this.userMockOne = UserServiceDataTestUtils.getMockUser(userIdOne, username,
+        this.userMockOne = UserServiceDataTestUtils.getUserMock(userIdOne, username,
                 password, firstName, lastName, age);
-        this.userMockOne.setRoles(List.of(RoleServiceDataTestUtils.getMockRole(1L, RoleName.ROLE_ADMIN)));
+        this.userMockOne.setRoles(List.of(RoleServiceDataTestUtils.getRoleMock(1L, RoleName.ROLE_ADMIN)));
 
 
         this.token = this.jwtTokenProvider.getTokenPrefix() +
@@ -145,7 +151,7 @@ class AuthResourceTest {
     @DisplayName("Should register")
     void when_register_then_returnApiResponseDto() throws Exception {
         RegisterRequestDto mockRegisterRequestDto = RegisterRequestDtoDataTest
-                .getMockRegisterRequestDto();
+                .getRegisterRequestDtoMock();
         ApiResponseDto apiResponseMock = ApiResponseDataTestUtils.
                 getApiResponseMock("registered successfully", User.class);
 

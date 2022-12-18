@@ -29,11 +29,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,16 +42,18 @@ import java.util.Optional;
 @WebMvcTest(value = UserResource.class, includeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtTokenProvider.class)
 })
-@ActiveProfiles("test")
 class UserResourceTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
+    private WebApplicationContext webApplicationContext;
+
+    @MockBean
     private JwtTokenProvider jwtTokenProvider;
 
-    @Autowired
+    @MockBean
     private JwtTokenFilter tokenFilter;
 
     @Autowired
@@ -78,6 +81,7 @@ class UserResourceTest {
 
     @BeforeEach
     void setUp() {
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
         Long userIdOne = 1L;
 
         String username = "kirenai";
@@ -86,10 +90,10 @@ class UserResourceTest {
         String lastName = "kirenai";
         Byte age = 22;
 
-        User userMockOne = UserServiceDataTestUtils.getMockUser(userIdOne, username,
+        User userMockOne = UserServiceDataTestUtils.getUserMock(userIdOne, username,
                 password, firstName, lastName, age);
-        userMockOne.setRoles(List.of(RoleServiceDataTestUtils.getMockRole(1L, RoleName.ROLE_ADMIN)));
-        this.userDtoMockOne = UserServiceDataTestUtils.getMockUserDto(userIdOne,
+        userMockOne.setRoles(List.of(RoleServiceDataTestUtils.getRoleMock(1L, RoleName.ROLE_ADMIN)));
+        this.userDtoMockOne = UserServiceDataTestUtils.getUserDtoMock(userIdOne,
                 username, password, firstName, lastName, age);
 
         this.token = this.jwtTokenProvider.getTokenPrefix() +
@@ -112,7 +116,7 @@ class UserResourceTest {
     @DisplayName("Should get users")
     void shouldGetUsers() throws Exception {
         Mockito.when(this.userService.findAll(Mockito.any(Pageable.class)))
-                .thenReturn(List.of(userDtoMockOne));
+                .thenReturn(List.of(this.userDtoMockOne));
 
         RequestBuilder request = MockMvcRequestBuilders
                 .get(this.URL.toString())

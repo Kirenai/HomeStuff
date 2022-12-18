@@ -1,25 +1,23 @@
 package com.revilla.homestuff.entity;
 
-import java.util.Collection;
-import javax.persistence.*;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
+
+import javax.persistence.*;
+import java.util.Collection;
 
 /**
  * User
+ *
  * @author Kirenai
  */
-@Data
 @Builder
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = {"nourishments", "consumptions"})
 @Entity
 @Table(name = "users", uniqueConstraints = {
         @UniqueConstraint(name = "unq_username", columnNames = {"username"})
@@ -46,6 +44,7 @@ public class User {
     @Column(name = "age", nullable = false)
     private Byte age;
 
+    @ToString.Exclude
     @JsonProperty(access = Access.WRITE_ONLY)
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Collection<Nourishment> nourishments;
@@ -58,6 +57,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Collection<Role> roles;
 
+    @ToString.Exclude
     @JsonProperty(access = Access.WRITE_ONLY)
     @OneToMany(mappedBy = "user")
     private Collection<Consumption> consumptions;
