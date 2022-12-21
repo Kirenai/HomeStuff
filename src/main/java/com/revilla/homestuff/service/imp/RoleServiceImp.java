@@ -11,7 +11,6 @@ import com.revilla.homestuff.util.GeneralUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-@Qualifier("role.service")
 public class RoleServiceImp extends GeneralServiceImp<RoleDto, Long, Role> implements RoleService {
 
     private final RoleRepository roleRepository;

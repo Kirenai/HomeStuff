@@ -6,7 +6,6 @@ import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.security.CurrentUser;
 import com.revilla.homestuff.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -23,7 +22,6 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class UserResource {
 
-    @Qualifier("user.service")
     private final UserService userService;
 
     @GetMapping

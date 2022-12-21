@@ -17,7 +17,6 @@ import com.revilla.homestuff.util.enums.MessageAction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +29,6 @@ import javax.transaction.Transactional;
  */
 @Slf4j
 @Service
-@Qualifier("consumption.service")
 @RequiredArgsConstructor
 public class ConsumptionServiceImp extends GeneralServiceImp<ConsumptionDto, Long, Consumption>
         implements ConsumptionService {

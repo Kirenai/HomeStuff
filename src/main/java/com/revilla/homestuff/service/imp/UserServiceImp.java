@@ -14,13 +14,12 @@ import com.revilla.homestuff.util.RoleUtil;
 import com.revilla.homestuff.util.enums.MessageAction;
 import com.revilla.homestuff.util.enums.RoleName;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
@@ -32,7 +31,6 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
-@Qualifier("user.service")
 @RequiredArgsConstructor
 public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> implements UserService {
 

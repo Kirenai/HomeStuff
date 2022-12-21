@@ -1,9 +1,5 @@
 package com.revilla.homestuff.service.imp;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
 import com.revilla.homestuff.dto.AmountNourishmentDto;
 import com.revilla.homestuff.dto.NourishmentDto;
 import com.revilla.homestuff.dto.response.ApiResponseDto;
@@ -21,13 +17,16 @@ import com.revilla.homestuff.util.ConstraintViolation;
 import com.revilla.homestuff.util.Entity;
 import com.revilla.homestuff.util.GeneralUtil;
 import com.revilla.homestuff.util.enums.MessageAction;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * NourishmentService
@@ -36,7 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-@Qualifier("nourishment.service")
 public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Long, Nourishment>
         implements NourishmentService {
 
