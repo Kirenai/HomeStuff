@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 /**
- * AmountNourishementDto
+ * AmountNourishmentDto
  */
 @Data
 @Builder

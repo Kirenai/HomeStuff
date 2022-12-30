@@ -1,7 +1,6 @@
 package com.revilla.homestuff.dto;
 
 import java.util.Collection;
-import javax.validation.constraints.NotEmpty;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.revilla.homestuff.dto.only.NourishmentDtoOnly;
@@ -27,7 +26,6 @@ public class NourishmentDto extends NourishmentDtoOnly {
 
     private Collection<ConsumptionDto> consumptions;
 
-    @NotEmpty
     private AmountNourishmentDto amountNourishment;
 
     private String message;

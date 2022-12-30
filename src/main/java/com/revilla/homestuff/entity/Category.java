@@ -15,6 +15,7 @@ import lombok.*;
  * @author Kirenai
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @ToString
 @Builder
 @AllArgsConstructor
@@ -23,7 +24,7 @@ import lombok.*;
 @Table(name = "categories", uniqueConstraints = {
     @UniqueConstraint(name = "unq_name", columnNames = {"name"})
 })
-public class Category {
+public class Category extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -14,17 +14,17 @@ public class UserServiceDataTestUtils {
                                          String firstName,
                                          String lastName,
                                          Byte age) {
-        return new UserDto(
-                userId,
-                username,
-                password,
-                firstName,
-                lastName,
-                age,
-                Collections.emptySet(),
-                Collections.emptyList(),
-                Collections.emptyList()
-        );
+        return UserDto.builder()
+                .userId(userId)
+                .username(username)
+                .password(password)
+                .firstName(firstName)
+                .lastName(lastName)
+                .age(age)
+                .nourishments(Collections.emptyList())
+                .consumptions(Collections.emptyList())
+                .roles(Collections.emptySet())
+                .build();
     }
 
     public static User getUserMock(String username,
@@ -57,13 +57,13 @@ public class UserServiceDataTestUtils {
                                                String firstName,
                                                String lastName,
                                                Byte age) {
-        return new UserDto(
-                username,
-                password,
-                firstName,
-                lastName,
-                age
-        );
+        return UserDto.builder()
+                .username(username)
+                .password(password)
+                .firstName(firstName)
+                .lastName(lastName)
+                .age(age)
+                .build();
     }
 
 }

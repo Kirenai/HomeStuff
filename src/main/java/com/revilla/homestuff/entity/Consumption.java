@@ -1,11 +1,11 @@
 package com.revilla.homestuff.entity;
 
-import java.math.BigDecimal;
-import javax.persistence.*;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import lombok.*;
+
+import javax.persistence.*;
+import java.math.BigDecimal;
 
 /**
  * Consumption
@@ -13,13 +13,14 @@ import lombok.*;
  * @author Kirenai
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(exclude = {"nourishment"})
 @Entity
 @Table(name = "consumptions")
-public class Consumption {
+public class Consumption extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

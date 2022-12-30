@@ -36,6 +36,7 @@ public class UserDto extends UserDtoOnly {
 
     private String message;
 
+    @Builder
     public UserDto(Long userId, @NotEmpty @Size(min = 2, max = 50) String username,
                    @NotEmpty @Size(min = 8, max = 64) String password,
                    @NotEmpty @Size(min = 2, max = 50) String firstName,
@@ -50,6 +51,7 @@ public class UserDto extends UserDtoOnly {
         this.roles = roles;
     }
 
+    @Builder
     public UserDto(@NotEmpty @Size(min = 2, max = 50) String username,
                    @NotEmpty @Size(min = 8, max = 64) String password,
                    @NotEmpty @Size(min = 2, max = 50) String firstName,
@@ -62,7 +64,7 @@ public class UserDto extends UserDtoOnly {
      * Adding a message to the response
      *
      * @param message of response
-     * @return the object referece (this)
+     * @return the object reference (this)
      */
     public UserDto setMessage(String message) {
         this.message = message;

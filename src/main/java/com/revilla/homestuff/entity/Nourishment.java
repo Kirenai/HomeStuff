@@ -25,6 +25,7 @@ import lombok.*;
  * @author Kirenai
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -33,7 +34,7 @@ import lombok.*;
 @Table(name = "nourishments", uniqueConstraints = {
     @UniqueConstraint(name = "unq_name", columnNames = {"name"})
 })
-public class Nourishment {
+public class Nourishment extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,8 +44,8 @@ public class Nourishment {
     @Column(name = "name", nullable = false, length = 35)
     private String name;
 
-    @Column(name = "image_path")
-    private String imagePath;
+    @Column(name = "image_url")
+    private String imageUrl;
 
     @Column(columnDefinition = "TEXT", name = "description")
     private String description;

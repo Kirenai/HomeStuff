@@ -139,17 +139,17 @@ class NourishmentResourceTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].nourishmentId").value(nourishmentDtoList.get(0).getNourishmentId()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].name").value(nourishmentDtoList.get(0).getName()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].description").value(nourishmentDtoList.get(0).getDescription()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].imagePath").value(nourishmentDtoList.get(0).getImagePath()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].imageUrl").value(nourishmentDtoList.get(0).getImageUrl()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].isAvailable").value(nourishmentDtoList.get(0).getIsAvailable()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].nourishmentId").value(nourishmentDtoList.get(1).getNourishmentId()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].name").value(nourishmentDtoList.get(1).getName()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].description").value(nourishmentDtoList.get(1).getDescription()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].imagePath").value(nourishmentDtoList.get(1).getImagePath()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].imageUrl").value(nourishmentDtoList.get(1).getImageUrl()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].isAvailable").value(nourishmentDtoList.get(1).getIsAvailable()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[2].nourishmentId").value(nourishmentDtoList.get(2).getNourishmentId()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[2].name").value(nourishmentDtoList.get(2).getName()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[2].description").value(nourishmentDtoList.get(2).getDescription()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[2].imagePath").value(nourishmentDtoList.get(2).getImagePath()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[2].imageUrl").value(nourishmentDtoList.get(2).getImageUrl()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[2].isAvailable").value(nourishmentDtoList.get(2).getIsAvailable()));
     }
 
@@ -170,7 +170,7 @@ class NourishmentResourceTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.nourishmentId").value(this.nourishmentDtoOneMock.getNourishmentId()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(this.nourishmentDtoOneMock.getName()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description").value(this.nourishmentDtoOneMock.getDescription()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.imagePath").value(this.nourishmentDtoOneMock.getImagePath()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.imageUrl").value(this.nourishmentDtoOneMock.getImageUrl()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.isAvailable").value(this.nourishmentDtoOneMock.getIsAvailable()));
     }
 
@@ -206,17 +206,17 @@ class NourishmentResourceTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].nourishmentId").value(nourishmentDtoList.get(0).getNourishmentId()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].name").value(nourishmentDtoList.get(0).getName()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].description").value(nourishmentDtoList.get(0).getDescription()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].imagePath").value(nourishmentDtoList.get(0).getImagePath()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].imageUrl").value(nourishmentDtoList.get(0).getImageUrl()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].isAvailable").value(nourishmentDtoList.get(0).getIsAvailable()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].nourishmentId").value(nourishmentDtoList.get(1).getNourishmentId()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].name").value(nourishmentDtoList.get(1).getName()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].description").value(nourishmentDtoList.get(1).getDescription()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].imagePath").value(nourishmentDtoList.get(1).getImagePath()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].imageUrl").value(nourishmentDtoList.get(1).getImageUrl()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].isAvailable").value(nourishmentDtoList.get(1).getIsAvailable()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[2].nourishmentId").value(nourishmentDtoList.get(2).getNourishmentId()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[2].name").value(nourishmentDtoList.get(2).getName()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[2].description").value(nourishmentDtoList.get(2).getDescription()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[2].imagePath").value(nourishmentDtoList.get(2).getImagePath()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[2].imageUrl").value(nourishmentDtoList.get(2).getImageUrl()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[2].isAvailable").value(nourishmentDtoList.get(2).getIsAvailable()));
     }
 
@@ -239,7 +239,7 @@ class NourishmentResourceTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.nourishmentId").value(this.nourishmentDtoOneMock.getNourishmentId()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(this.nourishmentDtoOneMock.getName()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description").value(this.nourishmentDtoOneMock.getDescription()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.imagePath").value(this.nourishmentDtoOneMock.getImagePath()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.imageUrl").value(this.nourishmentDtoOneMock.getImageUrl()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.isAvailable").value(this.nourishmentDtoOneMock.getIsAvailable()));
     }
 

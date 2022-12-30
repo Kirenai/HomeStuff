@@ -12,7 +12,7 @@ import java.util.Collection;
  */
 @Data
 @Builder
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(exclude = {"users"})
@@ -20,7 +20,7 @@ import java.util.Collection;
 @Table(name = "roles", uniqueConstraints = {
         @UniqueConstraint(name = "unq_name", columnNames = {"name"}) 
 })
-public class Role {
+public class Role extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 
 /**
  * NourishmentService
+ *
  * @author Kirenai
  */
 @Slf4j
@@ -65,7 +66,7 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
     @Transactional
     @Override
     public NourishmentDto create(Long userId, Long categoryId, NourishmentDto data,
-            AuthUserDetails userDetails) {
+                                 AuthUserDetails userDetails) {
         log.info("Calling the create method in "
                 + GeneralUtil.simpleNameClass(this.getClass()));
         ConstraintViolation.validateDuplicate(data.getName(), this.nourishmentRepository,
@@ -91,30 +92,30 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
     public ApiResponseDto update(Long id, NourishmentDto data, AuthUserDetails userDetails) {
         log.info("Calling the update method in " + GeneralUtil.simpleNameClass(this.getClass()));
         return this.nourishmentRepository.findById(id)
-                .map(n -> {
-                    GeneralUtil.validateAuthorizationPermissionOrThrow(n, userDetails,
-                            MessageAction.UPDATE);
-                    n.setName(data.getName());
-                    n.setImagePath(data.getImagePath());
-                    n.setDescription(data.getDescription());
-                    AmountNourishmentDto amountNourishmentDto = data.getAmountNourishment();
-                    AmountNourishment amountNourishment = n.getAmountNourishment();
-                    if (Objects.nonNull(amountNourishmentDto)
-                            && Objects.nonNull(amountNourishmentDto.getUnit())
-                            && Objects.nonNull(amountNourishment.getUnit())) {
-                        amountNourishment.setUnit(amountNourishmentDto.getUnit());
-                    }
-                    if (Objects.nonNull(amountNourishmentDto)
-                            && Objects.nonNull(amountNourishmentDto.getPercentage())
-                            && Objects.nonNull(amountNourishment.getPercentage())) {
-                        amountNourishment.setPercentage(amountNourishmentDto.getPercentage());
-                    }
-                    return GeneralUtil.responseMessageAction(Nourishment.class,
-                            "updated successfully");
-                })
+                .map(n -> this.mapOutApiResponseDto(data, n))
                 .orElseThrow(() -> new EntityNoSuchElementException(
                         GeneralUtil.simpleNameClass(Nourishment.class) + " not found with id: "
                                 + id));
+    }
+
+    private ApiResponseDto mapOutApiResponseDto(NourishmentDto data, Nourishment n) {
+        n.setName(data.getName());
+        n.setImageUrl(data.getImageUrl());
+        n.setDescription(data.getDescription());
+        AmountNourishmentDto amountNourishmentDto = data.getAmountNourishment();
+        AmountNourishment amountNourishment = n.getAmountNourishment();
+        if (Objects.nonNull(amountNourishmentDto)
+                && Objects.nonNull(amountNourishmentDto.getUnit())
+                && Objects.nonNull(amountNourishment.getUnit())) {
+            amountNourishment.setUnit(amountNourishmentDto.getUnit());
+        }
+        if (Objects.nonNull(amountNourishmentDto)
+                && Objects.nonNull(amountNourishmentDto.getPercentage())
+                && Objects.nonNull(amountNourishment.getPercentage())) {
+            amountNourishment.setPercentage(amountNourishmentDto.getPercentage());
+        }
+        return GeneralUtil.responseMessageAction(Nourishment.class,
+                "updated successfully");
     }
 
 }

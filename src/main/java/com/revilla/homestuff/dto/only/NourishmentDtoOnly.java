@@ -29,8 +29,7 @@ public class NourishmentDtoOnly {
     private String name;
 
     @NotEmpty
-    @Size(min = 2, max = 45)
-    private String imagePath;
+    private String imageUrl;
 
     private String description;
 
