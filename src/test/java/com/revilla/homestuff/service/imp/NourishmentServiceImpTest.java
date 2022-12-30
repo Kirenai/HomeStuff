@@ -20,10 +20,7 @@ import com.revilla.homestuff.utils.AmountNourishmentServiceDataTestUtils;
 import com.revilla.homestuff.utils.CategoryServiceDataTestUtils;
 import com.revilla.homestuff.utils.NourishmentServiceDataTestUtils;
 import com.revilla.homestuff.utils.UserServiceDataTestUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -368,6 +365,7 @@ class NourishmentServiceImpTest {
 
     @Test
     @DisplayName("Should throw an exception when user is unauthorized  when updating")
+    @Disabled // In NourishmentServiceImp.update the authentication method was removed
     void shouldThrowExceptionWhenUserUnauthenticatedWhenUpdating() {
         Long nourishmentIdToFind = 1L;
         String expected = "You don't have the permission to "
