@@ -6,11 +6,8 @@ import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.entity.Role;
 import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.repository.UserRepository;
-import com.revilla.homestuff.security.jwt.JwtAuthenticationEntryPoint;
-import com.revilla.homestuff.security.jwt.JwtTokenFilter;
 import com.revilla.homestuff.security.jwt.JwtTokenProvider;
 import com.revilla.homestuff.service.RoleService;
-import com.revilla.homestuff.service.imp.AuthUserDetailsServiceImp;
 import com.revilla.homestuff.util.enums.RoleName;
 import com.revilla.homestuff.utils.RoleServiceDataTestUtils;
 import com.revilla.homestuff.utils.UserServiceDataTestUtils;
@@ -26,10 +23,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -43,6 +38,7 @@ import java.util.Optional;
 @WebMvcTest(value = RoleResource.class, includeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtTokenProvider.class)
 })
+@WithMockUser
 class RoleResourceTest {
 
     @Autowired
@@ -50,12 +46,6 @@ class RoleResourceTest {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
-
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-
-    @Autowired
-    private JwtTokenFilter tokenFilter;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -66,17 +56,7 @@ class RoleResourceTest {
     @MockBean
     private UserRepository userRepository;
 
-    @MockBean
-    private AuthUserDetailsServiceImp userDetailsServiceImp;
-
-    @MockBean
-    private PasswordEncoder passwordEncoder;
-
-    @MockBean
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
     private final StringBuilder URL = new StringBuilder("/api/roles");
-    private String token;
 
     private RoleDto roleDtoOneMock;
 
@@ -97,14 +77,6 @@ class RoleResourceTest {
 
         this.roleDtoOneMock = RoleServiceDataTestUtils.getRoleDtoMock(3L, RoleName.ROLE_ADMIN);
 
-        this.token = this.jwtTokenProvider.getTokenPrefix() +
-                this.jwtTokenProvider.generateJwtToken(
-                        new UsernamePasswordAuthenticationToken(
-                                userMockOne.getUsername(),
-                                userMockOne.getPassword()
-                        )
-                );
-
         Mockito.when(this.userRepository.findByUsername(Mockito.anyString()))
                 .thenReturn(Optional.of(userMockOne));
     }
@@ -122,7 +94,6 @@ class RoleResourceTest {
 
         RequestBuilder request = MockMvcRequestBuilders
                 .get(this.URL.toString())
-                .header(HttpHeaders.AUTHORIZATION, this.token)
                 .accept(MediaType.APPLICATION_JSON);
 
         this.mockMvc.perform(request)
@@ -146,7 +117,6 @@ class RoleResourceTest {
 
         RequestBuilder request = MockMvcRequestBuilders
                 .get(this.URL.append("/").append(roleId).toString())
-                .header(HttpHeaders.AUTHORIZATION, this.token)
                 .accept(MediaType.APPLICATION_JSON);
 
         this.mockMvc.perform(request)
@@ -163,7 +133,6 @@ class RoleResourceTest {
 
         RequestBuilder request = MockMvcRequestBuilders
                 .post(this.URL.toString())
-                .header(HttpHeaders.AUTHORIZATION, this.token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(this.objectMapper.writeValueAsBytes(this.roleDtoOneMock))
                 .accept(MediaType.APPLICATION_JSON);
@@ -185,7 +154,6 @@ class RoleResourceTest {
 
         RequestBuilder request = MockMvcRequestBuilders
                 .put(this.URL.append("/").append(roleId).toString())
-                .header(HttpHeaders.AUTHORIZATION, this.token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(this.objectMapper.writeValueAsBytes(this.roleDtoOneMock))
                 .accept(MediaType.APPLICATION_JSON);
@@ -195,6 +163,5 @@ class RoleResourceTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.success").value(apiResponseDto.getSuccess()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(apiResponseDto.getMessage()));
     }
-
 
 }

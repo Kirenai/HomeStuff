@@ -7,11 +7,8 @@ import com.revilla.homestuff.entity.Nourishment;
 import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
 import com.revilla.homestuff.repository.UserRepository;
-import com.revilla.homestuff.security.jwt.JwtAuthenticationEntryPoint;
-import com.revilla.homestuff.security.jwt.JwtTokenFilter;
 import com.revilla.homestuff.security.jwt.JwtTokenProvider;
 import com.revilla.homestuff.service.NourishmentService;
-import com.revilla.homestuff.service.imp.AuthUserDetailsServiceImp;
 import com.revilla.homestuff.util.enums.RoleName;
 import com.revilla.homestuff.utils.AmountNourishmentServiceDataTestUtils;
 import com.revilla.homestuff.utils.NourishmentServiceDataTestUtils;
@@ -29,10 +26,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -46,6 +41,7 @@ import java.util.Optional;
 @WebMvcTest(value = NourishmentResource.class, includeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtTokenProvider.class)
 })
+@WithMockUser
 class NourishmentResourceTest {
 
     @Autowired
@@ -53,12 +49,6 @@ class NourishmentResourceTest {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
-
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-
-    @Autowired
-    private JwtTokenFilter tokenFilter;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -69,17 +59,7 @@ class NourishmentResourceTest {
     @MockBean
     private UserRepository userRepository;
 
-    @MockBean
-    private AuthUserDetailsServiceImp userDetailsServiceImp;
-
-    @MockBean
-    private PasswordEncoder passwordEncoder;
-
-    @MockBean
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
     private final StringBuilder URL = new StringBuilder("/api/nourishments");
-    private String token;
 
     private NourishmentDto nourishmentDtoOneMock;
 
@@ -106,14 +86,6 @@ class NourishmentResourceTest {
                 AmountNourishmentServiceDataTestUtils
                         .getAmountNourishmentDtoMock((byte) 20));
 
-        this.token = this.jwtTokenProvider.getTokenPrefix() +
-                this.jwtTokenProvider.generateJwtToken(
-                        new UsernamePasswordAuthenticationToken(
-                                userMockOne.getUsername(),
-                                userMockOne.getPassword()
-                        )
-                );
-
         Mockito.when(this.userRepository.findByUsername(Mockito.anyString()))
                 .thenReturn(Optional.of(userMockOne));
     }
@@ -130,8 +102,7 @@ class NourishmentResourceTest {
                 .thenReturn(nourishmentDtoList);
 
         RequestBuilder request = MockMvcRequestBuilders
-                .get(this.URL.toString())
-                .header(HttpHeaders.AUTHORIZATION, this.token);
+                .get(this.URL.toString());
 
         this.mockMvc.perform(request)
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -162,7 +133,6 @@ class NourishmentResourceTest {
 
         RequestBuilder request = MockMvcRequestBuilders
                 .get(this.URL.append("/").append(nourishmentId).toString())
-                .header(HttpHeaders.AUTHORIZATION, this.token)
                 .accept(MediaType.APPLICATION_JSON);
 
         this.mockMvc.perform(request)
@@ -182,8 +152,7 @@ class NourishmentResourceTest {
                 .thenThrow(new EntityNoSuchElementException("Nourishment not found with id: " + nourishmentId));
 
         RequestBuilder request = MockMvcRequestBuilders
-                .get(this.URL.append("/").append(nourishmentId).toString())
-                .header(HttpHeaders.AUTHORIZATION, this.token);
+                .get(this.URL.append("/").append(nourishmentId).toString());
 
         this.mockMvc.perform(request)
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -197,8 +166,7 @@ class NourishmentResourceTest {
                 .thenReturn(nourishmentDtoList);
 
         RequestBuilder request = MockMvcRequestBuilders
-                .get(this.URL.append("/stock/").append(true).toString())
-                .header(HttpHeaders.AUTHORIZATION, this.token);
+                .get(this.URL.append("/stock/").append(true).toString());
 
         this.mockMvc.perform(request)
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -230,7 +198,6 @@ class NourishmentResourceTest {
 
         RequestBuilder request = MockMvcRequestBuilders
                 .post(this.URL.append("/user/").append(userId).append("/category/").append(categoryId).toString())
-                .header(HttpHeaders.AUTHORIZATION, this.token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(this.objectMapper.writeValueAsString(this.nourishmentDtoOneMock));
 
@@ -254,7 +221,6 @@ class NourishmentResourceTest {
 
         RequestBuilder request = MockMvcRequestBuilders
                 .put(this.URL.append("/").append(nourishmentId).toString())
-                .header(HttpHeaders.AUTHORIZATION, this.token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(this.objectMapper.writeValueAsString(this.nourishmentDtoOneMock));
 
@@ -274,8 +240,7 @@ class NourishmentResourceTest {
                 .thenReturn(apiResponseDto);
 
         RequestBuilder request = MockMvcRequestBuilders
-                .delete(this.URL.append("/").append(nourishmentId).toString())
-                .header(HttpHeaders.AUTHORIZATION, this.token);
+                .delete(this.URL.append("/").append(nourishmentId).toString());
 
         this.mockMvc.perform(request)
                 .andExpect(MockMvcResultMatchers.status().isOk())

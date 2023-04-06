@@ -6,11 +6,8 @@ import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.entity.Category;
 import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.repository.UserRepository;
-import com.revilla.homestuff.security.jwt.JwtAuthenticationEntryPoint;
-import com.revilla.homestuff.security.jwt.JwtTokenFilter;
 import com.revilla.homestuff.security.jwt.JwtTokenProvider;
 import com.revilla.homestuff.service.CategoryService;
-import com.revilla.homestuff.service.imp.AuthUserDetailsServiceImp;
 import com.revilla.homestuff.util.enums.RoleName;
 import com.revilla.homestuff.utils.CategoryServiceDataTestUtils;
 import com.revilla.homestuff.utils.RoleServiceDataTestUtils;
@@ -27,10 +24,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -44,6 +40,7 @@ import java.util.Optional;
 @WebMvcTest(value = CategoryResource.class, includeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtTokenProvider.class)
 })
+@WithMockUser
 class CategoryResourceTest {
 
     @Autowired
@@ -51,12 +48,6 @@ class CategoryResourceTest {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
-
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-
-    @Autowired
-    private JwtTokenFilter tokenFilter;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -68,16 +59,9 @@ class CategoryResourceTest {
     private UserRepository userRepository;
 
     @MockBean
-    private AuthUserDetailsServiceImp userDetailsServiceImp;
-
-    @MockBean
     private PasswordEncoder passwordEncoder;
 
-    @MockBean
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
     private final StringBuilder URL = new StringBuilder("/api/categories");
-    private String token;
 
     private CategoryDto categoryDtoOneMock;
 
@@ -98,14 +82,6 @@ class CategoryResourceTest {
 
         this.categoryDtoOneMock = CategoryServiceDataTestUtils.getCategoryDtoMock(1L, "Category 1");
 
-        this.token = this.jwtTokenProvider.getTokenPrefix() +
-                this.jwtTokenProvider.generateJwtToken(
-                        new UsernamePasswordAuthenticationToken(
-                                userMockOne.getUsername(),
-                                userMockOne.getPassword()
-                        )
-                );
-
         Mockito.when(this.userRepository.findByUsername(Mockito.anyString()))
                 .thenReturn(Optional.of(userMockOne));
     }
@@ -124,7 +100,6 @@ class CategoryResourceTest {
 
         RequestBuilder request = MockMvcRequestBuilders
                 .get(this.URL.toString())
-                .header(HttpHeaders.AUTHORIZATION, this.token)
                 .accept(MediaType.APPLICATION_JSON);
 
         this.mockMvc.perform(request)
@@ -142,7 +117,6 @@ class CategoryResourceTest {
 
         RequestBuilder request = MockMvcRequestBuilders
                 .get(this.URL.append("/").append(categoryId).toString())
-                .header(HttpHeaders.AUTHORIZATION, this.token)
                 .accept(MediaType.APPLICATION_JSON);
 
         this.mockMvc.perform(request)
@@ -158,7 +132,6 @@ class CategoryResourceTest {
 
         RequestBuilder request = MockMvcRequestBuilders
                 .post(this.URL.toString())
-                .header(HttpHeaders.AUTHORIZATION, this.token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(this.objectMapper.writeValueAsString(this.categoryDtoOneMock))
                 .accept(MediaType.APPLICATION_JSON);
@@ -179,7 +152,6 @@ class CategoryResourceTest {
 
         RequestBuilder request = MockMvcRequestBuilders
                 .put(this.URL.append("/").append(categoryId).toString())
-                .header(HttpHeaders.AUTHORIZATION, this.token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(this.objectMapper.writeValueAsString(this.categoryDtoOneMock))
                 .accept(MediaType.APPLICATION_JSON);

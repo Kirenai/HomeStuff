@@ -4,11 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revilla.homestuff.dto.ConsumptionDto;
 import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.repository.UserRepository;
-import com.revilla.homestuff.security.jwt.JwtAuthenticationEntryPoint;
-import com.revilla.homestuff.security.jwt.JwtTokenFilter;
 import com.revilla.homestuff.security.jwt.JwtTokenProvider;
 import com.revilla.homestuff.service.ConsumptionService;
-import com.revilla.homestuff.service.imp.AuthUserDetailsServiceImp;
 import com.revilla.homestuff.util.enums.RoleName;
 import com.revilla.homestuff.utils.ConsumptionServiceDataTestUtils;
 import com.revilla.homestuff.utils.RoleServiceDataTestUtils;
@@ -24,10 +21,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -41,6 +36,7 @@ import java.util.Optional;
 @WebMvcTest(value = ConsumptionResource.class, includeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtTokenProvider.class)
 })
+@WithMockUser
 class ConsumptionResourceTest {
 
     @Autowired
@@ -48,12 +44,6 @@ class ConsumptionResourceTest {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
-
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-
-    @Autowired
-    private JwtTokenFilter tokenFilter;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -64,17 +54,7 @@ class ConsumptionResourceTest {
     @MockBean
     private UserRepository userRepository;
 
-    @MockBean
-    private AuthUserDetailsServiceImp userDetailsServiceImp;
-
-    @MockBean
-    private PasswordEncoder passwordEncoder;
-
-    @MockBean
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
     private final StringBuilder URL = new StringBuilder("/api/consumptions");
-    private String token;
 
     private ConsumptionDto consumptionDtoOneMock;
 
@@ -95,14 +75,6 @@ class ConsumptionResourceTest {
 
         this.consumptionDtoOneMock = ConsumptionServiceDataTestUtils.getConsumptionDtoMock(1L, (byte) 5);
 
-        this.token = this.jwtTokenProvider.getTokenPrefix() +
-                this.jwtTokenProvider.generateJwtToken(
-                        new UsernamePasswordAuthenticationToken(
-                                userMockOne.getUsername(),
-                                userMockOne.getPassword()
-                        )
-                );
-
         Mockito.when(this.userRepository.findByUsername(Mockito.anyString()))
                 .thenReturn(Optional.of(userMockOne));
     }
@@ -120,7 +92,6 @@ class ConsumptionResourceTest {
 
         RequestBuilder request = MockMvcRequestBuilders
                 .get(this.URL.toString())
-                .header(HttpHeaders.AUTHORIZATION, this.token)
                 .accept(MediaType.APPLICATION_JSON);
 
         this.mockMvc.perform(request)
@@ -140,7 +111,6 @@ class ConsumptionResourceTest {
 
         RequestBuilder request = MockMvcRequestBuilders
                 .get(this.URL.append("/").append(consumptionId).toString())
-                .header(HttpHeaders.AUTHORIZATION, this.token)
                 .accept(MediaType.APPLICATION_JSON);
 
         this.mockMvc.perform(request)
@@ -158,7 +128,6 @@ class ConsumptionResourceTest {
 
         RequestBuilder request = MockMvcRequestBuilders
                 .post(this.URL.append("/nourishment/").append(nourishmentId).append("/user/").append(userId).toString())
-                .header(HttpHeaders.AUTHORIZATION, this.token)
                 .content(this.objectMapper.writeValueAsString(this.consumptionDtoOneMock))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON);

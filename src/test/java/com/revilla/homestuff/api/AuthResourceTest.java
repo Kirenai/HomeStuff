@@ -9,7 +9,6 @@ import com.revilla.homestuff.repository.RoleRepository;
 import com.revilla.homestuff.repository.UserRepository;
 import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.security.jwt.JwtAuthenticationEntryPoint;
-import com.revilla.homestuff.security.jwt.JwtTokenFilter;
 import com.revilla.homestuff.security.jwt.JwtTokenProvider;
 import com.revilla.homestuff.service.AuthService;
 import com.revilla.homestuff.service.UserService;
@@ -29,11 +28,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -47,6 +45,7 @@ import java.util.Optional;
 @WebMvcTest(value = AuthResource.class, includeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtTokenProvider.class)
 })
+@WithMockUser
 class AuthResourceTest {
 
     @Autowired
@@ -54,12 +53,6 @@ class AuthResourceTest {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
-
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-
-    @Autowired
-    private JwtTokenFilter tokenFilter;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -86,7 +79,6 @@ class AuthResourceTest {
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     private final StringBuilder URL = new StringBuilder("/api/auth");
-    private String token;
 
     private User userMockOne;
 
@@ -105,15 +97,6 @@ class AuthResourceTest {
                 password, firstName, lastName, age);
         this.userMockOne.setRoles(List.of(RoleServiceDataTestUtils.getRoleMock(1L, RoleName.ROLE_ADMIN)));
 
-
-        this.token = this.jwtTokenProvider.getTokenPrefix() +
-                this.jwtTokenProvider.generateJwtToken(
-                        new UsernamePasswordAuthenticationToken(
-                                userMockOne.getUsername(),
-                                userMockOne.getPassword()
-                        )
-                );
-
         Mockito.when(this.userRepository.findByUsername(Mockito.anyString()))
                 .thenReturn(Optional.of(userMockOne));
     }
@@ -125,7 +108,6 @@ class AuthResourceTest {
 
         ResponseEntity<AuthUserDetails> authUserDetailsResponseMock = ResponseEntity
                 .ok()
-                .header(HttpHeaders.AUTHORIZATION, this.token)
                 .body(new AuthUserDetails(this.userMockOne));
 
         Mockito.when(this.authService.login(Mockito.any(LoginRequestDto.class)))
@@ -138,10 +120,6 @@ class AuthResourceTest {
 
         this.mockMvc.perform(request)
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.header().string(
-                        HttpHeaders.AUTHORIZATION,
-                        this.token
-                ))
                 .andExpect(MockMvcResultMatchers.content().json(
                         this.objectMapper.writeValueAsString(authUserDetailsResponseMock.getBody())
                 ));

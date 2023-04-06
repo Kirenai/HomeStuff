@@ -5,11 +5,8 @@ import com.revilla.homestuff.dto.UserDto;
 import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.repository.UserRepository;
-import com.revilla.homestuff.security.jwt.JwtAuthenticationEntryPoint;
-import com.revilla.homestuff.security.jwt.JwtTokenFilter;
 import com.revilla.homestuff.security.jwt.JwtTokenProvider;
 import com.revilla.homestuff.service.UserService;
-import com.revilla.homestuff.service.imp.AuthUserDetailsServiceImp;
 import com.revilla.homestuff.util.enums.RoleName;
 import com.revilla.homestuff.utils.RoleServiceDataTestUtils;
 import com.revilla.homestuff.utils.UserServiceDataTestUtils;
@@ -25,10 +22,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -42,6 +37,7 @@ import java.util.Optional;
 @WebMvcTest(value = UserResource.class, includeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtTokenProvider.class)
 })
+@WithMockUser
 class UserResourceTest {
 
     @Autowired
@@ -49,12 +45,6 @@ class UserResourceTest {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
-
-    @MockBean
-    private JwtTokenProvider jwtTokenProvider;
-
-    @MockBean
-    private JwtTokenFilter tokenFilter;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -65,19 +55,9 @@ class UserResourceTest {
     @MockBean
     private UserRepository userRepository;
 
-    @MockBean
-    private AuthUserDetailsServiceImp userDetailsServiceImp;
-
-    @MockBean
-    private PasswordEncoder passwordEncoder;
-
-    @MockBean
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
     private UserDto userDtoMockOne;
 
     private final StringBuilder URL = new StringBuilder("/api/users");
-    private String token;
 
     @BeforeEach
     void setUp() {
@@ -96,14 +76,6 @@ class UserResourceTest {
         this.userDtoMockOne = UserServiceDataTestUtils.getUserDtoMock(userIdOne,
                 username, password, firstName, lastName, age);
 
-        this.token = this.jwtTokenProvider.getTokenPrefix() +
-                this.jwtTokenProvider.generateJwtToken(
-                        new UsernamePasswordAuthenticationToken(
-                                userMockOne.getUsername(),
-                                userMockOne.getPassword()
-                        )
-                );
-
         Mockito.when(this.userRepository.findByUsername(Mockito.anyString()))
                 .thenReturn(Optional.of(userMockOne));
     }
@@ -120,7 +92,6 @@ class UserResourceTest {
 
         RequestBuilder request = MockMvcRequestBuilders
                 .get(this.URL.toString())
-                .header(HttpHeaders.AUTHORIZATION, this.token)
                 .accept(MediaType.APPLICATION_JSON);
 
         this.mockMvc
@@ -139,7 +110,6 @@ class UserResourceTest {
 
         RequestBuilder request = MockMvcRequestBuilders
                 .get(this.URL.append("/1").toString())
-                .header(HttpHeaders.AUTHORIZATION, this.token)
                 .accept(MediaType.APPLICATION_JSON);
 
         this.mockMvc
@@ -157,7 +127,6 @@ class UserResourceTest {
 
         RequestBuilder request = MockMvcRequestBuilders
                 .post(this.URL.toString())
-                .header(HttpHeaders.AUTHORIZATION, this.token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(this.objectMapper.writeValueAsString(userDtoMockOne));
 
@@ -178,7 +147,6 @@ class UserResourceTest {
 
         RequestBuilder request = MockMvcRequestBuilders
                 .put(this.URL.append("/1").toString())
-                .header(HttpHeaders.AUTHORIZATION, this.token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(this.objectMapper.writeValueAsString(userDtoMockOne));
 
@@ -199,7 +167,6 @@ class UserResourceTest {
 
         RequestBuilder request = MockMvcRequestBuilders
                 .delete(this.URL.append("/1").toString())
-                .header(HttpHeaders.AUTHORIZATION, this.token)
                 .contentType(MediaType.APPLICATION_JSON);
 
         this.mockMvc
