@@ -21,6 +21,7 @@ public class EntityExceptionHandler {
     @ResponseStatus(code = HttpStatus.NOT_FOUND)
     public EntityErrorMessage entityNoSuchElement(EntityNoSuchElementException ex,
                                                   WebRequest request) {
+        log.error("Invoking EntityExceptionHandler.entityNoSuchElement method");
         log.error("Error: " + ex.getMessage());
         return new EntityErrorMessage(
                 HttpStatus.NOT_FOUND.value(),
@@ -35,6 +36,7 @@ public class EntityExceptionHandler {
     public EntityErrorMessage entityDuplicateConstraintViolation(
             EntityDuplicateConstraintViolationException ex,
             WebRequest request) {
+        log.error("Invoking EntityExceptionHandler.entityDuplicateConstraintViolation method");
         log.error("Error: " + ex.getMessage());
         return new EntityErrorMessage(
                 HttpStatus.BAD_REQUEST.value(),

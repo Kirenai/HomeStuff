@@ -11,13 +11,14 @@ import com.revilla.homestuff.util.Entity;
 import com.revilla.homestuff.util.GeneralUtil;
 import com.revilla.homestuff.util.enums.MessageAction;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.revilla.homestuff.util.GeneralUtil.simpleNameClass;
 
 /**
  * GeneralServiceImp
@@ -31,7 +32,6 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
     private Class<T> firstGeneric;
     private Class<E> thirdGeneric;
 
-    @SuppressWarnings("unchecked") // idk, but work
     public Class<T> getFirstGenericClass() {
         if (firstGeneric == null) {
             firstGeneric = (Class<T>) Objects.requireNonNull(GenericTypeResolver
@@ -40,7 +40,6 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
         return firstGeneric;
     }
 
-    @SuppressWarnings("unchecked") // idk, but work
     public Class<E> getThirdGenericClass() {
         if (thirdGeneric == null) {
             thirdGeneric = (Class<E>) Objects.requireNonNull(GenericTypeResolver
@@ -51,8 +50,7 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
 
     @Override
     public List<T> findAll(Pageable pageable) {
-        log.info("Calling the findAll method in "
-                + GeneralUtil.simpleNameClass(this.getClass()));
+        log.info("Invoking {}.findAll method", simpleNameClass(this.getClass()));
         return this.getRepo().findAll(pageable)
                 .getContent()
                 .stream()
@@ -62,8 +60,7 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
 
     @Override
     public T findOne(ID id, AuthUserDetails userDetails) {
-        log.info("Calling the findOne method in "
-                + GeneralUtil.simpleNameClass(this.getClass()));
+        log.info("Invoking {}.findOne method", simpleNameClass(this.getClass()));
         E obj = Entity.getById(id, this.getRepo(), this.getThirdGenericClass());
         GeneralUtil.validateAuthorizationPermissionOrThrow(obj, userDetails, MessageAction.ACCESS);
         return this.getModelMapper().map(obj, this.getFirstGenericClass());
@@ -72,8 +69,7 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
     @Override
     @Transactional
     public ApiResponseDto delete(ID id, AuthUserDetails userDetails) {
-        log.info("Calling the delete method in "
-                + GeneralUtil.simpleNameClass(this.getClass()));
+        log.info("Invoking {}.delete method", simpleNameClass(this.getClass()));
         E obj = Entity.getById(id, this.getRepo(), this.getThirdGenericClass());
         GeneralUtil.validateAuthorizationPermissionOrThrow(obj, userDetails, MessageAction.DELETE);
         this.getRepo().delete(obj);

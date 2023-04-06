@@ -39,7 +39,7 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public ResponseEntity<AuthUserDetails> login(LoginRequestDto loginRequestDto) {
-        log.info("login({}})", loginRequestDto);
+        log.info("Invoking AuthServiceImp.login method");
         Authentication authentication = this.authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequestDto.getUsername(),
@@ -56,8 +56,7 @@ public class AuthServiceImp implements AuthService {
     @Transactional
     @Override
     public ApiResponseDto register(RegisterRequestDto requestDto) {
-        log.info("Calling the register method in "
-                + GeneralUtil.simpleNameClass(this.getClass()));
+        log.info("Invoking AuthServiceImp.register method");
         ConstraintViolation.validateDuplicate(requestDto.getUsername(),
                 this.userRepository, User.class);
         User user = this.modelMapper.map(requestDto, User.class);

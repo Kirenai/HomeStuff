@@ -3,15 +3,18 @@ package com.revilla.homestuff.util.consumption;
 import com.revilla.homestuff.dto.ConsumptionDto;
 import com.revilla.homestuff.entity.AmountNourishment;
 import com.revilla.homestuff.entity.Nourishment;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 
+@Slf4j
 public class CheckingValueAmountAndProcessing {
 
     public static void process(ConsumptionDto data,
                                AmountNourishment amountNourishment,
                                Nourishment nourishment) {
+        log.info("Invoking CheckingValueAmountAndProcessing.process method");
         if (Objects.nonNull(data.getUnit())) {
             if (Byte.toUnsignedInt(data.getUnit()) > Byte
                     .toUnsignedInt(amountNourishment.getUnit())) {

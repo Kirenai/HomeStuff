@@ -6,6 +6,7 @@ import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.security.CurrentUser;
 import com.revilla.homestuff.service.RoleService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -21,6 +22,7 @@ import java.util.List;
  * RoleResource
  * @author Kirenai
  */
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/roles")
@@ -36,6 +38,7 @@ public class RoleResource {
                 @SortDefault(sort = "roleId", direction = Sort.Direction.ASC)
         }) Pageable pageable
     ) {
+        log.info("Invoking RoleResource.getRoles method");
         List<RoleDto> response = this.roleService.findAll(pageable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -44,6 +47,7 @@ public class RoleResource {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RoleDto> getRole(@PathVariable Long roleId,
                                            @CurrentUser AuthUserDetails userDetails) {
+        log.info("Invoking RoleResource.getRole method");
         RoleDto response = this.roleService.findOne(roleId, userDetails);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -51,6 +55,7 @@ public class RoleResource {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RoleDto> createRole(@RequestBody RoleDto roleDto) {
+        log.info("Invoking RoleResource.createRole method");
         RoleDto response = this.roleService.create(roleDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -59,6 +64,7 @@ public class RoleResource {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponseDto> updateRole(@PathVariable Long roleId,
                                               @RequestBody RoleDto roleDto) {
+        log.info("Invoking RoleResource.updateRole method");
         ApiResponseDto response = this.roleService.update(roleId, roleDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

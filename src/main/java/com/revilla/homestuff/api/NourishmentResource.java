@@ -5,6 +5,7 @@ import com.revilla.homestuff.dto.response.ApiResponseDto;
 import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.security.CurrentUser;
 import com.revilla.homestuff.service.NourishmentService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -21,6 +22,7 @@ import java.util.List;
  * NourishmentResource
  * @author Kirenai
  */
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @CrossOrigin
@@ -37,6 +39,7 @@ public class NourishmentResource {
                     @SortDefault(sort = "nourishmentId", direction = Sort.Direction.ASC)
             }) Pageable pageable
     ) {
+        log.info("Invoking NourishmentResource.getNourishments method");
         List<NourishmentDto> response = this.nourishmentService.findAll(pageable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -47,6 +50,7 @@ public class NourishmentResource {
             @PathVariable Long nourishmentId,
             @CurrentUser AuthUserDetails userDetails
     ) {
+        log.info("Invoking NourishmentResource.getNourishment method");
         NourishmentDto response = this.nourishmentService.findOne(nourishmentId,
                 userDetails);
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -56,6 +60,7 @@ public class NourishmentResource {
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
     public ResponseEntity<List<NourishmentDto>> getNourishmentStockStatus(
             @PathVariable("is_available") boolean isAvailable) {
+        log.info("Invoking NourishmentResource.getNourishmentStockStatus method");
         List<NourishmentDto> response = this.nourishmentService.findAllNourishmentByStatus(isAvailable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -68,6 +73,7 @@ public class NourishmentResource {
             @RequestBody NourishmentDto nourishmentDto,
             @CurrentUser AuthUserDetails userDetails
     ) {
+        log.info("Invoking NourishmentResource.createNourishment method");
         NourishmentDto response = this.nourishmentService.create(
                 userId,
                 categoryId,
@@ -84,6 +90,7 @@ public class NourishmentResource {
             @RequestBody NourishmentDto nourishmentDto,
             @CurrentUser AuthUserDetails userDetails
     ) {
+        log.info("Invoking NourishmentResource.updateNourishment method");
         ApiResponseDto response = this.nourishmentService.update(nourishmentId,
                 nourishmentDto, userDetails);
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -94,6 +101,7 @@ public class NourishmentResource {
     public ResponseEntity<ApiResponseDto> deleteNourishment(
             @PathVariable Long nourishmentId,
             @CurrentUser AuthUserDetails userDetails) {
+        log.info("Invoking NourishmentResource.deleteNourishment method");
         ApiResponseDto response = this.nourishmentService.delete(nourishmentId, userDetails);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

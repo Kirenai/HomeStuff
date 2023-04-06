@@ -56,7 +56,7 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
 
     @Override
     public List<NourishmentDto> findAllNourishmentByStatus(boolean isAvailable) {
-        log.info("findAllNourishmentByStatus({})", isAvailable);
+        log.info("Invoking NourishmentServiceImp.findAllNourishmentByStatus method");
         return this.nourishmentRepository.findByIsAvailable(isAvailable)
                 .stream()
                 .map(nourishment -> this.getModelMapper().map(nourishment, super.getFirstGenericClass()))
@@ -67,8 +67,7 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
     @Override
     public NourishmentDto create(Long userId, Long categoryId, NourishmentDto data,
                                  AuthUserDetails userDetails) {
-        log.info("Calling the create method in "
-                + GeneralUtil.simpleNameClass(this.getClass()));
+        log.info("Invoking NourishmentServiceImp.create method");
         ConstraintViolation.validateDuplicate(data.getName(), this.nourishmentRepository,
                 Nourishment.class);
         Nourishment nourishment = this.getModelMapper().map(data, super.getThirdGenericClass());
@@ -90,7 +89,7 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
     @Transactional
     @Override
     public ApiResponseDto update(Long id, NourishmentDto data, AuthUserDetails userDetails) {
-        log.info("Calling the update method in " + GeneralUtil.simpleNameClass(this.getClass()));
+        log.info("Invoking NourishmentServiceImp.update method");
         return this.nourishmentRepository.findById(id)
                 .map(n -> this.mapOutApiResponseDto(data, n))
                 .orElseThrow(() -> new EntityNoSuchElementException(

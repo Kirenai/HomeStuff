@@ -5,6 +5,7 @@ import com.revilla.homestuff.entity.Role;
 import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
 import com.revilla.homestuff.repository.RoleRepository;
 import com.revilla.homestuff.util.enums.RoleName;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -16,10 +17,12 @@ import java.util.stream.Collectors;
  *
  * @author Kirenai
  */
+@Slf4j
 public class RoleUtil {
 
     public static Role getRoleByNameOrThrow(RoleName name,
                                             RoleRepository repo) {
+        log.info("Invoking RoleUtil.getRoleByNameOrThrow method");
         return repo.findByName(name.name())
                 .orElseThrow(() -> new EntityNoSuchElementException(
                         GeneralUtil.simpleNameClass(Role.class)
@@ -35,6 +38,7 @@ public class RoleUtil {
      */
     public static Set<Role> getSetOfRolesOrThrow(Collection<RoleDtoOnly> roleDto,
                                                  RoleRepository repo) {
+        log.info("Invoking RoleUtil.getSetOfRolesOrThrow method");
         if (Objects.isNull(roleDto)) {
             return Set.of(getRoleByNameOrThrow(RoleName.ROLE_USER, repo));
         }

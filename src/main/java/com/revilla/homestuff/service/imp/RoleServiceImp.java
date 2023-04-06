@@ -39,8 +39,7 @@ public class RoleServiceImp extends GeneralServiceImp<RoleDto, Long, Role> imple
 
     @Override
     public RoleDto create(RoleDto data) {
-        log.info("Calling the create method in "
-                + GeneralUtil.simpleNameClass(this.getClass()));
+        log.info("Invoking RoleServiceImp.create method");
         ConstraintViolation.validateDuplicate(data.getName().name(),
                 this.roleRepository, Role.class);
         Role role = this.getModelMapper().map(data, super.getThirdGenericClass());
@@ -50,8 +49,7 @@ public class RoleServiceImp extends GeneralServiceImp<RoleDto, Long, Role> imple
 
     @Override
     public ApiResponseDto update(Long id, RoleDto data) {
-        log.info("Calling the update method in "
-                + GeneralUtil.simpleNameClass(this.getClass()));
+        log.info("Invoking RoleServiceImp.update method");
         return this.roleRepository.findById(id)
                 .map(role -> {
                     role.setName(data.getName().name());

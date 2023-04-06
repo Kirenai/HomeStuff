@@ -52,7 +52,7 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
     @Transactional
     @Override
     public UserDto create(UserDto data) {
-        log.info("Calling the create method in " + GeneralUtil.simpleNameClass(this.getClass()));
+        log.info("Invoking UserServiceImp.create method");
         ConstraintViolation.validateDuplicate(data.getUsername(), this.userRepository, User.class);
         // TODO: Add an input and output mapper in the appropriate class for all entities
         User user = this.getModelMapper().map(data, super.getThirdGenericClass());
@@ -67,7 +67,7 @@ public class UserServiceImp extends GeneralServiceImp<UserDto, Long, User> imple
     @Transactional
     @Override
     public ApiResponseDto update(Long id, UserDto data, AuthUserDetails userDetails) {
-        log.info("Calling the update method in " + GeneralUtil.simpleNameClass(this.getClass()));
+        log.info("Invoking UserServiceImp.update method");
         return this.userRepository.findById(id)
                 .map(user -> {
                     GeneralUtil.validateAuthorizationPermissionOrThrow(user, userDetails,

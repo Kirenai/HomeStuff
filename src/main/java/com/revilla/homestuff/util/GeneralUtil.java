@@ -9,6 +9,7 @@ import com.revilla.homestuff.exception.unauthorize.UnauthorizedPermissionExcepti
 import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.util.enums.MessageAction;
 import com.revilla.homestuff.util.enums.RoleName;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -17,12 +18,14 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
  *
  * @author Kirenai
  */
+@Slf4j
 public class GeneralUtil {
 
     public static <E> void validateAuthorizationPermissionOrThrow(
             @NotNull E obj,
             @NotNull AuthUserDetails userDetails,
             @NotNull MessageAction action) {
+        log.info("Invoking GeneralUtil.validateAuthorizationPermissionOrThrow method");
         String errorMessage = null;
         if (obj instanceof User user) {
             if (user.getUserId().equals(userDetails.getUserId())

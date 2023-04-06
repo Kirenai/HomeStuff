@@ -21,6 +21,7 @@ public class UnauthorizedExceptionHandler {
     public UnauthorizedErrorMessage unauthorizedPermissionViolation(
             UnauthorizedPermissionException ex,
             WebRequest request) {
+        log.error("Invoking UnauthorizedExceptionHandler.unauthorizedPermissionViolation method");
         log.error("Error: " + ex.getMessage());
         return new UnauthorizedErrorMessage(
                 HttpStatus.UNAUTHORIZED.value(),

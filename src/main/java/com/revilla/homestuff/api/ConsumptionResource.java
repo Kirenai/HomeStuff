@@ -5,6 +5,7 @@ import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.security.CurrentUser;
 import com.revilla.homestuff.service.ConsumptionService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -20,6 +21,7 @@ import java.util.List;
  * ConsumptionResource
  * @author Kirenai
  */
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/consumptions")
@@ -35,6 +37,7 @@ public class ConsumptionResource {
                     @SortDefault(sort = "consumptionId", direction = Sort.Direction.ASC)
             }) Pageable pageable
     ) {
+        log.info("Invoking ConsumptionResource.getConsumptions method");
         List<ConsumptionDto> response = this.consumptionService.findAll(pageable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -45,6 +48,7 @@ public class ConsumptionResource {
             @PathVariable Long consumptionId,
             @CurrentUser AuthUserDetails userDetails
     ) {
+        log.info("Invoking ConsumptionResource.getConsumption method");
         ConsumptionDto response = this.consumptionService.findOne(consumptionId,
                 userDetails);
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -57,6 +61,7 @@ public class ConsumptionResource {
             @PathVariable Long userId,
             @RequestBody ConsumptionDto consumptionDto,
             @CurrentUser AuthUserDetails userDetails) {
+        log.info("Invoking ConsumptionResource.createConsumption method");
         ConsumptionDto response = this.consumptionService.create(nourishmentId,
                 userId, consumptionDto, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

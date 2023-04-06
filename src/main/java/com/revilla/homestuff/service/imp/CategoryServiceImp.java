@@ -42,7 +42,7 @@ public class CategoryServiceImp extends GeneralServiceImp<CategoryDto, Long, Cat
     @Transactional
     @Override
     public CategoryDto create(CategoryDto data) {
-        log.info("Calling the create method in " + getClass());
+        log.info("Invoking CategoryServiceImp.create method");
         ConstraintViolation.validateDuplicate(data.getName(),
                 this.categoryRepository, Category.class);
         Category category = this.getModelMapper().map(data, super.getThirdGenericClass());
@@ -53,7 +53,7 @@ public class CategoryServiceImp extends GeneralServiceImp<CategoryDto, Long, Cat
     @Transactional
     @Override
     public ApiResponseDto update(Long id, CategoryDto data) {
-        log.info("Calling the update method in " + getClass());
+        log.info("Invoking CategoryServiceImp.update method");
         return this.categoryRepository.findById(id).map(c -> {
             c.setName(data.getName());
             return GeneralUtil.responseMessageAction(Category.class, "updated successfully");

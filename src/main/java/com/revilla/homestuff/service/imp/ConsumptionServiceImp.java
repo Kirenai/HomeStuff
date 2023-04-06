@@ -55,8 +55,7 @@ public class ConsumptionServiceImp extends GeneralServiceImp<ConsumptionDto, Lon
             Long userId,
             ConsumptionDto data,
             AuthUserDetails userDetails) {
-        log.info("Calling the create method in "
-                + GeneralUtil.simpleNameClass(this.getClass()));
+        log.info("Invoking ConsumptionServiceImp.create method");
         User user = Entity.getById(userId, this.userRepository, User.class);
         Nourishment nourishment = Entity.getById(nourishmentId,
                 this.nourishmentRepository, Nourishment.class);
