@@ -2,6 +2,8 @@ package com.revilla.homestuff.config;
 
 import com.revilla.homestuff.security.jwt.JwtAuthenticationEntryPoint;
 import com.revilla.homestuff.security.jwt.JwtTokenFilter;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@SecurityScheme(name = "Bearer Authentication", type = SecuritySchemeType.HTTP, bearerFormat = "JWT", scheme = "bearer")
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -40,6 +43,8 @@ public class SecurityConfig {
         http.cors().and().csrf().disable()
                 .authorizeHttpRequests(authorize -> authorize
                         .antMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+                        .antMatchers("/api-docs").permitAll()
+                        .antMatchers("/docs/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(e -> e.authenticationEntryPoint(this.jwtAuthenticationEntryPoint))
