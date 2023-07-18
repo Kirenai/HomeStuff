@@ -31,6 +31,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,7 +61,7 @@ class UserResourceTest {
     private final StringBuilder URL = new StringBuilder("/api/users");
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
         Long userIdOne = 1L;
 
@@ -73,8 +74,7 @@ class UserResourceTest {
         User userMockOne = UserServiceDataTestUtils.getUserMock(userIdOne, username,
                 password, firstName, lastName, age);
         userMockOne.setRoles(List.of(RoleServiceDataTestUtils.getRoleMock(1L, RoleName.ROLE_ADMIN)));
-        this.userDtoMockOne = UserServiceDataTestUtils.getUserDtoMock(userIdOne,
-                username, password, firstName, lastName, age);
+        this.userDtoMockOne = UserServiceDataTestUtils.getInstance().getUserDto();
 
         Mockito.when(this.userRepository.findByUsername(Mockito.anyString()))
                 .thenReturn(Optional.of(userMockOne));
