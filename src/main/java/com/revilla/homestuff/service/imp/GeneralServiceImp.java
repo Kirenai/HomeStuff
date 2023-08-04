@@ -1,22 +1,23 @@
 package com.revilla.homestuff.service.imp;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import com.revilla.homestuff.dto.response.ApiResponseDto;
+import com.revilla.homestuff.mapper.GenericMapper;
 import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.service.GeneralService;
 import com.revilla.homestuff.util.Entity;
 import com.revilla.homestuff.util.GeneralUtil;
 import com.revilla.homestuff.util.enums.MessageAction;
-import org.modelmapper.ModelMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.revilla.homestuff.util.GeneralUtil.simpleNameClass;
 
@@ -29,16 +30,7 @@ import static com.revilla.homestuff.util.GeneralUtil.simpleNameClass;
 @Service
 public abstract class GeneralServiceImp<T, ID extends Serializable, E> implements GeneralService<T, ID> {
 
-    private Class<T> firstGeneric;
     private Class<E> thirdGeneric;
-
-    public Class<T> getFirstGenericClass() {
-        if (firstGeneric == null) {
-            firstGeneric = (Class<T>) Objects.requireNonNull(GenericTypeResolver
-                    .resolveTypeArguments(this.getClass(), GeneralServiceImp.class))[0];
-        }
-        return firstGeneric;
-    }
 
     public Class<E> getThirdGenericClass() {
         if (thirdGeneric == null) {
@@ -54,7 +46,7 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
         return this.getRepo().findAll(pageable)
                 .getContent()
                 .stream()
-                .map(obj -> this.getModelMapper().map(obj, this.getFirstGenericClass()))
+                .map(this.getMapper()::mapOut)
                 .collect(Collectors.toList());
     }
 
@@ -63,7 +55,7 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
         log.info("Invoking {}.findOne method", simpleNameClass(this.getClass()));
         E obj = Entity.getById(id, this.getRepo(), this.getThirdGenericClass());
         GeneralUtil.validateAuthorizationPermissionOrThrow(obj, userDetails, MessageAction.ACCESS);
-        return this.getModelMapper().map(obj, this.getFirstGenericClass());
+        return this.getMapper().mapOut(obj);
     }
 
     @Override
@@ -78,7 +70,6 @@ public abstract class GeneralServiceImp<T, ID extends Serializable, E> implement
     }
 
     public abstract JpaRepository<E, ID> getRepo();
-
-    public abstract ModelMapper getModelMapper();
+    public abstract GenericMapper<T, E> getMapper();
 
 }

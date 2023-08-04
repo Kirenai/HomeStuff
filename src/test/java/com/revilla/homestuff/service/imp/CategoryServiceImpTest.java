@@ -3,6 +3,7 @@ package com.revilla.homestuff.service.imp;
 import com.revilla.homestuff.dto.CategoryDto;
 import com.revilla.homestuff.entity.Category;
 import com.revilla.homestuff.exception.entity.EntityDuplicateConstraintViolationException;
+import com.revilla.homestuff.mapper.category.CategoryMapper;
 import com.revilla.homestuff.repository.CategoryRepository;
 import com.revilla.homestuff.utils.CategoryServiceDataTestUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -32,7 +32,7 @@ class CategoryServiceImpTest {
     @Mock
     private CategoryRepository categoryRepository;
     @Mock
-    private ModelMapper modelMapper;
+    private CategoryMapper categoryMapper;
 
     private Category categoryOne;
     private CategoryDto categoryDtoOne;
@@ -73,11 +73,11 @@ class CategoryServiceImpTest {
     void shouldCreateCategoryWhenCreate() {
         Mockito.when(this.categoryRepository.existsByName(Mockito.anyString()))
                 .thenReturn(false);
-        Mockito.when(this.modelMapper.map(Mockito.any(), Mockito.eq(Category.class)))
+        Mockito.when(this.categoryMapper.mapIn(ArgumentMatchers.any()))
                 .thenReturn(this.categoryOne);
         Mockito.when(this.categoryRepository.save(ArgumentMatchers.any(Category.class)))
                 .thenReturn(this.categoryOne);
-        Mockito.when(this.modelMapper.map(Mockito.any(), Mockito.eq(CategoryDto.class)))
+        Mockito.when(this.categoryMapper.mapOut(ArgumentMatchers.any()))
                 .thenReturn(this.categoryDtoOne);
 
         CategoryDto response = this.categoryService.create(this.categoryDtoOne);
@@ -86,12 +86,12 @@ class CategoryServiceImpTest {
 
         Mockito.verify(this.categoryRepository, Mockito.times(1))
                 .existsByName(this.categoryDtoOne.getName());
-        Mockito.verify(this.modelMapper, Mockito.times(1))
-                .map(this.categoryDtoOne, Category.class);
+        Mockito.verify(this.categoryMapper, Mockito.times(1))
+                .mapIn(ArgumentMatchers.any());
         Mockito.verify(this.categoryRepository, Mockito.times(1))
                 .save(this.categoryOne);
-        Mockito.verify(this.modelMapper, Mockito.times(1))
-                .map(this.categoryOne, CategoryDto.class);
+        Mockito.verify(this.categoryMapper, Mockito.times(1))
+                .mapOut(ArgumentMatchers.any());
     }
 
 }

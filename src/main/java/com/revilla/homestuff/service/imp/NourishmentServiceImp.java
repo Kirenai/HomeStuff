@@ -8,6 +8,8 @@ import com.revilla.homestuff.entity.Category;
 import com.revilla.homestuff.entity.Nourishment;
 import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
+import com.revilla.homestuff.mapper.GenericMapper;
+import com.revilla.homestuff.mapper.nourishment.NourishmentMapper;
 import com.revilla.homestuff.repository.CategoryRepository;
 import com.revilla.homestuff.repository.NourishmentRepository;
 import com.revilla.homestuff.repository.UserRepository;
@@ -19,7 +21,6 @@ import com.revilla.homestuff.util.GeneralUtil;
 import com.revilla.homestuff.util.enums.MessageAction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +43,7 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
     private final NourishmentRepository nourishmentRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
-    private final ModelMapper modelMapper;
+    private final NourishmentMapper nourishmentMapper;
 
     @Override
     public JpaRepository<Nourishment, Long> getRepo() {
@@ -50,8 +51,8 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
     }
 
     @Override
-    public ModelMapper getModelMapper() {
-        return this.modelMapper;
+    public GenericMapper<NourishmentDto, Nourishment> getMapper() {
+        return this.nourishmentMapper;
     }
 
     @Override
@@ -59,7 +60,7 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
         log.info("Invoking NourishmentServiceImp.findAllNourishmentByStatus method");
         return this.nourishmentRepository.findByIsAvailable(isAvailable)
                 .stream()
-                .map(nourishment -> this.getModelMapper().map(nourishment, super.getFirstGenericClass()))
+                .map(this.nourishmentMapper::mapOut)
                 .collect(Collectors.toList());
     }
 
@@ -70,7 +71,7 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
         log.info("Invoking NourishmentServiceImp.create method");
         ConstraintViolation.validateDuplicate(data.getName(), this.nourishmentRepository,
                 Nourishment.class);
-        Nourishment nourishment = this.getModelMapper().map(data, super.getThirdGenericClass());
+        Nourishment nourishment = this.nourishmentMapper.mapIn(data);
         User user = Entity.getById(userId, this.userRepository, User.class);
         nourishment.setUser(user);
         GeneralUtil.validateAuthorizationPermissionOrThrow(nourishment, userDetails,
@@ -81,7 +82,7 @@ public class NourishmentServiceImp extends GeneralServiceImp<NourishmentDto, Lon
         nourishment.setCategory(category);
         nourishment.getAmountNourishment().setNourishment(nourishment);
         Nourishment nourishmentSaved = this.nourishmentRepository.save(nourishment);
-        return this.getModelMapper().map(nourishmentSaved, super.getFirstGenericClass())
+        return this.nourishmentMapper.mapOut(nourishmentSaved)
                 .setMessage(
                         GeneralUtil.simpleNameClass(Nourishment.class) + " created successfully");
     }

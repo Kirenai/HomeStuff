@@ -5,6 +5,8 @@ import com.revilla.homestuff.entity.AmountNourishment;
 import com.revilla.homestuff.entity.Consumption;
 import com.revilla.homestuff.entity.Nourishment;
 import com.revilla.homestuff.entity.User;
+import com.revilla.homestuff.mapper.GenericMapper;
+import com.revilla.homestuff.mapper.consumption.ConsumptionMapper;
 import com.revilla.homestuff.repository.ConsumptionRepository;
 import com.revilla.homestuff.repository.NourishmentRepository;
 import com.revilla.homestuff.repository.UserRepository;
@@ -16,7 +18,6 @@ import com.revilla.homestuff.util.consumption.CheckingValueAmountAndProcessing;
 import com.revilla.homestuff.util.enums.MessageAction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +37,7 @@ public class ConsumptionServiceImp extends GeneralServiceImp<ConsumptionDto, Lon
     private final ConsumptionRepository consumptionRepository;
     private final NourishmentRepository nourishmentRepository;
     private final UserRepository userRepository;
-    private final ModelMapper modelMapper;
+    private final ConsumptionMapper consumptionMapper;
 
     @Override
     public JpaRepository<Consumption, Long> getRepo() {
@@ -44,8 +45,8 @@ public class ConsumptionServiceImp extends GeneralServiceImp<ConsumptionDto, Lon
     }
 
     @Override
-    public ModelMapper getModelMapper() {
-        return this.modelMapper;
+    public GenericMapper<ConsumptionDto, Consumption> getMapper() {
+        return this.consumptionMapper;
     }
 
     @Transactional
@@ -59,7 +60,7 @@ public class ConsumptionServiceImp extends GeneralServiceImp<ConsumptionDto, Lon
         User user = Entity.getById(userId, this.userRepository, User.class);
         Nourishment nourishment = Entity.getById(nourishmentId,
                 this.nourishmentRepository, Nourishment.class);
-        Consumption consumption = this.getModelMapper().map(data, super.getThirdGenericClass());
+        Consumption consumption = this.consumptionMapper.mapIn(data);
         consumption.setUser(user);
         GeneralUtil.validateAuthorizationPermissionOrThrow(consumption, userDetails,
                 MessageAction.CREATE);
@@ -67,7 +68,7 @@ public class ConsumptionServiceImp extends GeneralServiceImp<ConsumptionDto, Lon
         CheckingValueAmountAndProcessing.process(data, amountNourishment, nourishment);
         consumption.setNourishment(nourishment);
         Consumption consumptionSaved = this.consumptionRepository.save(consumption);
-        return this.getModelMapper().map(consumptionSaved, super.getFirstGenericClass())
+        return this.consumptionMapper.mapOut(consumptionSaved)
                 .setMessage(
                         GeneralUtil.simpleNameClass(Consumption.class) + " created successfully");
     }

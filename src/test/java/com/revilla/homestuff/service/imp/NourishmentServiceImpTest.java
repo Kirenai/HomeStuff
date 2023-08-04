@@ -10,6 +10,7 @@ import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.exception.entity.EntityDuplicateConstraintViolationException;
 import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
 import com.revilla.homestuff.exception.unauthorize.UnauthorizedPermissionException;
+import com.revilla.homestuff.mapper.nourishment.NourishmentMapper;
 import com.revilla.homestuff.repository.CategoryRepository;
 import com.revilla.homestuff.repository.NourishmentRepository;
 import com.revilla.homestuff.repository.UserRepository;
@@ -26,7 +27,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -49,7 +49,7 @@ class NourishmentServiceImpTest {
     @Mock
     private CategoryRepository categoryRepository;
     @Mock
-    private ModelMapper modelMapper;
+    private NourishmentMapper nourishmentMapper;
 
     private User userOne;
     private User userTwo;
@@ -116,7 +116,7 @@ class NourishmentServiceImpTest {
 
         when(this.nourishmentRepository.findAll(any(Pageable.class)))
                 .thenReturn(nourishmentPageMock);
-        when(this.modelMapper.map(any(Nourishment.class), eq(NourishmentDto.class)))
+        when(this.nourishmentMapper.mapOut(any()))
                 .thenReturn(nourishmentDtoListMock.get(0), nourishmentDtoListMock.get(1), nourishmentDtoListMock.get(2));
 
         List<NourishmentDto> response = nourishmentService.findAll(pageableMock);
@@ -125,7 +125,7 @@ class NourishmentServiceImpTest {
         assertEquals(nourishmentDtoListMock, response);
 
         verify(nourishmentRepository, times(1)).findAll(pageableMock);
-        verify(modelMapper, times(3)).map(any(), any());
+        verify(nourishmentMapper, times(3)).mapOut(any());
     }
 
     @Test
@@ -155,7 +155,7 @@ class NourishmentServiceImpTest {
         this.nourishmentOne.setUser(this.userOne);
         when(nourishmentRepository.findById(anyLong()))
                 .thenReturn(Optional.of(this.nourishmentOne));
-        when(modelMapper.map(any(), any()))
+        when(nourishmentMapper.mapOut(any()))
                 .thenReturn(this.nourishmentDtoOne);
 
         AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
@@ -165,7 +165,7 @@ class NourishmentServiceImpTest {
         assertEquals(this.nourishmentDtoOne, result);
 
         verify(nourishmentRepository, times(1)).findById(nourishmentIdToFind);
-        verify(modelMapper, times(1)).map(this.nourishmentOne, NourishmentDto.class);
+        verify(nourishmentMapper, times(1)).mapOut(any());
     }
 
     @Test
@@ -173,7 +173,7 @@ class NourishmentServiceImpTest {
     void shouldFindAllNourishmentsByStatusWhenFindAllByStatusWhenIsAvailableIsTrue() {
         when(this.nourishmentRepository.findByIsAvailable(anyBoolean()))
                 .thenReturn(List.of(this.nourishmentOne));
-        when(this.modelMapper.map(any(), any()))
+        when(this.nourishmentMapper.mapOut(any()))
                 .thenReturn(this.nourishmentDtoOne);
 
         List<NourishmentDto> allNourishmentByStatus = this.nourishmentService.findAllNourishmentByStatus(true);
@@ -181,7 +181,7 @@ class NourishmentServiceImpTest {
         Assertions.assertTrue(allNourishmentByStatus.get(0).getIsAvailable());
 
         verify(this.nourishmentRepository, times(1)).findByIsAvailable(true);
-        verify(this.modelMapper, times(1)).map(this.nourishmentOne, NourishmentDto.class);
+        verify(this.nourishmentMapper, times(1)).mapOut(any());
     }
 
     @Test
@@ -191,7 +191,7 @@ class NourishmentServiceImpTest {
         this.nourishmentDtoOne.setIsAvailable(false);
         when(this.nourishmentRepository.findByIsAvailable(anyBoolean()))
                 .thenReturn(List.of(this.nourishmentOne));
-        when(this.modelMapper.map(any(), any()))
+        when(this.nourishmentMapper.mapOut(any()))
                 .thenReturn(this.nourishmentDtoOne);
 
         List<NourishmentDto> allNourishmentByStatus = this.nourishmentService.findAllNourishmentByStatus(false);
@@ -199,7 +199,7 @@ class NourishmentServiceImpTest {
         Assertions.assertFalse(allNourishmentByStatus.get(0).getIsAvailable());
 
         verify(this.nourishmentRepository, times(1)).findByIsAvailable(false);
-        verify(this.modelMapper, times(1)).map(this.nourishmentOne, NourishmentDto.class);
+        verify(this.nourishmentMapper, times(1)).mapOut(any());
     }
 
     @Test
@@ -256,7 +256,7 @@ class NourishmentServiceImpTest {
 
         when(this.nourishmentRepository.existsByName(Mockito.anyString()))
                 .thenReturn(false);
-        when(this.modelMapper.map(this.nourishmentDtoOne, Nourishment.class))
+        when(this.nourishmentMapper.mapIn(any()))
                 .thenReturn(this.nourishmentOne);
         when(this.userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(this.userOne));
@@ -271,7 +271,7 @@ class NourishmentServiceImpTest {
         assertEquals(expected, ex.getMessage());
 
         verify(this.nourishmentRepository).existsByName(this.nourishmentDtoOne.getName());
-        verify(this.modelMapper).map(this.nourishmentDtoOne, Nourishment.class);
+        verify(this.nourishmentMapper).mapIn(any());
         verify(this.userRepository).findById(userIdToFind);
     }
 
@@ -284,7 +284,7 @@ class NourishmentServiceImpTest {
 
         when(this.nourishmentRepository.existsByName(anyString()))
                 .thenReturn(false);
-        when(this.modelMapper.map(this.nourishmentDtoOne, Nourishment.class))
+        when(this.nourishmentMapper.mapIn(any()))
                 .thenReturn(this.nourishmentOne);
         when(this.userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(this.userOne));
@@ -301,7 +301,7 @@ class NourishmentServiceImpTest {
         assertEquals(expected, ex.getMessage());
 
         verify(this.nourishmentRepository).existsByName(this.nourishmentDtoOne.getName());
-        verify(this.modelMapper).map(this.nourishmentDtoOne, Nourishment.class);
+        verify(this.nourishmentMapper).mapIn(any());
         verify(this.userRepository).findById(userIdToFind);
         verify(this.categoryRepository).findById(categoryIdToFind);
     }
@@ -316,7 +316,7 @@ class NourishmentServiceImpTest {
 
         when(this.nourishmentRepository.existsByName(anyString()))
                 .thenReturn(false);
-        when(this.modelMapper.map(this.nourishmentDtoOne, Nourishment.class))
+        when(this.nourishmentMapper.mapIn(any()))
                 .thenReturn(this.nourishmentOne);
         when(this.userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(this.userOne));
@@ -324,7 +324,7 @@ class NourishmentServiceImpTest {
                 .thenReturn(Optional.of(this.categoryOne));
         when(this.nourishmentRepository.save(any(Nourishment.class)))
                 .thenReturn(this.nourishmentOne);
-        when(this.modelMapper.map(this.nourishmentOne, NourishmentDto.class))
+        when(this.nourishmentMapper.mapOut(any()))
                 .thenReturn(this.nourishmentDtoOne);
 
         AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
@@ -335,11 +335,11 @@ class NourishmentServiceImpTest {
         assertEquals(expectedMessage, response.getMessage());
 
         verify(this.nourishmentRepository).existsByName(this.nourishmentDtoOne.getName());
-        verify(this.modelMapper).map(this.nourishmentDtoOne, Nourishment.class);
+        verify(this.nourishmentMapper).mapIn(any());
         verify(this.userRepository).findById(userIdToFind);
         verify(this.categoryRepository).findById(categoryIdToFind);
         verify(this.nourishmentRepository).save(this.nourishmentOne);
-        verify(this.modelMapper).map(this.nourishmentOne, NourishmentDto.class);
+        verify(this.nourishmentMapper).mapOut(any());
     }
 
     @Test

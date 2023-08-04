@@ -36,6 +36,8 @@ public class UserDto extends UserDtoOnly {
 
     private String message;
 
+
+
     @Builder
     public UserDto(Long userId, @NotEmpty @Size(min = 2, max = 50) String username,
                    @NotEmpty @Size(min = 8, max = 64) String password,

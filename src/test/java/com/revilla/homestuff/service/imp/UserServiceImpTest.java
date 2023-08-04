@@ -8,6 +8,7 @@ import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.exception.entity.EntityDuplicateConstraintViolationException;
 import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
 import com.revilla.homestuff.exception.unauthorize.UnauthorizedPermissionException;
+import com.revilla.homestuff.mapper.user.UserMapper;
 import com.revilla.homestuff.repository.RoleRepository;
 import com.revilla.homestuff.repository.UserRepository;
 import com.revilla.homestuff.security.AuthUserDetails;
@@ -20,11 +21,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -50,7 +51,7 @@ class UserServiceImpTest {
     @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
-    private ModelMapper modelMapper;
+    private UserMapper userMapper;
 
     private User userMockOne;
     private User userMockTwo;
@@ -97,7 +98,7 @@ class UserServiceImpTest {
         Pageable pageableMock = mock(Pageable.class);
         when(userRepository.findAll(any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(this.userMockOne, this.userMockTwo)));
-        when(modelMapper.map(this.userMockOne, UserDto.class))
+        when(userMapper.mapOut(ArgumentMatchers.any()))
                 .thenReturn(this.userDtoMockOne, this.userDtoMockTwo);
 
         List<UserDto> response = userService.findAll(pageableMock);
@@ -106,7 +107,7 @@ class UserServiceImpTest {
         assertEquals(sizeExpected, response.size());
 
         verify(userRepository, times(1)).findAll(pageableMock);
-        verify(modelMapper, times(2)).map(any(), any());
+        verify(userMapper, times(2)).mapOut(ArgumentMatchers.any());
     }
 
     @Test
@@ -114,8 +115,7 @@ class UserServiceImpTest {
     void shouldThrowExceptionWhenUserNotExistsByIdWhenFindOne() {
         Long userIdToFind = 1L;
         String expectedMessage = "User not found with id: " + userIdToFind;
-        when(userRepository.findById(anyLong()))
-                .thenReturn(Optional.empty());
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         EntityNoSuchElementException ex = assertThrows(EntityNoSuchElementException.class,
                 () -> userService.findOne(userIdToFind, null));
@@ -131,7 +131,7 @@ class UserServiceImpTest {
         Long userIdToFind = 1L;
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(userMockOne));
-        when(modelMapper.map(userMockOne, UserDto.class)).thenReturn(userDtoMockOne);
+        when(userMapper.mapOut(any())).thenReturn(userDtoMockOne);
 
         AuthUserDetails userDetails = new AuthUserDetails(this.userMockOne);
 
@@ -140,6 +140,7 @@ class UserServiceImpTest {
         assertEquals(userDto, userDtoMockOne);
 
         verify(userRepository, times(1)).findById(anyLong());
+        verify(this.userMapper, times(1)).mapOut(any());
     }
 
 
@@ -165,16 +166,17 @@ class UserServiceImpTest {
     void shouldCreateUser() {
         String expected = GeneralUtil.simpleNameClass(User.class)
                 + " created successfully by admin";
-        when(this.modelMapper.map(this.userDtoMockOne, User.class)).thenReturn(this.userMockOne);
+        when(this.userMapper.mapIn(any())).thenReturn(this.userMockOne);
         when(this.userRepository.save(any(User.class))).thenReturn(this.userMockOne);
-        when(this.modelMapper.map(this.userMockOne, UserDto.class)).thenReturn(this.userDtoMockOne);
+        when(this.userMapper.mapOut(any())).thenReturn(this.userDtoMockOne);
 
         UserDto userSaved = this.userService.create(this.userDtoMockOne);
 
         assertEquals(expected, userSaved.getMessage());
 
-        verify(this.modelMapper, times(2)).map(any(), any());
+        verify(this.userMapper, times(1)).mapIn(any());
         verify(this.userRepository, times(1)).save(any());
+        verify(this.userMapper, times(1)).mapOut(any());
     }
 
     @Test

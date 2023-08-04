@@ -7,6 +7,7 @@ import com.revilla.homestuff.entity.Nourishment;
 import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
 import com.revilla.homestuff.exception.unauthorize.UnauthorizedPermissionException;
+import com.revilla.homestuff.mapper.consumption.ConsumptionMapper;
 import com.revilla.homestuff.repository.ConsumptionRepository;
 import com.revilla.homestuff.repository.NourishmentRepository;
 import com.revilla.homestuff.repository.UserRepository;
@@ -24,7 +25,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
@@ -34,7 +34,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -50,7 +49,7 @@ class ConsumptionServiceImpTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private ModelMapper modelMapper;
+    private ConsumptionMapper consumptionMapper;
 
     private User userOne;
     private User userTwo;
@@ -107,7 +106,7 @@ class ConsumptionServiceImpTest {
         Pageable pageableMock = Mockito.mock(Pageable.class);
         when(this.consumptionRepository.findAll(any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(this.consumptionOne, this.consumptionTwo)));
-        when(this.modelMapper.map(any(Consumption.class), eq(ConsumptionDto.class)))
+        when(this.consumptionMapper.mapOut(any()))
                 .thenReturn(this.consumptionDtoOne, this.consumptionDtoTwo);
 
         List<ConsumptionDto> response = consumptionService.findAll(pageableMock);
@@ -117,8 +116,8 @@ class ConsumptionServiceImpTest {
 
         verify(consumptionRepository, Mockito.times(1))
                 .findAll(pageableMock);
-        verify(modelMapper, Mockito.times(2))
-                .map(any(Consumption.class), eq(ConsumptionDto.class));
+        verify(consumptionMapper, Mockito.times(2))
+                .mapOut(any());
     }
 
     @Test
@@ -170,7 +169,7 @@ class ConsumptionServiceImpTest {
         this.consumptionOne.setUser(this.userOne);
         when(this.consumptionRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.of(this.consumptionOne));
-        when(modelMapper.map(any(Consumption.class), eq(ConsumptionDto.class)))
+        when(consumptionMapper.mapOut(any()))
                 .thenReturn(this.consumptionDtoOne);
 
         AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
@@ -181,8 +180,8 @@ class ConsumptionServiceImpTest {
 
         verify(this.consumptionRepository, Mockito.times(1))
                 .findById(consumptionIdToFind);
-        verify(modelMapper, Mockito.times(1))
-                .map(this.consumptionOne, ConsumptionDto.class);
+        verify(consumptionMapper, Mockito.times(1))
+                .mapOut(any());
     }
 
     @Test
@@ -238,7 +237,7 @@ class ConsumptionServiceImpTest {
                 .thenReturn(Optional.of(userOne));
         when(nourishmentRepository.findById(nourishmentIdToFind))
                 .thenReturn(Optional.of(nourishmentOne));
-        when(modelMapper.map(any(), eq(Consumption.class)))
+        when(consumptionMapper.mapIn(any()))
                 .thenReturn(this.consumptionOne);
 
         AuthUserDetails userDetails = new AuthUserDetails(this.userTwo);
@@ -254,8 +253,8 @@ class ConsumptionServiceImpTest {
                 .findById(userIdToFind);
         verify(nourishmentRepository, Mockito.times(1))
                 .findById(nourishmentIdToFind);
-        verify(modelMapper, Mockito.times(1))
-                .map(this.consumptionDtoOne, Consumption.class);
+        verify(consumptionMapper, Mockito.times(1))
+                .mapIn(any());
     }
 
     @Test
@@ -267,11 +266,11 @@ class ConsumptionServiceImpTest {
                 .thenReturn(Optional.of(userOne));
         when(nourishmentRepository.findById(nourishmentIdToFind))
                 .thenReturn(Optional.of(nourishmentOne));
-        when(modelMapper.map(any(), eq(Consumption.class)))
+        when(consumptionMapper.mapIn(any()))
                 .thenReturn(this.consumptionOne);
         when(consumptionRepository.save(any()))
                 .thenReturn(this.consumptionOne);
-        when(modelMapper.map(any(), eq(ConsumptionDto.class)))
+        when(consumptionMapper.mapOut(any()))
                 .thenReturn(this.consumptionDtoOne);
 
         AuthUserDetails userDetails = new AuthUserDetails(this.userOne);
@@ -285,12 +284,12 @@ class ConsumptionServiceImpTest {
                 .findById(userIdToFind);
         verify(nourishmentRepository, Mockito.times(1))
                 .findById(nourishmentIdToFind);
-        verify(modelMapper, Mockito.times(1))
-                .map(this.consumptionDtoOne, Consumption.class);
+        verify(consumptionMapper, Mockito.times(1))
+                .mapIn(any());
         verify(consumptionRepository, Mockito.times(1))
                 .save(this.consumptionOne);
-        verify(modelMapper, Mockito.times(1))
-                .map(this.consumptionOne, ConsumptionDto.class);
+        verify(consumptionMapper, Mockito.times(1))
+                .mapOut(any());
     }
 
 }

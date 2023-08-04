@@ -25,6 +25,7 @@ public class RoleDto extends RoleDtoOnly {
 
     private Collection<UserDtoOnly> users;
 
+    @Builder
     public RoleDto(Long roleId, @NotEmpty RoleName name, Collection<UserDtoOnly> users) {
         super(roleId, name);
         this.users = users;

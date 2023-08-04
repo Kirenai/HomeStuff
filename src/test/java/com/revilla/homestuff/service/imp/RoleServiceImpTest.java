@@ -7,6 +7,7 @@ import com.revilla.homestuff.entity.User;
 import com.revilla.homestuff.exception.entity.EntityDuplicateConstraintViolationException;
 import com.revilla.homestuff.exception.entity.EntityNoSuchElementException;
 import com.revilla.homestuff.exception.unauthorize.UnauthorizedPermissionException;
+import com.revilla.homestuff.mapper.role.RoleMapper;
 import com.revilla.homestuff.repository.RoleRepository;
 import com.revilla.homestuff.security.AuthUserDetails;
 import com.revilla.homestuff.util.GeneralUtil;
@@ -23,7 +24,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
@@ -43,7 +43,7 @@ class RoleServiceImpTest {
     @Mock
     private RoleRepository roleRepository;
     @Mock
-    private ModelMapper modelMapper;
+    private RoleMapper roleMapper;
 
     private final Long roleId = 1L;
     private final Long userId = 1L;
@@ -87,7 +87,7 @@ class RoleServiceImpTest {
 
         when(this.roleRepository.findAll(any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(this.roleUser, this.roleAdmin)));
-        when(this.modelMapper.map(any(), eq(RoleDto.class)))
+        when(this.roleMapper.mapOut(any()))
                 .thenReturn(this.roleUserDto, this.roleAdminDto);
 
         List<RoleDto> response = this.roleService.findAll(pageableMock);
@@ -97,8 +97,8 @@ class RoleServiceImpTest {
 
         verify(this.roleRepository, times(1))
                 .findAll(pageableMock);
-        verify(this.modelMapper, times(2))
-                .map(any(), eq(RoleDto.class));
+        verify(this.roleMapper, times(2))
+                .mapOut(any());
     }
 
     @Test
@@ -148,7 +148,7 @@ class RoleServiceImpTest {
 
         when(this.roleRepository.findById(anyLong()))
                 .thenReturn(Optional.of(this.roleUser));
-        when(this.modelMapper.map(any(), eq(RoleDto.class)))
+        when(this.roleMapper.mapOut(any()))
                 .thenReturn(this.roleUserDto);
 
         this.userOne.setRoles(Set.of(this.roleAdmin));
@@ -159,7 +159,7 @@ class RoleServiceImpTest {
         assertEquals(this.roleUserDto, response);
 
         verify(this.roleRepository).findById(roleIdToFind);
-        verify(this.modelMapper).map(this.roleUser, RoleDto.class);
+        verify(this.roleMapper).mapOut(any());
     }
 
     @Test
@@ -189,18 +189,18 @@ class RoleServiceImpTest {
         RoleDto roleDto = RoleServiceDataTestUtils.getRoleDtoMock(1L, RoleName.ROLE_USER);
 
         when(this.roleRepository.existsByName(RoleName.ROLE_USER.name())).thenReturn(false);
-        when(this.modelMapper.map(roleDto, Role.class)).thenReturn(role);
+        when(this.roleMapper.mapIn(any())).thenReturn(role);
         when(this.roleRepository.save(any(Role.class))).thenReturn(role);
-        when(this.modelMapper.map(role, RoleDto.class)).thenReturn(roleDto);
+        when(this.roleMapper.mapOut(any())).thenReturn(roleDto);
 
         RoleDto roleCreated = this.roleService.create(roleDto);
 
         assertEquals(expected, roleCreated.getName().name());
 
         verify(this.roleRepository).existsByName(RoleName.ROLE_USER.name());
-        verify(this.modelMapper).map(roleDto, Role.class);
+        verify(this.roleMapper, times(1)).mapIn(any());
         verify(this.roleRepository).save(role);
-        verify(this.modelMapper).map(role, RoleDto.class);
+        verify(this.roleMapper, times(1)).mapOut(any());
     }
 
     @Test
