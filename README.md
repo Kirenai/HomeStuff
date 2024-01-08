@@ -20,8 +20,9 @@ This backend project is used to store, manage and retrieve household items. Have
 * Lombok
 * MySQL Drive
 * JWT
-* Model Mapper
+* MapStruct
 * Jetbrains Annotations
+* Swagger
 
 # Compilation
 
